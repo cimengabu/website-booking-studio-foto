@@ -1,0 +1,128 @@
+<?php
+
+use App\Http\Controllers\Admin\AdminAddonController;
+use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\AdminCalendarController;
+use App\Http\Controllers\Admin\AdminCustomerController;
+use App\Http\Controllers\Admin\AdminLogController;
+use App\Http\Controllers\Admin\AdminPackageController;
+use App\Http\Controllers\Admin\AdminPhotoController;
+use App\Http\Controllers\Admin\AdminPortfolioController;
+use App\Http\Controllers\Admin\AdminPromoController;
+use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminRoomController;
+use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Customer\BookingWizardController;
+use App\Http\Controllers\Customer\FavoriteController;
+use App\Http\Controllers\Customer\HomeController;
+use App\Http\Controllers\Customer\MyBookingController;
+use App\Http\Controllers\Customer\PackageController;
+use App\Http\Controllers\Customer\PortfolioController;
+use App\Http\Controllers\Customer\RoomController;
+use App\Http\Controllers\Staff\CheckinController;
+use App\Http\Middleware\RoleMiddleware;
+use Illuminate\Support\Facades\Route;
+
+// Public Pages
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
+Route::get('/rooms/{slug}', [RoomController::class, 'show'])->name('rooms.show');
+Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
+Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+
+// Public API endpoints for Booking Wizard
+Route::get('/api/slots', [BookingWizardController::class, 'getSlotsApi'])->name('api.slots');
+Route::post('/api/calculate-price', [BookingWizardController::class, 'calculatePriceApi'])->name('api.calculate-price');
+
+// Guest Authentication Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
+});
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Customer Protected Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/booking', [BookingWizardController::class, 'showWizard'])->name('booking.wizard');
+    Route::post('/booking', [BookingWizardController::class, 'storeBooking'])->name('booking.store');
+    Route::get('/booking/{code}/pay', [BookingWizardController::class, 'showPaymentPage'])->name('booking.pay');
+    Route::post('/booking/{code}/pay-simulated', [BookingWizardController::class, 'processSimulatedPayment'])->name('booking.pay-simulated');
+
+    Route::get('/my-bookings', [MyBookingController::class, 'index'])->name('my-bookings.index');
+    Route::get('/my-bookings/{code}', [MyBookingController::class, 'show'])->name('my-bookings.show');
+    Route::post('/my-bookings/{code}/review', [MyBookingController::class, 'storeReview'])->name('my-bookings.review');
+
+    Route::get('/photos/download/{photoId}', [MyBookingController::class, 'downloadPhoto'])->name('photos.download');
+    Route::get('/photos/zip/{code}', [MyBookingController::class, 'downloadZip'])->name('photos.zip');
+
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/toggle/{roomId}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+});
+
+// Staff Protected Routes
+Route::middleware(['auth', RoleMiddleware::class.':staff,admin'])->prefix('staff')->name('staff.')->group(function () {
+    Route::get('/scan', [CheckinController::class, 'showScan'])->name('scan');
+    Route::post('/checkin', [CheckinController::class, 'processCheckin'])->name('checkin');
+    Route::get('/today', [CheckinController::class, 'todaySchedule'])->name('today');
+    Route::post('/completed/{id}', [CheckinController::class, 'markCompleted'])->name('completed');
+});
+
+// Admin Protected Routes
+Route::middleware(['auth', RoleMiddleware::class.':admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Rooms Management
+    Route::resource('rooms', AdminRoomController::class);
+
+    // Packages & Addons Management
+    Route::resource('packages', AdminPackageController::class)->except(['create', 'edit', 'show']);
+    Route::resource('addons', AdminAddonController::class)->except(['create', 'edit', 'show']);
+
+    // Booking Management
+    Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/walkin', [AdminBookingController::class, 'createWalkin'])->name('bookings.walkin');
+    Route::post('/bookings/walkin', [AdminBookingController::class, 'storeWalkin'])->name('bookings.walkin.store');
+    Route::get('/bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
+    Route::patch('/bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.update-status');
+    Route::post('/bookings/{id}/pay-cash', [AdminBookingController::class, 'recordCashPayment'])->name('bookings.pay-cash');
+
+    // Calendar
+    Route::get('/calendar', [AdminCalendarController::class, 'index'])->name('calendar.index');
+    Route::get('/calendar/events', [AdminCalendarController::class, 'eventsApi'])->name('calendar.events');
+
+    // Photos Results Upload & Management
+    Route::get('/photos', [AdminPhotoController::class, 'index'])->name('photos.index');
+    Route::get('/photos/upload/{bookingId}', [AdminPhotoController::class, 'showUpload'])->name('photos.upload');
+    Route::post('/photos/upload/{bookingId}', [AdminPhotoController::class, 'storeUpload'])->name('photos.store');
+    Route::delete('/photos/{photoId}', [AdminPhotoController::class, 'destroyPhoto'])->name('photos.destroy');
+
+    // Portfolios
+    Route::get('/portfolios', [AdminPortfolioController::class, 'index'])->name('portfolios.index');
+    Route::post('/portfolios', [AdminPortfolioController::class, 'store'])->name('portfolios.store');
+    Route::delete('/portfolios/{id}', [AdminPortfolioController::class, 'destroy'])->name('portfolios.destroy');
+
+    // Customers
+    Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
+
+    // Promos
+    Route::resource('promos', AdminPromoController::class)->except(['create', 'edit', 'show']);
+
+    // Reviews Moderation
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::patch('/reviews/{id}/toggle', [AdminReviewController::class, 'toggleVisibility'])->name('reviews.toggle');
+
+    // Reports
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export');
+
+    // System Settings & Activity Logs
+    Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
+    Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
+});
