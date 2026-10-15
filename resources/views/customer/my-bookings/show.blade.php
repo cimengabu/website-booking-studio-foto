@@ -1,185 +1,393 @@
-@extends('layouts.app')
+@extends('layouts.public')
 
-@section('title', 'Detail Booking {{ $booking->booking_code }} — SnapSpace Studio')
+@section('title', 'Detail Booking '.$booking->booking_code.' — SnapSpace')
 
 @section('content')
-<div class="py-12 max-w-5xl mx-auto px-4 space-y-8">
 
-    <!-- Back + Status Header -->
-    <div class="flex items-start gap-4">
-        <a href="{{ route('my-bookings.index') }}" class="p-2.5 rounded-xl bg-[#1E1D1A] border border-[#2D2B26] text-gray-400 hover:text-white">
-            <i class="fa-solid fa-arrow-left text-sm"></i>
-        </a>
-        <div>
-            <h1 class="font-heading font-extrabold text-2xl text-white">{{ $booking->booking_code }}</h1>
-            <p class="text-xs font-mono text-gray-400">{{ $booking->room->name }} · {{ $booking->package->name }} · {{ $booking->booking_date->format('d M Y') }}</p>
-        </div>
-    </div>
+@php
+    $statusMap = [
+        'pending'    => ['Menunggu Pembayaran', 'warning', 'fa-clock'],
+        'paid'       => ['Dikonfirmasi / Terjadwal', 'success', 'fa-calendar-check'],
+        'dp_paid'    => ['DP Dibayar — Sisa Belum Lunas', 'info', 'fa-credit-card'],
+        'checked_in' => ['Sedang Berlangsung', 'gold', 'fa-camera'],
+        'completed'  => ['Selesai', 'teal', 'fa-circle-check'],
+        'cancelled'  => ['Dibatalkan', 'danger', 'fa-ban'],
+        'expired'    => ['Kadaluarsa', 'ink-muted', 'fa-clock-rotate-left'],
+    ];
+    [$statusLabel, $statusVariant, $statusIcon] = $statusMap[$booking->status] ?? ['Unknown', 'ink-muted', 'fa-question'];
+    $isPaid = in_array($booking->status, ['paid', 'dp_paid', 'checked_in', 'completed']);
+@endphp
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- Left Detail Info -->
-        <div class="lg:col-span-7 space-y-6">
+{{-- ── HEADER ── --}}
+<section class="bg-cream-warm py-8 border-b border-cream-dark">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex items-center gap-2 text-xs text-ink-muted mb-6">
+            <a href="{{ route('my-bookings.index') }}" class="hover:text-gold transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left text-[10px]"></i> Pesanan Saya
+            </a>
+            <i class="fa-solid fa-chevron-right text-[9px]"></i>
+            <span class="text-ink font-medium">{{ $booking->booking_code }}</span>
+        </nav>
 
-            <!-- QR Ticket Card -->
-            @if(in_array($booking->status, ['paid', 'dp_paid', 'checked_in', 'completed']))
-                <div class="bg-[#1E1D1A] border-2 border-dashed border-[#2D2B26] rounded-3xl p-8 text-center space-y-4">
-                    <div class="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold uppercase">
-                        <i class="fa-solid fa-ticket mr-1.5"></i> E-TIKET QR AKTIF
-                    </div>
-                    <!-- QR Code Display -->
-                    <div class="mx-auto w-48 h-48 bg-white rounded-2xl flex items-center justify-center text-gray-800 p-4">
-                        <div class="text-center">
-                            <div class="grid grid-cols-3 gap-0.5 w-32 h-32 mx-auto mb-1">
-                                @for($i = 0; $i < 9; $i++)
-                                    <div class="rounded-sm {{ in_array($i, [0,2,6,8,1,3,4,5,7]) ? 'bg-gray-800' : 'bg-white' }}"></div>
-                                @endfor
-                            </div>
-                            <p class="text-[8px] font-mono text-gray-600 break-all leading-tight">{{ $booking->booking_code }}</p>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-400 font-mono">Tunjukkan kode ini ke Staff saat tiba di studio</p>
-                    <p class="font-mono text-[10px] bg-[#141311] rounded-xl py-2 px-4 text-[#F2C94C] font-bold">TOKEN: {{ $booking->qr_token }}</p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="font-mono font-bold text-lg text-gold">{{ $booking->booking_code }}</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-{{ $statusVariant }}/15 text-{{ $statusVariant }} border border-{{ $statusVariant }}/20 flex items-center gap-1.5">
+                        <i class="fa-solid fa-{{ $statusIcon }} text-[10px]"></i> {{ $statusLabel }}
+                    </span>
                 </div>
-            @endif
-
-            <!-- Booking Info Details -->
-            <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-5">
-                <h3 class="font-heading font-bold text-lg text-white border-b border-[#2D2B26] pb-4">Detail Sesi Foto</h3>
-                <div class="grid grid-cols-2 gap-4 text-xs font-mono">
-                    <div><p class="text-gray-400">Ruangan / Tema</p><p class="font-bold text-white mt-0.5">{{ $booking->room->name }}</p></div>
-                    <div><p class="text-gray-400">Paket</p><p class="font-bold text-white mt-0.5">{{ $booking->package->name }}</p></div>
-                    <div><p class="text-gray-400">Tanggal Sesi</p><p class="font-bold text-[#F2C94C] mt-0.5">{{ $booking->booking_date->format('l, d M Y') }}</p></div>
-                    <div><p class="text-gray-400">Jam</p><p class="font-bold text-white mt-0.5">{{ substr($booking->start_time, 0, 5) }} – {{ substr($booking->end_time, 0, 5) }} WIB</p></div>
-                    <div><p class="text-gray-400">Jumlah Orang</p><p class="font-bold text-white mt-0.5">{{ $booking->people_count }} orang</p></div>
-                    <div><p class="text-gray-400">Status Check-In</p><p class="font-bold mt-0.5 {{ $booking->checked_in_at ? 'text-emerald-400' : 'text-gray-500' }}">{{ $booking->checked_in_at ? $booking->checked_in_at->format('H:i d M Y') : 'Belum Check-In' }}</p></div>
-                </div>
-                @if($booking->notes)
-                    <div class="border-t border-[#2D2B26] pt-4">
-                        <p class="text-[10px] text-gray-400 font-mono mb-1">Catatan Booking:</p>
-                        <p class="text-xs text-gray-200 italic">"{{ $booking->notes }}"</p>
-                    </div>
-                @endif
+                <p class="text-sm text-ink-muted">{{ $booking->package->name }} · {{ $booking->room->name }}</p>
             </div>
 
-            <!-- Foto Hasil Galeri -->
-            @if($booking->photoResults->isNotEmpty())
-                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-5">
-                    <div class="flex items-center justify-between border-b border-[#2D2B26] pb-4">
-                        <h3 class="font-heading font-bold text-lg text-white">Galeri Foto Hasil Sesi</h3>
-                        <a href="{{ route('photos.zip', $booking->booking_code) }}" class="px-4 py-2 rounded-full bg-[#1F3A2E] text-[#F2C94C] font-bold text-xs hover:bg-emerald-900 flex items-center gap-2">
-                            <i class="fa-solid fa-file-zipper"></i> Unduh Semua (ZIP)
-                        </a>
-                    </div>
-
-                    @if($booking->photoDelivery)
-                        <div class="text-[11px] font-mono text-emerald-300 bg-emerald-950/40 border border-emerald-800/40 rounded-2xl px-4 py-2.5 flex items-center gap-2">
-                            <i class="fa-solid fa-cloud-arrow-down"></i>
-                            Link aktif s/d {{ $booking->photoDelivery->expires_at?->format('d M Y') }} · Telah diunduh {{ $booking->photoDelivery->download_count }}x
-                        </div>
-                    @endif
-
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        @foreach($booking->photoResults as $photo)
-                            <div class="group relative aspect-square rounded-2xl overflow-hidden bg-gray-900 border border-[#2D2B26]">
-                                <img src="{{ $photo->path }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="{{ $photo->original_name }}">
-                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <a href="{{ route('photos.download', $photo->id) }}" class="px-4 py-2 rounded-full bg-white text-black font-bold text-xs">
-                                        <i class="fa-solid fa-download mr-1.5"></i> Unduh
-                                    </a>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
-            <!-- Review Section -->
-            @if(in_array($booking->status, ['completed', 'checked_in']))
-                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-5">
-                    <h3 class="font-heading font-bold text-lg text-white border-b border-[#2D2B26] pb-4">
-                        {{ $booking->review ? 'Ulasan Anda' : 'Beri Ulasan & Rating' }}
-                    </h3>
-
-                    @if($booking->review)
-                        <div class="space-y-2">
-                            <div class="flex items-center gap-1 text-[#F2C94C] text-lg">
-                                @for($i = 1; $i <= $booking->review->rating; $i++) <i class="fa-solid fa-star"></i> @endfor
-                            </div>
-                            <p class="text-xs text-gray-300 italic">"{{ $booking->review->comment }}"</p>
-                        </div>
-                    @else
-                        <form method="POST" action="{{ route('my-bookings.review', $booking->booking_code) }}" x-data="{ rating: 5 }" class="space-y-4">
-                            @csrf
-                            <div>
-                                <p class="text-xs font-semibold text-gray-300 mb-2">Bintang Rating:</p>
-                                <div class="flex gap-2 text-3xl">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <button type="button" @click="rating = {{ $i }}" class="transition-transform hover:scale-110" :class="rating >= {{ $i }} ? 'text-[#F2C94C]' : 'text-gray-600'">
-                                            <i class="fa-solid fa-star"></i>
-                                        </button>
-                                    @endfor
-                                </div>
-                                <input type="hidden" name="rating" x-model="rating">
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-gray-300 mb-1.5 block">Komentar Jujur Kamu:</label>
-                                <textarea name="comment" required placeholder="Ceritakan pengalaman sesi foto Anda di SnapSpace..." rows="3" class="w-full bg-[#141311] border border-[#2D2B26] focus:border-[#E8451E] text-white text-xs px-4 py-3 rounded-xl resize-none focus:outline-none"></textarea>
-                            </div>
-                            <button type="submit" class="px-6 py-3 rounded-full bg-[#E8451E] text-white font-bold text-xs hover:bg-[#d03a16] shadow-lg">
-                                Kirim Ulasan <i class="fa-solid fa-paper-plane ml-1.5"></i>
-                            </button>
-                        </form>
-                    @endif
-                </div>
-            @endif
-        </div>
-
-        <!-- Right Payment Summary -->
-        <div class="lg:col-span-5 space-y-6">
-            <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-5">
-                <h3 class="font-heading font-bold text-lg text-white border-b border-[#2D2B26] pb-4">Ringkasan Biaya</h3>
-                <div class="space-y-2.5 text-xs font-mono text-gray-300">
-                    <div class="flex justify-between"><span>Harga Paket</span><span>Rp {{ number_format($booking->subtotal, 0, ',', '.') }}</span></div>
-                    @if($booking->addons_total > 0)
-                        <div class="flex justify-between"><span>Add-on</span><span>Rp {{ number_format($booking->addons_total, 0, ',', '.') }}</span></div>
-                    @endif
-                    @if($booking->discount > 0)
-                        <div class="flex justify-between text-emerald-400"><span>Diskon</span><span>-Rp {{ number_format($booking->discount, 0, ',', '.') }}</span></div>
-                    @endif
-                    <div class="flex justify-between font-bold text-white pt-2 border-t border-[#2D2B26]"><span>TOTAL</span><span class="text-[#F2C94C] font-heading text-xl">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span></div>
-                    <div class="flex justify-between text-emerald-400"><span>Sudah Dibayar</span><span>Rp {{ number_format($booking->paid_amount, 0, ',', '.') }}</span></div>
-                    @if($booking->remaining_balance > 0)
-                        <div class="flex justify-between text-amber-300 font-bold"><span>Sisa Tagihan</span><span>Rp {{ number_format($booking->remaining_balance, 0, ',', '.') }}</span></div>
-                    @endif
-                </div>
-
-                @if($booking->status === 'dp_paid' && $booking->remaining_balance > 0)
-                    <a href="{{ route('booking.pay', $booking->booking_code) }}" class="block w-full py-3.5 rounded-full bg-[#E8451E] text-white font-bold text-xs text-center hover:bg-[#d03a16] shadow-lg">
-                        Lunasi Sisa Pembayaran <i class="fa-solid fa-arrow-right ml-1"></i>
+            <div class="flex gap-2 flex-wrap">
+                @if($booking->status === 'pending' && !$booking->expires_at?->isPast())
+                    <a href="{{ route('booking.pay', $booking->booking_code) }}"
+                       class="btn-gold btn-bounce px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-warm flex items-center gap-2">
+                        <i class="fa-solid fa-credit-card"></i> Bayar Sekarang
+                    </a>
+                @endif
+                @if($booking->status === 'dp_paid')
+                    <a href="{{ route('booking.pay', $booking->booking_code) }}"
+                       class="px-5 py-2.5 rounded-xl bg-info/10 text-info text-sm font-bold border border-info/20 flex items-center gap-2">
+                        <i class="fa-solid fa-money-bill"></i> Lunasi Sisa
                     </a>
                 @endif
             </div>
+        </div>
+    </div>
+</section>
 
-            <!-- Payment History -->
-            @if($booking->payments->isNotEmpty())
-                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
-                    <h3 class="font-heading font-bold text-sm text-white border-b border-[#2D2B26] pb-4">Riwayat Transaksi</h3>
-                    <div class="space-y-3">
-                        @foreach($booking->payments as $pay)
-                            <div class="flex items-center justify-between text-xs font-mono">
-                                <div>
-                                    <p class="font-bold text-white">{{ strtoupper($pay->payment_kind) }} — {{ $pay->payment_type }}</p>
-                                    <p class="text-gray-500 text-[10px]">{{ $pay->paid_at?->format('d M Y, H:i') ?? 'Belum terbayar' }}</p>
+<div class="py-8 bg-cream">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            {{-- ══ LEFT COLUMN ══ --}}
+            <div class="lg:col-span-7 space-y-6">
+
+                {{-- ── STATUS TIMELINE ── --}}
+                <div class="bg-white rounded-3xl border border-cream-dark shadow-card p-7">
+                    <h2 class="font-serif font-semibold text-lg text-ink mb-6">Timeline Status</h2>
+
+                    @php
+                        $timeline = [
+                            ['status' => 'pending',    'label' => 'Booking Dibuat',        'icon' => 'fa-plus-circle',    'desc' => 'Menunggu pembayaran'],
+                            ['status' => 'paid',       'label' => 'Pembayaran Diterima',   'icon' => 'fa-credit-card',    'desc' => 'Slot terkunci, tiket aktif'],
+                            ['status' => 'checked_in', 'label' => 'Check-In di Studio',    'icon' => 'fa-qrcode',         'desc' => 'Scan QR berhasil'],
+                            ['status' => 'completed',  'label' => 'Sesi Foto Selesai',     'icon' => 'fa-camera',         'desc' => 'Foto sedang diproses'],
+                        ];
+                        $statusOrder = ['pending', 'dp_paid', 'paid', 'checked_in', 'completed'];
+                        $currentIdx  = array_search($booking->status, $statusOrder);
+                        if ($currentIdx === false) $currentIdx = -1;
+                    @endphp
+
+                    <div class="space-y-0 relative">
+                        @foreach($timeline as $i => $t)
+                            @php
+                                $tIdx    = array_search($t['status'], $statusOrder);
+                                $isDone  = $tIdx !== false && $currentIdx >= $tIdx;
+                                $isActive = ($booking->status === $t['status']) || ($booking->status === 'dp_paid' && $t['status'] === 'paid');
+                            @endphp
+                            <div class="flex items-start gap-4 {{ $i < count($timeline)-1 ? 'pb-6' : '' }} relative">
+                                {{-- Vertical line --}}
+                                @if($i < count($timeline)-1)
+                                    <div class="absolute left-4 top-9 w-0.5 h-full {{ $isDone && !$isActive ? 'bg-success' : 'bg-cream-dark' }}"></div>
+                                @endif
+
+                                {{-- Dot --}}
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 flex-shrink-0
+                                            {{ $isDone ? ($isActive ? 'bg-gold text-white ring-4 ring-gold/20' : 'bg-success text-white') : 'bg-cream border-2 border-cream-dark text-ink-muted' }}">
+                                    @if($isDone && !$isActive)
+                                        <i class="fa-solid fa-check text-xs"></i>
+                                    @else
+                                        <i class="fa-solid fa-{{ $t['icon'] }} text-xs"></i>
+                                    @endif
                                 </div>
-                                <span class="font-bold {{ $pay->transaction_status === 'settlement' ? 'text-emerald-400' : 'text-amber-300' }}">
-                                    Rp {{ number_format($pay->gross_amount, 0, ',', '.') }}
-                                </span>
+
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm {{ $isDone ? 'text-ink' : 'text-ink-muted' }}">{{ $t['label'] }}</p>
+                                    <p class="text-xs text-ink-muted">{{ $t['desc'] }}</p>
+                                </div>
                             </div>
                         @endforeach
                     </div>
+
+                    @if(in_array($booking->status, ['cancelled', 'expired']))
+                        <div class="mt-4 p-4 rounded-xl bg-danger/5 border border-danger/20 flex items-center gap-3">
+                            <i class="fa-solid fa-{{ $booking->status === 'cancelled' ? 'ban' : 'clock-rotate-left' }} text-danger"></i>
+                            <p class="text-sm font-semibold text-danger">
+                                {{ $booking->status === 'cancelled' ? 'Booking ini telah dibatalkan.' : 'Booking ini telah kedaluwarsa karena melewati batas pembayaran.' }}
+                            </p>
+                        </div>
+                    @endif
                 </div>
-            @endif
+
+                {{-- ── BOOKING DETAILS ── --}}
+                <div class="bg-white rounded-3xl border border-cream-dark shadow-card p-7">
+                    <h2 class="font-serif font-semibold text-lg text-ink mb-5">Detail Booking</h2>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        @foreach([
+                            ['fa-door-open', '#C8A27A', 'Ruangan', $booking->room->name],
+                            ['fa-box-open', '#2F4F4F', 'Paket', $booking->package->name],
+                            ['fa-calendar', '#C8A27A', 'Tanggal', $booking->booking_date->translatedFormat('l, d M Y')],
+                            ['fa-clock', '#2E9E6B', 'Jam Sesi', substr($booking->start_time, 0, 5).' – '.substr($booking->end_time, 0, 5).' WIB'],
+                            ['fa-users', '#2F4F4F', 'Jumlah Orang', $booking->people_count.' orang'],
+                            ['fa-timer', '#C8A27A', 'Durasi', $booking->package->duration_minutes.' menit'],
+                        ] as [$icon, $color, $label, $val])
+                            <div class="p-3.5 rounded-xl bg-cream border border-cream-dark">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="fa-solid fa-{{ $icon }} text-xs" style="color: {{ $color }}"></i>
+                                    <span class="text-[11px] text-ink-muted">{{ $label }}</span>
+                                </div>
+                                <p class="font-semibold text-sm text-ink">{{ $val }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    @if($booking->notes)
+                        <div class="mt-4 p-3.5 rounded-xl bg-cream border border-cream-dark">
+                            <p class="text-[11px] text-ink-muted mb-1"><i class="fa-solid fa-sticky-note text-gold mr-1"></i> Catatan</p>
+                            <p class="text-sm text-ink">{{ $booking->notes }}</p>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- ── PHOTO GALLERY ── --}}
+                @if($booking->photoResults && $booking->photoResults->isNotEmpty())
+                    <div class="bg-white rounded-3xl border border-cream-dark shadow-card p-7">
+                        <div class="flex items-center justify-between mb-5">
+                            <h2 class="font-serif font-semibold text-lg text-ink">Galeri Foto Anda</h2>
+                            <a href="{{ route('photos.zip', $booking->booking_code) }}"
+                               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal/10 text-teal text-xs font-bold border border-teal/20 hover:bg-teal/20 transition-colors">
+                                <i class="fa-solid fa-download"></i> Unduh Semua (ZIP)
+                            </a>
+                        </div>
+
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                            @foreach($booking->photoResults as $photo)
+                                <div class="relative group aspect-square rounded-xl overflow-hidden bg-cream-dark border border-cream-dark">
+                                    <img src="{{ Storage::url($photo->path) }}" alt="{{ $photo->original_name }}"
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                                    <div class="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                        <a href="{{ route('photos.download', $photo->id) }}"
+                                           class="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors">
+                                            <i class="fa-solid fa-download text-ink text-xs"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        @if($booking->photoDelivery)
+                            <div class="mt-4 p-3 rounded-xl bg-cream border border-cream-dark text-xs text-ink-muted flex items-center gap-2">
+                                <i class="fa-solid fa-circle-info text-gold"></i>
+                                Link galeri aktif hingga {{ $booking->photoDelivery->expires_at?->translatedFormat('d M Y') ?? '30 hari setelah sesi' }}.
+                                @if($booking->photoDelivery->download_count > 0)
+                                    Sudah diunduh {{ $booking->photoDelivery->download_count }}x.
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                {{-- ── REVIEW SECTION ── --}}
+                <div class="bg-white rounded-3xl border border-cream-dark shadow-card p-7" id="review">
+                    @if($booking->review)
+                        <h2 class="font-serif font-semibold text-lg text-ink mb-4">Ulasan Anda</h2>
+                        <div class="flex gap-1 text-gold text-lg mb-3">
+                            @for($i=1; $i<=5; $i++)
+                                <i class="{{ $i <= $booking->review->rating ? 'fa-solid' : 'fa-regular' }} fa-star"></i>
+                            @endfor
+                        </div>
+                        <p class="text-sm text-ink-soft leading-relaxed italic">"{{ $booking->review->comment }}"</p>
+                        <p class="text-xs text-ink-muted mt-3">Dikirim {{ $booking->review->created_at->translatedFormat('d M Y H:i') }}</p>
+                    @elseif(in_array($booking->status, ['completed', 'checked_in', 'paid']))
+                        <h2 class="font-serif font-semibold text-lg text-ink mb-5">Bagaimana Pengalaman Anda?</h2>
+                        <form method="POST" action="{{ route('my-bookings.review', $booking->booking_code) }}"
+                              x-data="{ rating: 5, comment: '' }">
+                            @csrf
+                            {{-- Star Rating --}}
+                            <div class="flex gap-1 mb-5">
+                                @for($i=1; $i<=5; $i++)
+                                    <button type="button" @click="rating = {{ $i }}"
+                                            class="text-3xl transition-colors"
+                                            :class="rating >= {{ $i }} ? 'text-gold' : 'text-cream-dark'">
+                                        <i class="fa-solid fa-star"></i>
+                                    </button>
+                                @endfor
+                                <input type="hidden" name="rating" :value="rating">
+                            </div>
+                            <textarea name="comment" x-model="comment" rows="3" required
+                                      placeholder="Ceritakan pengalaman sesi foto Anda..."
+                                      class="w-full px-4 py-3 rounded-xl border border-cream-dark bg-cream text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all resize-none mb-4"></textarea>
+                            <button type="submit" :disabled="!comment"
+                                    class="btn-gold btn-bounce px-6 py-3 rounded-xl text-white font-bold text-sm shadow-warm disabled:opacity-40">
+                                <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Ulasan
+                            </button>
+                        </form>
+                    @else
+                        <div class="text-center py-6">
+                            <i class="fa-regular fa-comment-dots text-3xl text-cream-dark mb-3 block"></i>
+                            <p class="text-sm text-ink-muted">Ulasan dapat diberikan setelah sesi foto selesai.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- ══ RIGHT COLUMN ══ --}}
+            <div class="lg:col-span-5 space-y-5">
+
+                {{-- ── E-TICKET QR ── --}}
+                @if($isPaid)
+                    <div class="bg-white rounded-3xl border border-cream-dark shadow-card p-7 text-center">
+                        <div class="w-12 h-12 rounded-xl bg-gold flex items-center justify-center mx-auto mb-4 shadow-warm">
+                            <i class="fa-solid fa-ticket text-white text-lg"></i>
+                        </div>
+                        <p class="text-xs font-bold text-gold uppercase tracking-widest mb-2">E-Tiket Anda</p>
+                        <h3 class="font-serif font-bold text-2xl text-ink mb-4">{{ $booking->booking_code }}</h3>
+
+                        {{-- QR Code --}}
+                        <div class="bg-cream rounded-2xl p-5 border border-cream-dark inline-block mb-4">
+                            <div class="w-40 h-40 mx-auto" id="qr-code"></div>
+                        </div>
+
+                        <p class="text-xs text-ink-muted mb-4">Tunjukkan QR ini ke staff saat check-in di studio.</p>
+
+                        <div class="flex flex-col gap-2">
+                            <a href="#" onclick="window.print(); return false;"
+                               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-cream-dark text-ink text-sm font-semibold hover:border-gold hover:text-gold transition-colors">
+                                <i class="fa-solid fa-print text-xs"></i> Cetak Tiket
+                            </a>
+                            <a href="https://wa.me/?text={{ urlencode('🎬 Booking SnapSpace: '.$booking->booking_code."\n📅 ".$booking->booking_date->format('d/m/Y').' '.$booking->start_time."\n📍 Studio: ".$booking->room->name) }}"
+                               target="_blank" rel="noopener"
+                               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-success/10 text-success text-sm font-semibold border border-success/20 hover:bg-success/20 transition-colors">
+                                <i class="fa-brands fa-whatsapp"></i> Share via WA
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- ── PRICE BREAKDOWN ── --}}
+                <div class="bg-white rounded-3xl border border-cream-dark shadow-card p-7">
+                    <h3 class="font-serif font-semibold text-lg text-ink mb-4">Rincian Harga</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between py-1.5">
+                            <span class="text-ink-muted">Paket {{ $booking->package->name }}</span>
+                            <span class="text-ink">Rp {{ number_format($booking->package_price, 0, ',', '.') }}</span>
+                        </div>
+                        @if($booking->addon_total > 0)
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-ink-muted">Add-ons</span>
+                                <span class="text-ink">Rp {{ number_format($booking->addon_total, 0, ',', '.') }}</span>
+                            </div>
+                        @endif
+                        @if($booking->markup_amount > 0)
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-ink-muted">Markup</span>
+                                <span class="text-warning">+Rp {{ number_format($booking->markup_amount, 0, ',', '.') }}</span>
+                            </div>
+                        @endif
+                        @if($booking->discount_amount > 0)
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-ink-muted">Diskon</span>
+                                <span class="text-success">-Rp {{ number_format($booking->discount_amount, 0, ',', '.') }}</span>
+                            </div>
+                        @endif
+
+                        <div class="flex justify-between py-2 border-t-2 border-cream-dark">
+                            <span class="font-bold text-ink">Total</span>
+                            <span class="font-serif font-bold text-xl text-gold">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                        </div>
+
+                        @if($booking->paid_amount > 0)
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-ink-muted">Sudah dibayar</span>
+                                <span class="text-success font-semibold">Rp {{ number_format($booking->paid_amount, 0, ',', '.') }}</span>
+                            </div>
+                        @endif
+                        @if($booking->status === 'dp_paid')
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-ink-muted">Sisa pembayaran</span>
+                                <span class="text-danger font-semibold">Rp {{ number_format($booking->total_price - $booking->paid_amount, 0, ',', '.') }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- ── PAYMENT HISTORY ── --}}
+                @if($booking->payments->isNotEmpty())
+                    <div class="bg-white rounded-3xl border border-cream-dark shadow-card p-7">
+                        <h3 class="font-serif font-semibold text-lg text-ink mb-4">Riwayat Pembayaran</h3>
+                        <div class="space-y-3">
+                            @foreach($booking->payments as $pay)
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-cream border border-cream-dark">
+                                    <div class="w-9 h-9 rounded-xl {{ $pay->status === 'paid' ? 'bg-success/15' : 'bg-warning/15' }} flex items-center justify-center flex-shrink-0">
+                                        <i class="fa-solid fa-{{ $pay->status === 'paid' ? 'check' : 'clock' }} text-xs {{ $pay->status === 'paid' ? 'text-success' : 'text-warning' }}"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-xs text-ink">Rp {{ number_format($pay->amount, 0, ',', '.') }}</p>
+                                        <p class="text-[11px] text-ink-muted">{{ ucfirst($pay->method ?? 'N/A') }} · {{ $pay->created_at->translatedFormat('d M Y H:i') }}</p>
+                                    </div>
+                                    <span class="text-[11px] font-bold {{ $pay->status === 'paid' ? 'text-success' : 'text-warning' }}">
+                                        {{ $pay->status === 'paid' ? 'Sukses' : 'Pending' }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- ── QUICK ACTIONS ── --}}
+                <div class="bg-white rounded-2xl border border-cream-dark shadow-card p-5 space-y-2">
+                    <a href="https://wa.me/6281234567890?text=Halo%20SnapSpace%2C%20saya%20ingin%20bertanya%20tentang%20booking%20{{ $booking->booking_code }}"
+                       target="_blank" rel="noopener"
+                       class="flex items-center gap-3 p-3 rounded-xl hover:bg-cream transition-colors">
+                        <i class="fa-brands fa-whatsapp text-success"></i>
+                        <span class="text-sm font-semibold text-ink">Chat Admin</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-ink-muted ml-auto"></i>
+                    </a>
+                    @if(in_array($booking->status, ['paid', 'dp_paid']))
+                        <a href="https://calendar.google.com/calendar/event?action=TEMPLATE&text={{ urlencode('📸 SnapSpace — '.$booking->package->name) }}&dates={{ $booking->booking_date->format('Ymd') }}T{{ str_replace(':', '', substr($booking->start_time, 0, 5)) }}00/{{ $booking->booking_date->format('Ymd') }}T{{ str_replace(':', '', substr($booking->end_time, 0, 5)) }}00&details={{ urlencode('Kode: '.$booking->booking_code) }}&location={{ urlencode('SnapSpace Studio Surabaya') }}"
+                           target="_blank" rel="noopener"
+                           class="flex items-center gap-3 p-3 rounded-xl hover:bg-cream transition-colors">
+                            <i class="fa-solid fa-calendar-plus text-gold"></i>
+                            <span class="text-sm font-semibold text-ink">Tambah ke Google Calendar</span>
+                            <i class="fa-solid fa-arrow-right text-xs text-ink-muted ml-auto"></i>
+                        </a>
+                    @endif
+                    <a href="{{ route('booking.wizard') }}"
+                       class="flex items-center gap-3 p-3 rounded-xl hover:bg-cream transition-colors">
+                        <i class="fa-solid fa-rotate-right text-teal"></i>
+                        <span class="text-sm font-semibold text-ink">Pesan Lagi</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-ink-muted ml-auto"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const qrContainer = document.getElementById('qr-code');
+    if (qrContainer) {
+        QRCode.toCanvas(document.createElement('canvas'), '{{ $booking->booking_code }}', {
+            width: 160,
+            margin: 1,
+            color: { dark: '#1A1A1A', light: '#F8F6F3' },
+        }, function (err, canvas) {
+            if (!err) {
+                canvas.style.cssText = 'width:100%;height:auto;border-radius:8px;';
+                qrContainer.appendChild(canvas);
+            }
+        });
+    }
+});
+</script>
+@endpush

@@ -11,9 +11,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
 
-    <!-- FontAwesome & Alpine.js -->
+    <!-- FontAwesome, Alpine.js, AOS & Helper Scripts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -41,10 +45,47 @@
             }
         }
     </script>
+    <style>
+        @keyframes scanbeam {
+            0% { top: 0%; opacity: 0.8; }
+            50% { top: 92%; opacity: 1; }
+            100% { top: 0%; opacity: 0.8; }
+        }
+        .animate-scanbeam {
+            animation: scanbeam 2.2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(232, 69, 30, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(232, 69, 30, 0.85); }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 2.5s infinite;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float-slow {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer-badge {
+            background: linear-gradient(90deg, rgba(242, 201, 76, 0.1) 0%, rgba(242, 201, 76, 0.4) 50%, rgba(242, 201, 76, 0.1) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
 <body class="bg-[#141311] text-gray-100 font-sans antialiased min-h-screen flex flex-col selection:bg-[#E8451E] selection:text-white">
+
 
     <!-- Header / Navbar -->
     <header class="sticky top-0 z-50 bg-[#141311]/90 backdrop-blur-md border-b border-[#2D2B26]">
@@ -229,6 +270,18 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 700,
+                    easing: 'ease-out-cubic',
+                    once: true
+                });
+            }
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>
+

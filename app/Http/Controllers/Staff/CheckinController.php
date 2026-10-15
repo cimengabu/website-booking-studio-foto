@@ -17,13 +17,11 @@ class CheckinController extends Controller
 
     public function processCheckin(Request $request)
     {
-        $request->validate([
-            'token' => 'required|string',
-        ], [
-            'token.required' => 'QR Token / Kode Booking wajib diisi.',
-        ]);
+        $token = trim($request->input('token', $request->input('qr_token', '')));
 
-        $token = trim($request->token);
+        if (empty($token)) {
+            return back()->withInput()->withErrors(['checkin' => 'QR Token / Kode Booking wajib diisi.']);
+        }
 
         $booking = Booking::with(['user', 'room', 'package'])
             ->where('qr_token', $token)

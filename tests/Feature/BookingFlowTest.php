@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Booking;
 use App\Models\Package;
+use App\Models\Room;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,38 +13,43 @@ class BookingFlowTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $user;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed();
+        $this->user = User::where('role', 'customer')->first();
     }
 
     public function test_can_view_home_page(): void
     {
         $response = $this->get(route('home'));
         $response->assertStatus(200);
-        $response->assertSee('KILAT');
+        $response->assertSee('SnapSpace');
     }
 
     public function test_can_view_packages_page(): void
     {
-        $response = $this->get(route('packages'));
+        $response = $this->get(route('packages.index'));
         $response->assertStatus(200);
-        $response->assertSee('Quick Snap');
-        $response->assertSee('Classic');
+        $response->assertSee('Basic Snap');
+        $response->assertSee('Standard Studio');
     }
 
     public function test_can_view_booking_wizard_page(): void
     {
-        $response = $this->get(route('booking.wizard'));
+        $response = $this->actingAs($this->user)->get(route('booking.wizard'));
         $response->assertStatus(200);
     }
 
     public function test_can_get_available_slots_api(): void
     {
         $tomorrow = now()->addDay()->format('Y-m-d');
+        $room = Room::first();
+        $package = Package::first();
 
-        $response = $this->getJson('/api/slots?date='.$tomorrow.'&package_id='.Package::first()->id);
+        $response = $this->getJson('/api/slots?room_id='.$room->id.'&date='.$tomorrow.'&package_id='.$package->id);
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['slots']);
@@ -50,61 +57,37 @@ class BookingFlowTest extends TestCase
 
     public function test_can_create_booking(): void
     {
-        $package = Package::where('slug', 'classic')->first();
+        $package = Package::first();
+        $room = Room::first();
         $tomorrow = now()->addDay()->format('Y-m-d');
 
         $bookingData = [
+            'room_id' => $room->id,
             'package_id' => $package->id,
             'booking_date' => $tomorrow,
             'start_time' => '14:00',
-            'customer_name' => 'Budi Pratama',
-            'customer_email' => 'budi@example.com',
-            'customer_phone' => '081234567890',
+            'people_count' => 2,
+            'payment_option' => 'full',
             'notes' => 'Sesi foto wisuda',
-            'addons' => [],
-            'promo_code' => 'SELFIE10',
         ];
 
-        $response = $this->postJson('/api/bookings', $bookingData);
+        $response = $this->actingAs($this->user)->post(route('booking.store'), $bookingData);
 
-        $response->assertStatus(200);
-        $response->assertJsonStructure([
-            'success',
-            'booking_code',
-            'redirect_url',
-        ]);
-
+        $response->assertRedirect();
         $this->assertDatabaseHas('bookings', [
-            'customer_name' => 'Budi Pratama',
-            'customer_phone' => '081234567890',
+            'user_id' => $this->user->id,
+            'room_id' => $room->id,
+            'package_id' => $package->id,
         ]);
     }
 
     public function test_can_check_booking_status(): void
     {
-        $package = Package::first();
-        $booking = Booking::create([
-            'booking_code' => 'KLT-20261005-TEST',
-            'package_id' => $package->id,
-            'booking_date' => now()->addDay()->format('Y-m-d'),
-            'start_time' => '15:00',
-            'end_time' => '15:30',
-            'customer_name' => 'Siti Rahma',
-            'customer_email' => 'siti@example.com',
-            'customer_phone' => '081987654321',
-            'subtotal' => 65000,
-            'total_price' => 65000,
-            'status' => 'paid',
-            'expires_at' => now()->addMinutes(15),
-        ]);
+        $booking = Booking::first();
 
-        $response = $this->get(route('check.booking', [
-            'code' => $booking->booking_code,
-            'phone' => '081987654321',
-        ]));
+        $response = $this->actingAs($this->user)->get(route('my-bookings.show', $booking->booking_code));
 
         $response->assertStatus(200);
         $response->assertSee($booking->booking_code);
-        $response->assertSee('Siti Rahma');
     }
 }

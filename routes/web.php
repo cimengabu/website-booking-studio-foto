@@ -15,7 +15,10 @@ use App\Http\Controllers\Admin\AdminRoomController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Customer\AboutController;
 use App\Http\Controllers\Customer\BookingWizardController;
+use App\Http\Controllers\Customer\ContactController;
+use App\Http\Controllers\Customer\FaqController;
 use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\MyBookingController;
@@ -32,6 +35,22 @@ Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
 Route::get('/rooms/{slug}', [RoomController::class, 'show'])->name('rooms.show');
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
 Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+
+// New Public Informational Pages
+Route::get('/tentang-kami', [AboutController::class, 'index'])->name('about');
+Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+Route::get('/kontak', [ContactController::class, 'index'])->name('contact');
+Route::post('/kontak', [ContactController::class, 'send'])->name('contact.send');
+
+// Static info pages
+Route::view('/syarat-ketentuan', 'customer.terms')->name('terms');
+Route::view('/kebijakan-privasi', 'customer.privacy')->name('privacy');
+Route::view('/kebijakan-reschedule', 'customer.reschedule-policy')->name('reschedule.policy');
+
+// Guest booking status check
+Route::get('/cek-booking', function () {
+    return view('customer.check-booking');
+})->name('booking.check');
 
 // Public API endpoints for Booking Wizard
 Route::get('/api/slots', [BookingWizardController::class, 'getSlotsApi'])->name('api.slots');

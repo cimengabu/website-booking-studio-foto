@@ -13,7 +13,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             <!-- Left Text Content -->
-            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <div class="lg:col-span-7 space-y-6 text-center lg:text-left" data-aos="fade-right">
                 <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#1E1D1A] border border-[#2D2B26] text-xs font-mono font-semibold text-[#F2C94C]">
                     <span class="w-2 h-2 rounded-full bg-[#E8451E] animate-ping"></span>
                     <span>SELF-PHOTO STUDIO NO. 1 DI SURABAYA</span>
@@ -29,7 +29,7 @@
 
                 <!-- Quick Action CTA -->
                 <div class="flex flex-col sm:flex-row items-center gap-4 pt-4 justify-center lg:justify-start">
-                    <a href="{{ route('booking.wizard') }}" class="w-full sm:w-auto px-8 py-4 rounded-full bg-[#E8451E] text-white font-extrabold text-base hover:bg-[#d03a16] shadow-xl shadow-[#E8451E]/30 hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                    <a href="{{ route('booking.wizard') }}" class="w-full sm:w-auto px-8 py-4 rounded-full bg-[#E8451E] text-white font-extrabold text-base hover:bg-[#d03a16] shadow-xl shadow-[#E8451E]/30 hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center justify-center gap-3 animate-pulse-glow">
                         <i class="fa-solid fa-bolt"></i> Booking Slot Sekarang
                     </a>
                     <a href="{{ route('rooms.index') }}" class="w-full sm:w-auto px-7 py-4 rounded-full bg-[#1E1D1A] text-gray-200 border border-[#2D2B26] hover:border-[#E8451E] hover:text-white font-semibold text-sm transition-all text-center">
@@ -55,8 +55,8 @@
             </div>
 
             <!-- Right Visual Contact Sheet Showcase -->
-            <div class="lg:col-span-5 flex justify-center">
-                <div class="relative w-full max-w-sm">
+            <div class="lg:col-span-5 flex justify-center" data-aos="fade-left">
+                <div class="relative w-full max-w-sm animate-float-slow">
                     <!-- Photo Strip Frame -->
                     <div class="bg-[#1E1D1A] border border-[#2D2B26] p-4 space-y-4 rounded-3xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
                         <div class="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-900">
@@ -82,7 +82,7 @@
 </section>
 
 <!-- Rekomendasi Jam Hemat Banner -->
-<section class="bg-[#1F3A2E] border-y border-emerald-800/40 py-6">
+<section class="bg-[#1F3A2E] border-y border-emerald-800/40 py-6" data-aos="fade-up">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-4 text-center md:text-left">
             <div class="w-12 h-12 rounded-2xl bg-[#F2C94C] text-[#1B1A17] flex items-center justify-center font-bold text-2xl shrink-0">
@@ -100,7 +100,7 @@
 </section>
 
 <!-- Featured Rooms / Studio Themes -->
-<section class="py-20 bg-[#141311]">
+<section class="py-20 bg-[#141311]" data-aos="fade-up">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12">
             <div>
@@ -114,7 +114,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @foreach($rooms as $room)
-                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl overflow-hidden group hover:border-[#E8451E] transition-all flex flex-col justify-between shadow-xl">
+                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl overflow-hidden group hover:border-[#E8451E] transition-all flex flex-col justify-between shadow-xl" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
                     <div>
                         <!-- Image Container -->
                         <div class="relative aspect-[16/10] overflow-hidden bg-gray-900">
@@ -147,6 +147,7 @@
         </div>
     </div>
 </section>
+
 
 <!-- Popular Packages -->
 <section class="py-20 bg-[#1E1D1A] border-y border-[#2D2B26]">
