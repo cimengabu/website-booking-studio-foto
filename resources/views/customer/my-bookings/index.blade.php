@@ -83,16 +83,22 @@
                 @foreach($bookings as $b)
                     @php
                         $statusMap = [
-                            'pending'    => ['Menunggu Bayar', 'bg-warning/15 text-warning border-warning/20', 'fa-clock'],
-                            'paid'       => ['Terjadwal', 'bg-success/15 text-success border-success/20', 'fa-calendar-check'],
-                            'dp_paid'    => ['DP Dibayar', 'bg-info/15 text-info border-info/20', 'fa-credit-card'],
-                            'checked_in' => ['Sedang Berlangsung', 'bg-gold/15 text-gold border-gold/20', 'fa-camera'],
-                            'completed'  => ['Selesai', 'bg-teal/15 text-teal border-teal/20', 'fa-circle-check'],
-                            'cancelled'  => ['Dibatalkan', 'bg-danger/15 text-danger border-danger/20', 'fa-ban'],
-                            'expired'    => ['Kadaluarsa', 'bg-ink/10 text-ink-muted border-ink/10', 'fa-clock-rotate-left'],
+                            'pending'     => ['Menunggu Bayar', 'bg-warning/15 text-warning border-warning/20', 'fa-clock'],
+                            'confirmed'   => ['Dikonfirmasi', 'bg-success/15 text-success border-success/20', 'fa-calendar-check'],
+                            'paid'        => ['Terjadwal', 'bg-success/15 text-success border-success/20', 'fa-calendar-check'],
+                            'dp_paid'     => ['DP Dibayar', 'bg-info/15 text-info border-info/20', 'fa-credit-card'],
+                            'in_progress' => ['Sedang Berlangsung', 'bg-gold/15 text-gold border-gold/20', 'fa-camera'],
+                            'checked_in'  => ['Sedang Berlangsung', 'bg-gold/15 text-gold border-gold/20', 'fa-camera'],
+                            'completed'   => ['Selesai Sesi', 'bg-teal/15 text-teal border-teal/20', 'fa-circle-check'],
+                            'delivered'   => ['Foto Siap Diunduh', 'bg-teal/15 text-teal border-teal/20', 'fa-images'],
+                            'closed'      => ['Ditutup', 'bg-ink/10 text-ink-muted border-ink/10', 'fa-box-archive'],
+                            'rescheduled' => ['Rescheduled', 'bg-amber-500/15 text-amber-700 border-amber-500/20', 'fa-calendar-days'],
+                            'cancelled'   => ['Dibatalkan', 'bg-danger/15 text-danger border-danger/20', 'fa-ban'],
+                            'no_show'     => ['No-Show (Hangus)', 'bg-danger/15 text-danger border-danger/20', 'fa-user-xmark'],
+                            'expired'     => ['Kadaluarsa', 'bg-ink/10 text-ink-muted border-ink/10', 'fa-clock-rotate-left'],
                         ];
                         [$statusLabel, $statusClass, $statusIcon] = $statusMap[$b->status] ?? ['Unknown', 'bg-cream text-ink-muted', 'fa-question'];
-                        $isUpcoming = in_array($b->status, ['paid', 'dp_paid']) && $b->booking_date->isFuture();
+                        $isUpcoming = in_array($b->status, ['confirmed', 'paid', 'dp_paid']) && $b->booking_date->isFuture();
                     @endphp
 
                     <div class="bg-white rounded-2xl border border-cream-dark shadow-card hover:shadow-warm transition-shadow p-5 sm:p-6">

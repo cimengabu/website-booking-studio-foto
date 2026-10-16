@@ -33,26 +33,70 @@
                         <p class="text-xs text-gray-200 italic">"{{ $booking->notes }}"</p>
                     </div>
                 @endif
+
+                <!-- Reschedule Details -->
+                @if($booking->original_booking_date || $booking->reschedule_count > 0)
+                    <div class="border-t border-[#2D2B26] pt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                        <p class="text-xs font-bold text-amber-300 flex items-center gap-1.5 mb-1">
+                            <i class="fa-solid fa-calendar-days"></i> Booking Pernah Di-Reschedule ({{ $booking->reschedule_count }}x)
+                        </p>
+                        <p class="text-[11px] text-gray-300">
+                            Jadwal Asal: <span class="font-bold text-white">{{ $booking->original_booking_date }}</span> jam <span class="font-bold text-white">{{ substr($booking->original_start_time ?? '', 0, 5) }} WIB</span>
+                        </p>
+                    </div>
+                @endif
+
+                <!-- Cancellation / No Show Details -->
+                @if($booking->status === 'cancelled' || $booking->status === 'no_show')
+                    <div class="border-t border-[#2D2B26] pt-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl space-y-1">
+                        <p class="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-ban"></i> {{ $booking->status === 'no_show' ? 'Pelanggan Tidak Hadir (No-Show)' : 'Booking Dibatalkan' }}
+                        </p>
+                        @if($booking->cancellation_reason)
+                            <p class="text-[11px] text-gray-300">Alasan: <span class="italic text-white">"{{ $booking->cancellation_reason }}"</span></p>
+                        @endif
+                        <div class="flex gap-4 pt-1 text-[11px]">
+                            <span>Refund: <strong class="text-emerald-400">Rp {{ number_format($booking->refund_amount ?? 0, 0, ',', '.') }}</strong></span>
+                            <span>Penalti: <strong class="text-rose-400">Rp {{ number_format($booking->penalty_amount ?? 0, 0, ',', '.') }}</strong></span>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- Update Status Form -->
             <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
-                <h3 class="font-heading font-bold text-sm text-white">Update Status Manual</h3>
+                <div class="flex items-center justify-between">
+                    <h3 class="font-heading font-bold text-sm text-white">Update Status Lifecycle</h3>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#141311] border border-[#2D2B26] text-gray-300">
+                        Status Saat Ini: <strong class="text-[#F2C94C]">{{ $booking->status_label }}</strong>
+                    </span>
+                </div>
                 <form method="POST" action="{{ route('admin.bookings.update-status', $booking->id) }}" class="flex gap-3 items-end">
                     @csrf @method('PATCH')
                     <select name="status" class="flex-grow bg-[#141311] border border-[#2D2B26] text-white px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:border-[#E8451E]">
-                        @foreach(['pending', 'dp_paid', 'paid', 'checked_in', 'completed', 'cancelled', 'expired'] as $s)
-                            <option value="{{ $s }}" {{ $booking->status === $s ? 'selected' : '' }}>{{ strtoupper($s) }}</option>
+                        @foreach([
+                            'pending'     => 'Menunggu Pembayaran',
+                            'confirmed'   => 'Dikonfirmasi (Lunas / DP)',
+                            'in_progress' => 'Sedang Berlangsung (Sesi)',
+                            'completed'   => 'Selesai Sesi Pemotretan',
+                            'delivered'   => 'Foto Siap (Delivery)',
+                            'closed'      => 'Ditutup (Closed)',
+                            'rescheduled' => 'Rescheduled',
+                            'cancelled'   => 'Dibatalkan',
+                            'no_show'     => 'No-Show (DP Hangus)',
+                            'expired'     => 'Kedaluwarsa',
+                        ] as $s => $lbl)
+                            <option value="{{ $s }}" {{ $booking->status === $s ? 'selected' : '' }}>{{ strtoupper($s) }} — {{ $lbl }}</option>
                         @endforeach
                     </select>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#E8451E] text-white font-bold text-xs hover:bg-[#d03a16]">Update</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#E8451E] text-white font-bold text-xs hover:bg-[#d03a16]">Update Status</button>
                 </form>
             </div>
 
             <!-- Record Cash Payment -->
             @if($booking->remaining_balance > 0)
                 <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
-                    <h3 class="font-heading font-bold text-sm text-white">Catat Pembayaran Tunai / EDC</h3>
+                    <h3 class="font-heading font-bold text-sm text-white">Catat Pembayaran Tunai / EDC (Pelunasan)</h3>
                     <form method="POST" action="{{ route('admin.bookings.pay-cash', $booking->id) }}" class="flex gap-3 items-end">
                         @csrf
                         <div class="flex-grow">
@@ -69,7 +113,7 @@
             @endif
 
             <!-- Photo Upload Button -->
-            @if(in_array($booking->status, ['paid', 'dp_paid', 'checked_in', 'completed']))
+            @if(in_array($booking->status, ['confirmed', 'paid', 'dp_paid', 'in_progress', 'checked_in', 'completed', 'delivered', 'closed']))
                 <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 flex items-center justify-between">
                     <div>
                         <h3 class="font-heading font-bold text-sm text-white">Unggah Hasil Foto Sesi</h3>

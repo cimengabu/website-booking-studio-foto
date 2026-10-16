@@ -29,7 +29,7 @@ class AvailabilityService
         // Fetch existing bookings for this room & date
         $existingBookings = Booking::where('room_id', $roomId)
             ->whereDate('booking_date', $date)
-            ->whereIn('status', ['pending', 'dp_paid', 'paid', 'checked_in'])
+            ->whereIn('status', ['pending', 'confirmed', 'in_progress', 'completed', 'dp_paid', 'paid', 'checked_in'])
             ->where(function ($query) {
                 $query->where('status', '!=', 'pending')
                     ->orWhere('expires_at', '>', now());

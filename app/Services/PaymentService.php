@@ -58,11 +58,7 @@ class PaymentService
         $newPaidAmount = (float) $booking->paid_amount + (float) $payment->gross_amount;
         $booking->paid_amount = $newPaidAmount;
 
-        if ($newPaidAmount >= (float) $booking->total_price) {
-            $booking->status = 'paid';
-        } else {
-            $booking->status = 'dp_paid';
-        }
+        $booking->status = 'confirmed';
 
         $booking->save();
 

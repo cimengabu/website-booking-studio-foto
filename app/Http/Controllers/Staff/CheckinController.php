@@ -32,16 +32,16 @@ class CheckinController extends Controller
             return back()->withInput()->withErrors(['checkin' => 'Tiket / Kode Booking tidak ditemukan.']);
         }
 
-        if (in_array($booking->status, ['checked_in', 'completed'])) {
+        if (in_array($booking->status, ['in_progress', 'checked_in', 'completed', 'delivered'])) {
             return back()->with('info', "Pelanggan {$booking->user->name} sudah check-in sebelumnya pada {$booking->checked_in_at?->format('H:i, d M Y')}.");
         }
 
-        if ($booking->status === 'cancelled' || $booking->status === 'expired') {
-            return back()->withErrors(['checkin' => "Booking ini berstatus {$booking->status} dan tidak berlaku."]);
+        if (in_array($booking->status, ['cancelled', 'expired', 'no_show', 'closed'])) {
+            return back()->withErrors(['checkin' => "Booking ini berstatus {$booking->status_label} dan tidak berlaku."]);
         }
 
         $booking->update([
-            'status' => 'checked_in',
+            'status' => 'in_progress',
             'checked_in_at' => now(),
         ]);
 
@@ -55,7 +55,7 @@ class CheckinController extends Controller
         $today = now()->format('Y-m-d');
         $bookings = Booking::with(['user', 'room', 'package'])
             ->whereDate('booking_date', $today)
-            ->whereIn('status', ['paid', 'dp_paid', 'checked_in', 'completed'])
+            ->whereIn('status', ['confirmed', 'in_progress', 'completed', 'delivered', 'paid', 'dp_paid', 'checked_in'])
             ->orderBy('start_time')
             ->get();
 

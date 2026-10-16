@@ -152,4 +152,48 @@ class BookingWizardController extends Controller
         return redirect()->route('my-bookings.show', $booking->booking_code)
             ->with('success', 'Pembayaran berhasil dikonfirmasi! E-Tiket QR Anda telah terbit.');
     }
+
+    public function checkBookingApi(Request $request)
+    {
+        $request->validate([
+            'booking_code' => 'required|string',
+            'identifier' => 'required|string',
+        ]);
+
+        $code = trim($request->booking_code);
+        $identifier = trim($request->identifier);
+
+        $booking = Booking::with(['user', 'room', 'package', 'payments'])
+            ->where('booking_code', $code)
+            ->whereHas('user', function ($q) use ($identifier) {
+                $q->where('email', $identifier)
+                    ->orWhere('phone', $identifier);
+            })
+            ->first();
+
+        if (! $booking) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode booking tidak ditemukan atau data email/nomor HP tidak cocok.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'booking' => [
+                'booking_code' => $booking->booking_code,
+                'status' => $booking->status,
+                'status_label' => $booking->status_label,
+                'package_name' => $booking->package->name,
+                'room_name' => $booking->room->name,
+                'schedule' => $booking->booking_date->translatedFormat('d M Y').' ('.substr($booking->start_time, 0, 5).'–'.substr($booking->end_time, 0, 5).' WIB)',
+                'total_price' => 'Rp '.number_format($booking->total_price, 0, ',', '.'),
+                'paid_amount' => 'Rp '.number_format($booking->paid_amount, 0, ',', '.'),
+                'remaining_balance' => (float) $booking->remaining_balance,
+                'remaining_balance_formatted' => 'Rp '.number_format($booking->remaining_balance, 0, ',', '.'),
+                'pay_url' => route('booking.pay', $booking->booking_code),
+                'reschedule_count' => $booking->reschedule_count,
+            ],
+        ]);
+    }
 }

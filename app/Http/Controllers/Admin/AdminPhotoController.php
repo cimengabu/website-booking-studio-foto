@@ -79,7 +79,7 @@ class AdminPhotoController extends Controller
             ]
         );
 
-        $booking->update(['status' => 'completed']);
+        $booking->update(['status' => 'delivered']);
 
         ActivityLog::record(request()->user()?->id, 'admin_upload_photos', "Mengunggah hasil foto untuk booking {$booking->booking_code}");
 

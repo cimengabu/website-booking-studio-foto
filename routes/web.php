@@ -51,6 +51,7 @@ Route::view('/kebijakan-reschedule', 'customer.reschedule-policy')->name('resche
 Route::get('/cek-booking', function () {
     return view('customer.check-booking');
 })->name('booking.check');
+Route::post('/api/check-booking', [BookingWizardController::class, 'checkBookingApi'])->name('api.check-booking');
 
 // Public API endpoints for Booking Wizard
 Route::get('/api/slots', [BookingWizardController::class, 'getSlotsApi'])->name('api.slots');
@@ -75,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/my-bookings', [MyBookingController::class, 'index'])->name('my-bookings.index');
     Route::get('/my-bookings/{code}', [MyBookingController::class, 'show'])->name('my-bookings.show');
+    Route::post('/my-bookings/{code}/reschedule', [MyBookingController::class, 'reschedule'])->name('my-bookings.reschedule');
+    Route::post('/my-bookings/{code}/cancel', [MyBookingController::class, 'cancel'])->name('my-bookings.cancel');
     Route::post('/my-bookings/{code}/review', [MyBookingController::class, 'storeReview'])->name('my-bookings.review');
 
     Route::get('/photos/download/{photoId}', [MyBookingController::class, 'downloadPhoto'])->name('photos.download');

@@ -19,7 +19,7 @@
 
         {{-- Form --}}
         <div class="bg-white rounded-3xl p-8 border border-cream-dark shadow-card reveal" data-delay="100"
-             x-data="{ loading: false, result: null, error: null }">
+             x-data="{ loading: false, result: null, error: null, bookingCode: '', identifier: '' }">
 
             <form @submit.prevent="checkBooking($data)" class="space-y-4">
                 <div>
@@ -53,42 +53,72 @@
                 <template x-if="result">
                     <div class="space-y-4">
                         {{-- Status badge --}}
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
                             <span class="font-mono font-bold text-sm text-ink" x-text="result?.booking_code"></span>
                             <span class="px-3 py-1 rounded-full text-xs font-bold"
                                   :class="{
-                                      'bg-success/15 text-success': result?.status === 'paid' || result?.status === 'completed',
-                                      'bg-warning/15 text-warning': result?.status === 'dp_paid' || result?.status === 'pending',
-                                      'bg-danger/15 text-danger': result?.status === 'cancelled' || result?.status === 'expired',
-                                      'bg-teal/15 text-teal': result?.status === 'checked_in',
+                                      'bg-success/15 text-success': ['confirmed', 'paid', 'completed', 'delivered'].includes(result?.status),
+                                      'bg-warning/15 text-warning': ['pending', 'rescheduled'].includes(result?.status),
+                                      'bg-info/15 text-info': result?.status === 'dp_paid',
+                                      'bg-danger/15 text-danger': ['cancelled', 'expired', 'no_show'].includes(result?.status),
+                                      'bg-teal/15 text-teal': ['in_progress', 'checked_in'].includes(result?.status),
+                                      'bg-ink-muted/15 text-ink-muted': result?.status === 'closed',
                                   }"
                                   x-text="result?.status_label">
                             </span>
                         </div>
 
-                        <div class="space-y-3 text-sm">
+                        <div class="space-y-2.5 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-ink-muted">Paket</span>
                                 <span class="font-semibold text-ink" x-text="result?.package_name"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-ink-muted">Ruangan</span>
+                                <span class="text-ink-muted">Ruangan Studio</span>
                                 <span class="font-semibold text-ink" x-text="result?.room_name"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-ink-muted">Tanggal & Waktu</span>
+                                <span class="text-ink-muted">Tanggal & Jam</span>
                                 <span class="font-semibold text-ink" x-text="result?.schedule"></span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-ink-muted">Total</span>
+                                <span class="text-ink-muted">Total Biaya</span>
                                 <span class="font-serif font-bold text-gold" x-text="result?.total_price"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-ink-muted">Sudah Dibayar</span>
+                                <span class="font-semibold text-success" x-text="result?.paid_amount"></span>
                             </div>
                         </div>
 
-                        <a href="{{ route('login') }}" class="btn-bounce flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-teal text-white font-semibold text-sm transition-colors hover:bg-teal-light">
-                            <i class="fa-solid fa-right-to-bracket"></i>
-                            Login untuk lihat detail lengkap
-                        </a>
+                        {{-- Pelunasan atau Pembayaran Awal --}}
+                        <template x-if="result?.status === 'pending'">
+                            <a :href="result?.pay_url" class="btn-gold btn-bounce flex items-center justify-center gap-2 w-full py-3 rounded-xl text-white font-bold text-sm shadow-warm">
+                                <i class="fa-solid fa-credit-card"></i> Selesaikan Pembayaran Awal
+                            </a>
+                        </template>
+
+                        <template x-if="result?.remaining_balance > 0 && ['confirmed', 'dp_paid'].includes(result?.status)">
+                            <div class="p-3 rounded-xl bg-rose-50 border border-rose-200">
+                                <div class="flex justify-between items-center text-xs mb-2">
+                                    <span class="text-danger font-bold">Sisa Pelunasan Wajib:</span>
+                                    <span class="font-bold text-danger" x-text="result?.remaining_balance_formatted"></span>
+                                </div>
+                                <a :href="result?.pay_url" class="btn-gold btn-bounce flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white font-bold text-xs shadow-warm">
+                                    <i class="fa-solid fa-money-bill-wave"></i> Bayar Sisa Pelunasan Sekarang
+                                </a>
+                            </div>
+                        </template>
+
+                        <div class="pt-2 flex flex-col gap-2">
+                            <a href="{{ route('login') }}" class="btn-bounce flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-teal text-white font-semibold text-xs transition-colors hover:bg-teal-light">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                Login untuk Mengelola / Reschedule
+                            </a>
+                            <a href="{{ route('reschedule.policy') }}" target="_blank" class="text-center text-[11px] text-ink-muted hover:text-gold transition-colors">
+                                Baca Kebijakan Reschedule & Pembatalan Studio →
+                            </a>
+                        </div>
                     </div>
                 </template>
             </div>
@@ -117,21 +147,41 @@
 @push('scripts')
 <script>
     function checkBooking(data) {
-        // In production, this would be an AJAX call to the API
-        // For demo purposes, show a mock error
         data.loading = true;
         data.error = null;
         data.result = null;
 
-        setTimeout(() => {
+        if (!data.bookingCode || !data.identifier) {
             data.loading = false;
-            // Simulate API response
-            if (!data.bookingCode || !data.identifier) {
-                data.error = 'Mohon isi kode booking dan email/nomor HP.';
-                return;
+            data.error = 'Mohon isi kode booking dan email/nomor HP.';
+            return;
+        }
+
+        fetch('{{ route('api.check-booking') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                booking_code: data.bookingCode,
+                identifier: data.identifier,
+            })
+        })
+        .then(res => res.json())
+        .then(resData => {
+            data.loading = false;
+            if (resData.success) {
+                data.result = resData.booking;
+            } else {
+                data.error = resData.message || 'Kode booking tidak ditemukan atau data tidak cocok.';
             }
-            data.error = 'Kode booking tidak ditemukan atau data tidak cocok. Pastikan kode booking dan email/HP yang dimasukkan benar.';
-        }, 1200);
+        })
+        .catch(err => {
+            data.loading = false;
+            data.error = 'Terjadi gangguan jaringan saat memeriksa booking. Silakan coba lagi.';
+        });
     }
 </script>
 @endpush

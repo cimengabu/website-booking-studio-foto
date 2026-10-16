@@ -106,21 +106,30 @@ class AdminBookingController extends Controller
         $booking = Booking::findOrFail($id);
 
         $request->validate([
-            'status' => 'required|in:pending,dp_paid,paid,checked_in,completed,cancelled,expired',
+            'status' => 'required|in:pending,confirmed,in_progress,completed,delivered,closed,rescheduled,cancelled,expired,no_show,dp_paid,paid,checked_in',
         ]);
 
         $oldStatus = $booking->status;
-        $booking->update(['status' => $request->status]);
 
-        ActivityLog::record(Auth::id(), 'admin_update_booking_status', "Mengubah status booking {$booking->booking_code} dari {$oldStatus} ke {$request->status}");
+        if ($request->status === 'no_show') {
+            $booking->update([
+                'status' => 'no_show',
+                'refund_amount' => 0,
+                'penalty_amount' => $booking->paid_amount,
+            ]);
+            ActivityLog::record(Auth::id(), 'admin_mark_no_show', "Menandai booking {$booking->booking_code} sebagai No-Show (DP Hangus).");
+        } else {
+            $booking->update(['status' => $request->status]);
+            ActivityLog::record(Auth::id(), 'admin_update_booking_status', "Mengubah status booking {$booking->booking_code} dari {$oldStatus} ke {$request->status}");
+        }
 
         if ($request->status === 'cancelled') {
             app(NotificationService::class)->sendCancellationNotification($booking, 'Dibatalkan oleh pihak studio/pelanggan');
-        } elseif ($request->status === 'completed') {
+        } elseif ($request->status === 'completed' || $request->status === 'delivered') {
             app(NotificationService::class)->sendReviewRequestNotification($booking);
         }
 
-        return back()->with('success', "Status booking berhasil diubah ke {$request->status}.");
+        return back()->with('success', "Status booking berhasil diubah ke {$booking->status_label}.");
     }
 
     public function recordCashPayment(Request $request, int $id)
@@ -144,9 +153,7 @@ class AdminBookingController extends Controller
 
         $newPaidAmount = (float) $booking->paid_amount + (float) $request->amount;
         $booking->paid_amount = $newPaidAmount;
-        if ($newPaidAmount >= (float) $booking->total_price) {
-            $booking->status = 'paid';
-        }
+        $booking->status = 'confirmed';
         $booking->save();
 
         ActivityLog::record(Auth::id(), 'admin_record_cash', 'Mencatat pembayaran tunai Rp '.number_format($request->amount, 0, ',', '.')." untuk {$booking->booking_code}");

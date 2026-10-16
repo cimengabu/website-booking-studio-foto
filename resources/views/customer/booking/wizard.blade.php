@@ -368,9 +368,21 @@
                                         </div>
                                         <div>
                                             <p class="font-semibold text-xs text-ink">Bayar DP 50%</p>
-                                            <p class="text-[11px] text-ink-muted">Sisa dilunasi H-1</p>
+                                            <p class="text-[11px] text-ink-muted">Sisa dilunasi sebelum sesi</p>
                                         </div>
                                     </label>
+                                </div>
+                                <div class="mt-3 p-3 rounded-xl bg-gold/5 border border-gold/20 flex items-start gap-2.5 text-xs text-ink-muted">
+                                    <i class="fa-solid fa-shield-halved text-gold mt-0.5 shrink-0 text-sm"></i>
+                                    <div class="space-y-1">
+                                        <p class="font-semibold text-ink text-[11px]">Ketentuan Pembayaran & Sesi:</p>
+                                        <p class="text-[11px] leading-relaxed">
+                                            • Reschedule maksimal 1x (minimal H-2 sebelum tanggal sesi).<br>
+                                            • Pelunasan wajib diselesaikan maksimal sebelum sesi foto dimulai.<br>
+                                            • Pembatalan: H-3+ (Refund 100%), H-2 s/d H-1 (Refund 50%), Hari H (0% / Hangus).<br>
+                                            • Pembayaran tidak dapat dikembalikan jika tidak hadir tanpa konfirmasi (No-Show).
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -442,6 +454,32 @@
                                     </div>
                                 </div>
                             @endforeach
+                        </div>
+
+                        {{-- Policy summary box --}}
+                        <div class="mb-5 p-4 rounded-2xl bg-cream border border-cream-dark space-y-2 text-xs">
+                            <div class="flex items-center gap-2 font-bold text-ink">
+                                <i class="fa-solid fa-circle-info text-gold"></i>
+                                <span>Ringkasan Aturan & Kebijakan Studio:</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-ink-muted text-[11px] pt-1">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-rotate text-cyan-600 text-xs"></i>
+                                    <span><strong>Reschedule:</strong> Maks 1x, min H-2.</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-receipt text-teal text-xs"></i>
+                                    <span><strong>Pelunasan:</strong> Sebelum sesi dimulai.</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-hand-holding-dollar text-amber-600 text-xs"></i>
+                                    <span><strong>Refund:</strong> H-3+ (100%), H-2/H-1 (50%), H (0%).</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-user-xmark text-rose-600 text-xs"></i>
+                                    <span><strong>No-Show:</strong> DP/Pembayaran hangus.</span>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Agreement --}}
