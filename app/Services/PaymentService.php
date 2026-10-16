@@ -10,6 +10,10 @@ use Illuminate\Support\Str;
 
 class PaymentService
 {
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {}
+
     public function createPayment(Booking $booking, string $kind = 'full'): Payment
     {
         $amount = 0.0;
@@ -63,5 +67,11 @@ class PaymentService
         $booking->save();
 
         ActivityLog::record($booking->user_id, 'payment_success', "Pembayaran {$payment->payment_kind} untuk {$booking->booking_code} sebesar Rp ".number_format($payment->gross_amount, 0, ',', '.').' berhasil.');
+
+        if ($payment->payment_kind === 'remaining') {
+            $this->notificationService->sendSettlementReceived($payment);
+        } else {
+            $this->notificationService->sendPaymentReceived($payment);
+        }
     }
 }

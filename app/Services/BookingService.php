@@ -16,7 +16,8 @@ use Illuminate\Support\Str;
 class BookingService
 {
     public function __construct(
-        protected PricingService $pricingService
+        protected PricingService $pricingService,
+        protected NotificationService $notificationService
     ) {}
 
     public function createBooking(array $data): Booking
@@ -126,6 +127,8 @@ class BookingService
             }
 
             ActivityLog::record($userId, 'booking_created', "Membuat booking {$bookingCode}");
+
+            $this->notificationService->sendBookingConfirmation($booking);
 
             return $booking;
         });

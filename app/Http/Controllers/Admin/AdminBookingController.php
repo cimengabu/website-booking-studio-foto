@@ -10,6 +10,7 @@ use App\Models\Payment;
 use App\Models\Room;
 use App\Models\User;
 use App\Services\BookingService;
+use App\Services\NotificationService;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -113,6 +114,12 @@ class AdminBookingController extends Controller
 
         ActivityLog::record(Auth::id(), 'admin_update_booking_status', "Mengubah status booking {$booking->booking_code} dari {$oldStatus} ke {$request->status}");
 
+        if ($request->status === 'cancelled') {
+            app(NotificationService::class)->sendCancellationNotification($booking, 'Dibatalkan oleh pihak studio/pelanggan');
+        } elseif ($request->status === 'completed') {
+            app(NotificationService::class)->sendReviewRequestNotification($booking);
+        }
+
         return back()->with('success', "Status booking berhasil diubah ke {$request->status}.");
     }
 
@@ -143,6 +150,12 @@ class AdminBookingController extends Controller
         $booking->save();
 
         ActivityLog::record(Auth::id(), 'admin_record_cash', 'Mencatat pembayaran tunai Rp '.number_format($request->amount, 0, ',', '.')." untuk {$booking->booking_code}");
+
+        if ($payment->payment_kind === 'remaining') {
+            app(NotificationService::class)->sendSettlementReceived($payment);
+        } else {
+            app(NotificationService::class)->sendPaymentReceived($payment);
+        }
 
         return back()->with('success', 'Pembayaran tunai berhasil dicatat.');
     }

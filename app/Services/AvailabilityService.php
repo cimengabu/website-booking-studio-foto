@@ -95,9 +95,12 @@ class AvailabilityService
             $hasSaverDiscount = $isOffPeak && $isMorning;
 
             $slots[] = [
+                'start' => $slotStart,
+                'end' => $slotEnd,
                 'start_time' => $slotStart,
                 'end_time' => $slotEnd,
                 'status' => $status,
+                'available' => ($status === 'available'),
                 'has_saver_discount' => $hasSaverDiscount,
                 'saver_note' => $hasSaverDiscount ? 'Hemat 15% Jam Hemat Midweek!' : null,
             ];

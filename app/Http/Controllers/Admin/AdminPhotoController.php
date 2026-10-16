@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\Booking;
 use App\Models\PhotoDelivery;
 use App\Models\PhotoResult;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class AdminPhotoController extends Controller
@@ -82,8 +83,10 @@ class AdminPhotoController extends Controller
 
         ActivityLog::record(request()->user()?->id, 'admin_upload_photos', "Mengunggah hasil foto untuk booking {$booking->booking_code}");
 
+        app(NotificationService::class)->sendPhotosReadyNotification($booking);
+
         return redirect()->route('admin.photos.upload', $booking->id)
-            ->with('success', 'Hasil foto berhasil diunggah! Notifikasi pengiriman foto telah aktif untuk pelanggan.');
+            ->with('success', 'Hasil foto berhasil diunggah! Notifikasi WhatsApp foto siap unduh telah dikirimkan ke pelanggan.');
     }
 
     public function destroyPhoto(int $photoId)

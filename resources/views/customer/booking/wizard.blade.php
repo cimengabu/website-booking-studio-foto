@@ -33,6 +33,8 @@
 
 @section('content')
 
+<div x-data="bookingWizard({{ $selectedRoomId ?? 'null' }}, {{ $selectedPackageId ?? 'null' }})">
+
 {{-- ── TOP STEPPER ── --}}
 <div class="sticky top-[72px] z-20 bg-white border-b border-cream-dark shadow-sm">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4">
@@ -47,8 +49,7 @@
         </div>
 
         {{-- Desktop: full stepper --}}
-        <div class="hidden md:flex items-center justify-center gap-0"
-             x-data>
+        <div class="hidden md:flex items-center justify-center gap-0">
             @php
                 $stepDefs = [
                     ['Paket','fa-box-open'],
@@ -64,7 +65,7 @@
                              :class="step > {{ $i+1 }} ? 'done' : (step === {{ $i+1 }} ? 'active' : 'pending')">
                             <i x-show="step > {{ $i+1 }}" class="fa-solid fa-check text-white text-xs"></i>
                             <i x-show="step <= {{ $i+1 }}" class="fa-solid fa-{{ $ico }} text-xs"
-                               :class="step === {{ $i+1 }} ? 'text-white' : 'text-ink-muted'"></i>
+                                :class="step === {{ $i+1 }} ? 'text-white' : 'text-ink-muted'"></i>
                         </div>
                         <span class="text-[10px] font-bold uppercase tracking-wide transition-colors"
                               :class="step >= {{ $i+1 }} ? 'text-ink' : 'text-ink-muted'">{{ $lbl }}</span>
@@ -86,9 +87,7 @@
 </div>
 
 {{-- ── WIZARD BODY ── --}}
-<div class="min-h-screen bg-cream py-10"
-     x-data="bookingWizard({{ $selectedRoomId ?? 'null' }}, {{ $selectedPackageId ?? 'null' }})"
-     x-init="init()">
+<div class="min-h-screen bg-cream py-10">
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -110,7 +109,7 @@
                             @foreach($packages as $pkg)
                                 <label class="flex items-center justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-200 group"
                                        :class="selectedPackageId === {{ $pkg->id }} ? 'border-gold bg-gold/5 shadow-warm' : 'border-cream-dark bg-cream hover:border-gold/50'"
-                                       @click="selectPackage({{ $pkg->id }}, {{ $pkg->price }}, '{{ addslashes($pkg->name) }}')">
+                                       @click="selectPackage({{ $pkg->id }}, {{ $pkg->price }}, '{{ addslashes($pkg->name) }}', {{ $pkg->max_people }})">
                                     <div class="flex items-center gap-4">
                                         <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
                                              :class="selectedPackageId === {{ $pkg->id }} ? 'border-gold bg-gold' : 'border-cream-dark'">
@@ -246,29 +245,51 @@
                             </div>
 
                             {{-- Loading skeleton --}}
-                            <div x-show="loadingSlots" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                            <div x-show="loadingSlots" class="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
                                 @for($s=0;$s<8;$s++)
-                                    <div class="skeleton h-10 rounded-xl"></div>
+                                    <div class="skeleton h-14 rounded-xl"></div>
                                 @endfor
                             </div>
 
                             {{-- Slots --}}
-                            <div x-show="!loadingSlots && slots.length > 0" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                            <div x-show="!loadingSlots && slots.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
                                 <template x-for="slot in slots" :key="slot.start">
-                                    <button @click="slot.available && selectSlot(slot)"
-                                            class="slot-chip"
+                                    <button type="button"
+                                            @click="slot.available && selectSlot(slot)"
+                                            class="slot-chip relative flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border transition-all text-center"
                                             :class="selectedSlot?.start === slot.start ? 'selected' : (slot.available ? 'available' : 'booked')"
-                                            :disabled="!slot.available"
-                                            x-text="slot.start">
+                                            :disabled="!slot.available">
+                                        <span class="text-sm font-bold tracking-tight" x-text="slot.start"></span>
+                                        <span class="text-[11px] opacity-75 mt-0.5" x-text="slot.end ? 's/d ' + slot.end : ''"></span>
+                                        <span x-show="slot.has_saver_discount" class="text-[9px] bg-amber-500/15 text-amber-600 font-semibold px-1.5 py-0.5 rounded-full mt-1">Hemat 15%</span>
                                     </button>
                                 </template>
+                            </div>
+
+                            {{-- Slot selected info --}}
+                            <div x-show="selectedSlot" class="mt-4 p-3.5 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-solid fa-circle-check text-gold text-base"></i>
+                                    <div>
+                                        <p class="text-xs font-bold text-ink">Jam Terpilih: <span class="text-gold" x-text="selectedSlot ? (selectedSlot.start + ' - ' + selectedSlot.end) : ''"></span></p>
+                                        <p class="text-[11px] text-ink-muted">Tekan 'Lanjut: Isi Data Diri' untuk tahap selanjutnya</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Helper prompt when slots loaded but none selected --}}
+                            <div x-show="!loadingSlots && slots.length > 0 && !selectedSlot" class="mt-3 text-center">
+                                <p class="text-xs text-ink-muted flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-hand-pointer text-gold text-[11px]"></i>
+                                    <span>Pilih salah satu jam yang berwarna putih di atas.</span>
+                                </p>
                             </div>
 
                             {{-- No slots --}}
                             <div x-show="!loadingSlots && slots.length === 0 && selectedDate" class="text-center py-8">
                                 <i class="fa-regular fa-calendar-xmark text-3xl text-gold/40 mb-3 block"></i>
                                 <p class="text-sm font-semibold text-ink mb-1">Tidak ada slot tersedia</p>
-                                <p class="text-xs text-ink-muted">Coba pilih tanggal lain.</p>
+                                <p class="text-xs text-ink-muted">Semua sesi pada tanggal ini sudah terisi atau studio tutup. Silakan pilih tanggal lain.</p>
                             </div>
                         </div>
 
@@ -318,7 +339,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-ink-muted uppercase tracking-wide mb-1.5" for="w_people">Jumlah Orang *</label>
-                                <input id="w_people" type="number" x-model.number="form.people_count" min="1" :max="selectedPackage?.max_people ?? 6"
+                                <input id="w_people" type="number" x-model.number="form.people_count" min="1" :max="selectedPackage ? selectedPackage.max_people : 6"
                                        class="w-full px-4 py-3.5 rounded-xl border border-cream-dark bg-cream text-sm text-ink focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all">
                             </div>
 
@@ -556,6 +577,7 @@
         </div>{{-- end grid --}}
     </div>
 </div>
+</div>{{-- end x-data bookingWizard --}}
 
 @endsection
 
@@ -569,6 +591,8 @@ function bookingWizard(initRoomId, initPackageId) {
         // Selections
         selectedPackageId: initPackageId,
         selectedPackageName: '',
+        selectedPackageMaxPeople: 6,
+        selectedPackage: null,
         selectedRoomId: initRoomId,
         selectedRoomName: '',
         selectedDate: '',
@@ -598,7 +622,13 @@ function bookingWizard(initRoomId, initPackageId) {
         // State
         slots: [],
         loadingSlots: false,
-        today: new Date().toISOString().split('T')[0],
+        today: (() => {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        })(),
         agreed: false,
         submitting: false,
         loadingPromo: false,
@@ -606,6 +636,16 @@ function bookingWizard(initRoomId, initPackageId) {
         promoError: '',
 
         init() {
+            // Set default selectedDate to tomorrow if empty
+            if (!this.selectedDate) {
+                const tmrw = new Date();
+                tmrw.setDate(tmrw.getDate() + 1);
+                const year = tmrw.getFullYear();
+                const month = String(tmrw.getMonth() + 1).padStart(2, '0');
+                const day = String(tmrw.getDate()).padStart(2, '0');
+                this.selectedDate = `${year}-${month}-${day}`;
+            }
+
             // Pre-populate selections from URL params
             if (this.selectedPackageId) {
                 const pkgEl = document.querySelector(`input[name="package"][value="${this.selectedPackageId}"]`);
@@ -616,6 +656,8 @@ function bookingWizard(initRoomId, initPackageId) {
             if (this.selectedPackageId === {{ $pkg->id }}) {
                 this.selectedPackageName = '{{ $pkg->name }}';
                 this.packagePrice = {{ $pkg->price }};
+                this.selectedPackageMaxPeople = {{ $pkg->max_people }};
+                this.selectedPackage = { id: {{ $pkg->id }}, name: '{{ $pkg->name }}', price: {{ $pkg->price }}, max_people: {{ $pkg->max_people }} };
             }
             @endforeach
 
@@ -624,13 +666,23 @@ function bookingWizard(initRoomId, initPackageId) {
                 this.selectedRoomName = '{{ $room->name }}';
             }
             @endforeach
+
+            // Immediately load slots for default room & date
+            if (this.selectedRoomId && this.selectedDate) {
+                this.fetchSlots();
+            }
         },
 
-        selectPackage(id, price, name) {
+        selectPackage(id, price, name, maxPeople = 6) {
             this.selectedPackageId = id;
             this.packagePrice = price;
             this.selectedPackageName = name;
+            this.selectedPackageMaxPeople = maxPeople;
+            this.selectedPackage = { id, name, price, max_people: maxPeople };
             this.recalculate();
+            if (this.selectedRoomId && this.selectedDate) {
+                this.fetchSlots();
+            }
         },
 
         selectRoom(id, name) {
@@ -638,6 +690,9 @@ function bookingWizard(initRoomId, initPackageId) {
             this.selectedRoomName = name;
             this.selectedSlot = null;
             this.slots = [];
+            if (this.selectedDate) {
+                this.fetchSlots();
+            }
         },
 
         selectSlot(slot) {
@@ -663,7 +718,12 @@ function bookingWizard(initRoomId, initPackageId) {
             try {
                 const res = await fetch(`/api/slots?room_id=${this.selectedRoomId}&date=${this.selectedDate}&package_id=${this.selectedPackageId || ''}`);
                 const data = await res.json();
-                this.slots = data.slots ?? [];
+                this.slots = (data.slots ?? []).map(s => ({
+                    ...s,
+                    start: s.start ?? s.start_time,
+                    end: s.end ?? s.end_time,
+                    available: (s.available !== undefined) ? s.available : (s.status === 'available'),
+                }));
                 // Also grab markup
                 if (data.markup_percent) {
                     this.markupAmount = Math.round(this.packagePrice * data.markup_percent / 100);
