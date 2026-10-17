@@ -9,15 +9,24 @@ use App\Models\PhotoDelivery;
 use App\Models\PhotoResult;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminPhotoController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with(['user', 'room', 'package', 'photoResults', 'photoDelivery'])
-            ->whereIn('status', ['checked_in', 'completed', 'paid'])
-            ->latest()
-            ->paginate(15);
+        $user = Auth::user();
+        $query = Booking::with(['user', 'room', 'package', 'photoResults', 'photoDelivery', 'photographer'])
+            ->whereIn('status', ['confirmed', 'paid', 'dp_paid', 'checked_in', 'in_progress', 'completed', 'delivered', 'closed']);
+
+        if ($user && $user->isPhotographer()) {
+            $query->where(function ($q) use ($user) {
+                $q->where('photographer_id', $user->id)
+                    ->orWhereNull('photographer_id');
+            });
+        }
+
+        $bookings = $query->latest()->paginate(15);
 
         return view('admin.photos.index', compact('bookings'));
     }
@@ -34,10 +43,15 @@ class AdminPhotoController extends Controller
         $booking = Booking::findOrFail($bookingId);
 
         $request->validate([
-            'photos' => 'required|array|min:1',
-            'photos.*' => 'required|image|mimes:jpeg,jpg,png,webp|max:15360', // max 15MB each
+            'photos' => 'nullable|array',
+            'photos.*' => 'image|mimes:jpeg,jpg,png,webp|max:15360', // max 15MB each
             'image_urls' => 'nullable|array',
         ]);
+
+        $hasUrls = ! empty(array_filter($request->input('image_urls', [])));
+        if (! $request->hasFile('photos') && ! $hasUrls) {
+            return back()->withErrors(['photos' => 'Harap upload minimal 1 file foto atau masukkan 1 URL foto demo.']);
+        }
 
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $file) {

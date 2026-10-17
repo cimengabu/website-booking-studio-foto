@@ -21,8 +21,30 @@ class RoleMiddleware
         }
 
         $user = Auth::user();
-        if (! in_array($user->role, $roles)) {
-            abort(403, 'Anda tidak memiliki hak akses ke halaman ini.');
+
+        // Owner/Admin has full access to everything
+        if ($user->isOwner()) {
+            return $next($request);
+        }
+
+        // Map role aliases
+        $normalizedUserRoles = match ($user->role) {
+            'owner', 'admin' => ['owner', 'admin', 'staff', 'kasir', 'photographer', 'fotografer'],
+            'staff', 'kasir' => ['staff', 'kasir'],
+            'photographer', 'fotografer' => ['photographer', 'fotografer'],
+            default => [$user->role],
+        };
+
+        $hasAccess = false;
+        foreach ($roles as $r) {
+            if (in_array(trim($r), $normalizedUserRoles)) {
+                $hasAccess = true;
+                break;
+            }
+        }
+
+        if (! $hasAccess) {
+            abort(403, 'Akses Ditolak: Role Anda ('.$user->role_label.') tidak memiliki izin untuk modul ini.');
         }
 
         return $next($request);

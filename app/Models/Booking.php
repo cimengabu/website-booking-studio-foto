@@ -42,6 +42,7 @@ class Booking extends Model
     protected $fillable = [
         'booking_code',
         'user_id',
+        'photographer_id',
         'room_id',
         'package_id',
         'booking_date',
@@ -87,6 +88,11 @@ class Booking extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function photographer()
+    {
+        return $this->belongsTo(User::class, 'photographer_id');
     }
 
     public function room()

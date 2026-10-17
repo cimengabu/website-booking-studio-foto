@@ -63,35 +63,90 @@
                 @endif
             </div>
 
-            <!-- Update Status Form -->
+            <!-- Photographer Assignment Card (RBAC) -->
             <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-heading font-bold text-sm text-white">Update Status Lifecycle</h3>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#141311] border border-[#2D2B26] text-gray-300">
-                        Status Saat Ini: <strong class="text-[#F2C94C]">{{ $booking->status_label }}</strong>
-                    </span>
+                    <div>
+                        <h3 class="font-heading font-bold text-sm text-white flex items-center gap-2">
+                            <i class="fa-solid fa-camera text-amber-400"></i>
+                            Penugasan Fotografer (Crew Bertugas)
+                        </h3>
+                        <p class="text-[11px] text-gray-400 font-mono mt-0.5">Fotografer yang bertugas memandu sesi dan mengunggah hasil foto</p>
+                    </div>
+                    @if($booking->photographer)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold">
+                            <i class="fa-solid fa-user-check text-[10px]"></i> {{ $booking->photographer->name }}
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141311] border border-dashed border-[#2D2B26] text-gray-400 font-mono text-xs">
+                            <i class="fa-solid fa-user-slash text-[10px]"></i> Belum Ditugaskan
+                        </span>
+                    @endif
                 </div>
-                <form method="POST" action="{{ route('admin.bookings.update-status', $booking->id) }}" class="flex gap-3 items-end">
-                    @csrf @method('PATCH')
-                    <select name="status" class="flex-grow bg-[#141311] border border-[#2D2B26] text-white px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:border-[#E8451E]">
-                        @foreach([
-                            'pending'     => 'Menunggu Pembayaran',
-                            'confirmed'   => 'Dikonfirmasi (Lunas / DP)',
-                            'in_progress' => 'Sedang Berlangsung (Sesi)',
-                            'completed'   => 'Selesai Sesi Pemotretan',
-                            'delivered'   => 'Foto Siap (Delivery)',
-                            'closed'      => 'Ditutup (Closed)',
-                            'rescheduled' => 'Rescheduled',
-                            'cancelled'   => 'Dibatalkan',
-                            'no_show'     => 'No-Show (DP Hangus)',
-                            'expired'     => 'Kedaluwarsa',
-                        ] as $s => $lbl)
-                            <option value="{{ $s }}" {{ $booking->status === $s ? 'selected' : '' }}>{{ strtoupper($s) }} — {{ $lbl }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#E8451E] text-white font-bold text-xs hover:bg-[#d03a16]">Update Status</button>
-                </form>
+
+                @if(!auth()->user()->isPhotographer())
+                    <form method="POST" action="{{ route('admin.bookings.assign-photographer', $booking->id) }}" class="flex flex-col sm:flex-row gap-3 items-end pt-2 border-t border-[#2D2B26]">
+                        @csrf @method('PATCH')
+                        <div class="w-full sm:flex-grow">
+                            <label class="block text-[10px] font-mono font-bold text-gray-400 uppercase mb-1.5">Tugaskan / Ganti Fotografer</label>
+                            <select name="photographer_id" class="w-full bg-[#141311] border border-[#2D2B26] text-white px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:border-[#E8451E]">
+                                <option value="">-- Tanpa Fotografer (Kosongkan) --</option>
+                                @foreach($photographers as $ph)
+                                    <option value="{{ $ph->id }}" {{ $booking->photographer_id == $ph->id ? 'selected' : '' }}>
+                                        {{ $ph->name }} ({{ $ph->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-all whitespace-nowrap">
+                            <i class="fa-solid fa-check mr-1.5"></i> Simpan Penugasan
+                        </button>
+                    </form>
+                @else
+                    @if($booking->photographer_id === auth()->id())
+                        <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-between">
+                            <p class="text-xs text-emerald-300 font-mono">
+                                <i class="fa-solid fa-circle-check mr-1"></i> Sesi ini telah ditugaskan kepada Anda.
+                            </p>
+                            <a href="{{ route('admin.photos.upload', $booking->id) }}" class="text-xs font-bold text-emerald-400 hover:underline">
+                                Langsung Unggah Foto &rarr;
+                            </a>
+                        </div>
+                    @endif
+                @endif
             </div>
+
+            <!-- Update Status Form (Staff & Owner) -->
+            @if(!auth()->user()->isPhotographer())
+                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-heading font-bold text-sm text-white">Update Status Lifecycle</h3>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#141311] border border-[#2D2B26] text-gray-300">
+                            Status Saat Ini: <strong class="text-[#F2C94C]">{{ $booking->status_label }}</strong>
+                        </span>
+                    </div>
+                    <form method="POST" action="{{ route('admin.bookings.update-status', $booking->id) }}" class="flex gap-3 items-end">
+                        @csrf @method('PATCH')
+                        <select name="status" class="flex-grow bg-[#141311] border border-[#2D2B26] text-white px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:border-[#E8451E]">
+                            @foreach([
+                                'pending'     => 'Menunggu Pembayaran',
+                                'confirmed'   => 'Dikonfirmasi (Lunas / DP)',
+                                'in_progress' => 'Sedang Berlangsung (Sesi)',
+                                'completed'   => 'Selesai Sesi Pemotretan',
+                                'delivered'   => 'Foto Siap (Delivery)',
+                                'closed'      => 'Ditutup (Closed)',
+                                'rescheduled' => 'Rescheduled',
+                                'cancelled'   => 'Dibatalkan',
+                                'no_show'     => 'No-Show (DP Hangus)',
+                                'expired'     => 'Kedaluwarsa',
+                            ] as $s => $lbl)
+                                <option value="{{ $s }}" {{ $booking->status === $s ? 'selected' : '' }}>{{ strtoupper($s) }} — {{ $lbl }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#E8451E] text-white font-bold text-xs hover:bg-[#d03a16]">Update Status</button>
+                    </form>
+                </div>
+            @endif
 
             <!-- Record Cash Payment -->
             @if($booking->remaining_balance > 0)

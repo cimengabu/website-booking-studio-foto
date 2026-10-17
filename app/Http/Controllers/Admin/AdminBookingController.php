@@ -24,7 +24,15 @@ class AdminBookingController extends Controller
 
     public function index(Request $request)
     {
-        $query = Booking::with(['user', 'room', 'package', 'payments']);
+        $user = Auth::user();
+        $query = Booking::with(['user', 'room', 'package', 'payments', 'photographer']);
+
+        // Photographer RBAC: only see their assigned bookings
+        if ($user->isPhotographer()) {
+            $query->where('photographer_id', $user->id);
+        } elseif ($request->filled('photographer_id')) {
+            $query->where('photographer_id', $request->photographer_id);
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -52,15 +60,33 @@ class AdminBookingController extends Controller
 
         $bookings = $query->latest()->paginate(15);
         $rooms = Room::all();
+        $photographers = User::whereIn('role', ['photographer', 'fotografer'])->get();
 
-        return view('admin.bookings.index', compact('bookings', 'rooms'));
+        return view('admin.bookings.index', compact('bookings', 'rooms', 'photographers'));
+    }
+
+    public function assignPhotographer(Request $request, int $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        $request->validate([
+            'photographer_id' => 'nullable|exists:users,id',
+        ]);
+
+        $booking->update(['photographer_id' => $request->photographer_id]);
+
+        $name = $booking->photographer ? $booking->photographer->name : 'Dikosongkan';
+        ActivityLog::record(Auth::id(), 'assign_photographer', "Menugaskan fotografer {$name} untuk booking {$booking->booking_code}");
+
+        return back()->with('success', "Fotografer untuk {$booking->booking_code} berhasil diperbarui ({$name}).");
     }
 
     public function show(int $id)
     {
-        $booking = Booking::with(['user', 'room', 'package', 'bookingAddons.addon', 'payments', 'photoResults', 'photoDelivery', 'review'])->findOrFail($id);
+        $booking = Booking::with(['user', 'room', 'package', 'bookingAddons.addon', 'payments', 'photoResults', 'photoDelivery', 'review', 'photographer'])->findOrFail($id);
+        $photographers = User::whereIn('role', ['photographer', 'fotografer'])->get();
 
-        return view('admin.bookings.show', compact('booking'));
+        return view('admin.bookings.show', compact('booking', 'photographers'));
     }
 
     public function createWalkin()

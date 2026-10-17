@@ -6,7 +6,7 @@
 <div class="space-y-6">
     <!-- Filters -->
     <form method="GET" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 items-end">
+        <div class="grid grid-cols-2 {{ auth()->user()->isPhotographer() ? 'md:grid-cols-5' : 'md:grid-cols-6' }} gap-4 items-end">
             <div>
                 <label class="block text-[10px] font-mono font-bold text-gray-400 uppercase mb-1.5">Cari</label>
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Kode/Nama/HP..." class="w-full bg-[#141311] border border-[#2D2B26] text-white px-3 py-2 rounded-xl text-xs focus:outline-none focus:border-[#E8451E]">
@@ -40,6 +40,17 @@
                     @endforeach
                 </select>
             </div>
+            @if(!auth()->user()->isPhotographer())
+                <div>
+                    <label class="block text-[10px] font-mono font-bold text-gray-400 uppercase mb-1.5">Fotografer</label>
+                    <select name="photographer_id" class="w-full bg-[#141311] border border-[#2D2B26] text-white px-3 py-2 rounded-xl text-xs focus:outline-none">
+                        <option value="">Semua Crew</option>
+                        @foreach($photographers as $ph)
+                            <option value="{{ $ph->id }}" {{ request('photographer_id') == $ph->id ? 'selected' : '' }}>{{ $ph->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
             <div>
                 <label class="block text-[10px] font-mono font-bold text-gray-400 uppercase mb-1.5">Tanggal Sesi</label>
                 <input type="date" name="date" value="{{ request('date') }}" class="w-full bg-[#141311] border border-[#2D2B26] text-white px-3 py-2 rounded-xl text-xs focus:outline-none focus:border-[#E8451E]">
@@ -56,7 +67,7 @@
             <table class="w-full text-xs font-mono">
                 <thead class="bg-[#141311] text-gray-400 text-[10px] uppercase">
                     <tr>
-                        @foreach(['Kode Booking', 'Pelanggan', 'Ruangan / Paket', 'Tanggal Sesi', 'Jam', 'Total', 'Dibayar', 'Status', 'Aksi'] as $h)
+                        @foreach(['Kode Booking', 'Pelanggan', 'Ruangan / Paket', 'Tanggal Sesi', 'Jam', 'Fotografer', 'Total', 'Dibayar', 'Status', 'Aksi'] as $h)
                             <th class="text-left px-4 py-3">{{ $h }}</th>
                         @endforeach
                     </tr>
@@ -92,6 +103,17 @@
                             </td>
                             <td class="px-4 py-3 text-gray-300">{{ $b->booking_date->format('d M Y') }}</td>
                             <td class="px-4 py-3 text-gray-300">{{ substr($b->start_time, 0, 5) }}</td>
+                            <td class="px-4 py-3">
+                                @if($b->photographer)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#141311] border border-[#2D2B26] text-amber-300 text-[10px] font-bold">
+                                        <i class="fa-solid fa-camera text-[9px]"></i> {{ $b->photographer->name }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#141311] border border-dashed border-[#2D2B26] text-gray-500 text-[10px]">
+                                        <i class="fa-solid fa-user-slash text-[9px]"></i> Belum ada
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 font-bold text-white">Rp {{ number_format($b->total_price, 0, ',', '.') }}</td>
                             <td class="px-4 py-3 font-bold text-emerald-400">Rp {{ number_format($b->paid_amount, 0, ',', '.') }}</td>
                             <td class="px-4 py-3">
@@ -104,7 +126,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="9" class="text-center py-12 text-gray-500">Tidak ada data booking yang ditemukan.</td></tr>
+                        <tr><td colspan="10" class="text-center py-12 text-gray-500">Tidak ada data booking yang ditemukan.</td></tr>
                     @endforelse
                 </tbody>
             </table>

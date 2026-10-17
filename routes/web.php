@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminRoomController;
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\AboutController;
@@ -109,56 +110,67 @@ Route::middleware(['auth', RoleMiddleware::class.':staff,admin'])->prefix('staff
     Route::post('/completed/{id}', [CheckinController::class, 'markCompleted'])->name('completed');
 });
 
-// Admin Protected Routes
-Route::middleware(['auth', RoleMiddleware::class.':admin'])->prefix('admin')->name('admin.')->group(function () {
+// Admin Protected Routes (RBAC)
+Route::middleware(['auth', RoleMiddleware::class.':admin,owner,staff,kasir,photographer,fotografer'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Rooms Management
-    Route::resource('rooms', AdminRoomController::class);
+    // Global APIs (Search & Notifications for Topbar)
+    Route::get('/api/search', [DashboardController::class, 'searchApi'])->name('api.search');
+    Route::get('/api/notifications', [DashboardController::class, 'notificationsApi'])->name('api.notifications');
 
-    // Packages & Addons Management
-    Route::resource('packages', AdminPackageController::class)->except(['create', 'edit', 'show']);
-    Route::resource('addons', AdminAddonController::class)->except(['create', 'edit', 'show']);
-
-    // Booking Management
+    // Booking Management (Owner, Staff, Photographer)
     Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/walkin', [AdminBookingController::class, 'createWalkin'])->name('bookings.walkin');
     Route::post('/bookings/walkin', [AdminBookingController::class, 'storeWalkin'])->name('bookings.walkin.store');
     Route::get('/bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
     Route::patch('/bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.update-status');
     Route::post('/bookings/{id}/pay-cash', [AdminBookingController::class, 'recordCashPayment'])->name('bookings.pay-cash');
+    Route::patch('/bookings/{id}/assign-photographer', [AdminBookingController::class, 'assignPhotographer'])->name('bookings.assign-photographer');
 
     // Calendar
     Route::get('/calendar', [AdminCalendarController::class, 'index'])->name('calendar.index');
     Route::get('/calendar/events', [AdminCalendarController::class, 'eventsApi'])->name('calendar.events');
 
-    // Photos Results Upload & Management
+    // Photos Results Upload & Management (Owner, Staff, Photographer)
     Route::get('/photos', [AdminPhotoController::class, 'index'])->name('photos.index');
     Route::get('/photos/upload/{bookingId}', [AdminPhotoController::class, 'showUpload'])->name('photos.upload');
     Route::post('/photos/upload/{bookingId}', [AdminPhotoController::class, 'storeUpload'])->name('photos.store');
     Route::delete('/photos/{photoId}', [AdminPhotoController::class, 'destroyPhoto'])->name('photos.destroy');
 
-    // Portfolios
-    Route::get('/portfolios', [AdminPortfolioController::class, 'index'])->name('portfolios.index');
-    Route::post('/portfolios', [AdminPortfolioController::class, 'store'])->name('portfolios.store');
-    Route::delete('/portfolios/{id}', [AdminPortfolioController::class, 'destroy'])->name('portfolios.destroy');
-
-    // Customers
+    // Customers (Owner & Staff)
     Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
 
-    // Promos
-    Route::resource('promos', AdminPromoController::class)->except(['create', 'edit', 'show']);
-
-    // Reviews Moderation
+    // Reviews Moderation (Owner & Staff)
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
     Route::patch('/reviews/{id}/toggle', [AdminReviewController::class, 'toggleVisibility'])->name('reviews.toggle');
 
-    // Reports
-    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export');
+    // ── OWNER EXCLUSIVE MODULES (Master Data, Keuangan, Settings, RBAC Team) ──
+    Route::middleware([RoleMiddleware::class.':admin,owner'])->group(function () {
+        // Team Management & RBAC Roles
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::patch('/users/{id}/role', [AdminUserController::class, 'updateRole'])->name('users.update-role');
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
-    // System Settings & Activity Logs
-    Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
-    Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
+        // Master Data: Rooms, Packages, Addons, Portfolio
+        Route::resource('rooms', AdminRoomController::class);
+        Route::resource('packages', AdminPackageController::class)->except(['create', 'edit', 'show']);
+        Route::resource('addons', AdminAddonController::class)->except(['create', 'edit', 'show']);
+
+        Route::get('/portfolios', [AdminPortfolioController::class, 'index'])->name('portfolios.index');
+        Route::post('/portfolios', [AdminPortfolioController::class, 'store'])->name('portfolios.store');
+        Route::delete('/portfolios/{id}', [AdminPortfolioController::class, 'destroy'])->name('portfolios.destroy');
+
+        // Marketing Promos
+        Route::resource('promos', AdminPromoController::class)->except(['create', 'edit', 'show']);
+
+        // Financial Reports & Export
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export');
+
+        // System Settings & Activity Logs
+        Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
+        Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
+    });
 });
