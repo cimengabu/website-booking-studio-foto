@@ -139,6 +139,70 @@ class MyBookingController extends Controller
         return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 
+    public function downloadSignedPhoto(Request $request, int $photoId)
+    {
+        if (! $request->hasValidSignature()) {
+            abort(401, 'Tautan unduhan tidak valid atau telah kadaluarsa.');
+        }
+
+        $photo = PhotoResult::with('booking.photoDelivery')->findOrFail($photoId);
+
+        if ($photo->booking->photoDelivery) {
+            $delivery = $photo->booking->photoDelivery;
+            if ($delivery->expires_at && $delivery->expires_at->isPast()) {
+                abort(410, 'Masa aktif unduhan foto telah berakhir.');
+            }
+            $delivery->increment('download_count');
+        }
+
+        if (Storage::disk('public')->exists($photo->path)) {
+            return Storage::disk('public')->download($photo->path, $photo->original_name);
+        }
+
+        abort(404, 'File foto tidak ditemukan.');
+    }
+
+    public function downloadSignedZip(Request $request, string $code)
+    {
+        if (! $request->hasValidSignature()) {
+            abort(401, 'Tautan unduhan ZIP tidak valid atau telah kadaluarsa.');
+        }
+
+        $booking = Booking::with(['photoResults', 'photoDelivery'])->where('booking_code', $code)->firstOrFail();
+
+        if ($booking->photoDelivery) {
+            $delivery = $booking->photoDelivery;
+            if ($delivery->expires_at && $delivery->expires_at->isPast()) {
+                abort(410, 'Masa aktif unduhan foto telah berakhir.');
+            }
+            $delivery->increment('download_count');
+        }
+
+        if ($booking->photoResults->isEmpty()) {
+            abort(404, 'Belum ada foto hasil yang diunggah.');
+        }
+
+        $zipFileName = "SnapSpace-{$booking->booking_code}-Signed-Photos.zip";
+        $zipPath = storage_path("app/public/zips/{$zipFileName}");
+
+        if (! file_exists(dirname($zipPath))) {
+            mkdir(dirname($zipPath), 0755, true);
+        }
+
+        $zip = new ZipArchive;
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            foreach ($booking->photoResults as $photo) {
+                $filePath = storage_path("app/public/{$photo->path}");
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, $photo->original_name);
+                }
+            }
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
     public function reschedule(Request $request, string $code, BookingService $bookingService)
     {
         $booking = Booking::where('booking_code', $code)

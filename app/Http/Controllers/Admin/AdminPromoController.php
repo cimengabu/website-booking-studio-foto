@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Promo;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,7 @@ class AdminPromoController extends Controller
             'quota' => 'required|integer|min:1',
         ]);
 
-        Promo::create([
+        $promo = Promo::create([
             'code' => strtoupper($request->code),
             'type' => $request->type,
             'value' => $request->value,
@@ -36,6 +37,8 @@ class AdminPromoController extends Controller
             'end_date' => $request->end_date ?: null,
             'is_active' => $request->boolean('is_active', true),
         ]);
+
+        ActivityLog::record(auth()->id(), 'admin_create_promo', "Membuat kode promo baru: {$promo->code}");
 
         return back()->with('success', 'Kode Promo berhasil ditambahkan.');
     }
@@ -63,12 +66,18 @@ class AdminPromoController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        ActivityLog::record(auth()->id(), 'admin_update_promo', "Memperbarui kode promo: {$promo->code}");
+
         return back()->with('success', 'Kode Promo berhasil diperbarui.');
     }
 
     public function destroy(int $id)
     {
-        Promo::findOrFail($id)->delete();
+        $promo = Promo::findOrFail($id);
+        $code = $promo->code;
+        $promo->delete();
+
+        ActivityLog::record(auth()->id(), 'admin_delete_promo', "Menghapus kode promo: {$code}");
 
         return back()->with('success', 'Kode Promo berhasil dihapus.');
     }

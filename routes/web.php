@@ -58,14 +58,18 @@ Route::post('/api/check-booking', [BookingWizardController::class, 'checkBooking
 
 // Public API endpoints for Booking Wizard
 Route::get('/api/slots', [BookingWizardController::class, 'getSlotsApi'])->name('api.slots');
-Route::post('/api/calculate-price', [BookingWizardController::class, 'calculatePriceApi'])->name('api.calculate-price');
+Route::post('/api/calculate-price', [BookingWizardController::class, 'calculatePriceApi'])->name('api.calculate-price')->middleware('throttle:promo');
 
-// Guest Authentication Routes
+// Signed Photo Download Routes (Privat & Tervalidasi Cryptographic Signature)
+Route::get('/photos/signed/{photoId}', [MyBookingController::class, 'downloadSignedPhoto'])->name('photos.signed-download');
+Route::get('/photos/signed-zip/{code}', [MyBookingController::class, 'downloadSignedZip'])->name('photos.signed-zip');
+
+// Guest Authentication Routes (Protected by Anti-Brute Force Throttling)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -77,11 +81,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/galeri', [CustomerDashboardController::class, 'gallery'])->name('dashboard.gallery');
     Route::get('/dashboard/pembayaran', [CustomerDashboardController::class, 'payments'])->name('dashboard.payments');
 
-    // Profile & Settings
+    // Profile & Settings (including UU PDP Data Portability & Erasure)
     Route::get('/dashboard/profil', [ProfileController::class, 'index'])->name('dashboard.profile');
     Route::patch('/dashboard/profil', [ProfileController::class, 'update'])->name('dashboard.profile.update');
     Route::patch('/dashboard/profil/password', [ProfileController::class, 'updatePassword'])->name('dashboard.profile.password');
     Route::patch('/dashboard/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('dashboard.profile.avatar');
+    Route::get('/dashboard/profil/export-data', [ProfileController::class, 'exportPersonalData'])->name('dashboard.profile.export-data');
     Route::delete('/dashboard/profil', [ProfileController::class, 'deleteAccount'])->name('dashboard.profile.delete');
 
     Route::get('/booking', [BookingWizardController::class, 'showWizard'])->name('booking.wizard');

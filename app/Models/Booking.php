@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class Booking extends Model
 {
@@ -239,5 +240,14 @@ class Booking extends Model
             self::STATUS_DP_PAID,
             self::STATUS_PAID,
         ]);
+    }
+
+    public function getSignedZipUrlAttribute(): string
+    {
+        return URL::temporarySignedRoute(
+            'photos.signed-zip',
+            now()->addHours(2),
+            ['code' => $this->booking_code]
+        );
     }
 }

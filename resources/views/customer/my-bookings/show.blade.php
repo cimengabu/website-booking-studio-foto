@@ -348,9 +348,9 @@
                                 <h2 class="font-serif font-semibold text-lg text-ink">Galeri Foto Anda</h2>
                                 <p class="text-xs text-ink-muted">{{ $booking->photoResults->count() }} foto siap diunduh</p>
                             </div>
-                            <a href="{{ route('photos.zip', $booking->booking_code) }}"
+                            <a href="{{ $booking->signed_zip_url }}"
                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-teal/10 text-teal text-xs font-bold border border-teal/20 hover:bg-teal/20 transition-colors">
-                                <i class="fa-solid fa-download"></i> Unduh Semua (ZIP)
+                                <i class="fa-solid fa-download"></i> Unduh Semua (ZIP Privat)
                             </a>
                         </div>
 
@@ -360,9 +360,9 @@
                                     <img src="{{ Storage::url($photo->path) }}" alt="{{ $photo->original_name }}"
                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
                                     <div class="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <a href="{{ route('photos.download', $photo->id) }}"
+                                        <a href="{{ $photo->signed_download_url }}"
                                            class="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors"
-                                           title="Unduh foto ini">
+                                           title="Unduh foto privat ini (Tautan Terenkripsi)">
                                             <i class="fa-solid fa-download text-ink text-xs"></i>
                                         </a>
                                     </div>

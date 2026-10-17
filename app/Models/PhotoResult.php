@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class PhotoResult extends Model
 {
@@ -20,5 +21,14 @@ class PhotoResult extends Model
     public function booking()
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function getSignedDownloadUrlAttribute(): string
+    {
+        return URL::temporarySignedRoute(
+            'photos.signed-download',
+            now()->addHours(2),
+            ['photoId' => $this->id]
+        );
     }
 }

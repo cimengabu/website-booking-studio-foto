@@ -22,6 +22,9 @@ Schedule::job(new SendReviewRequestJob)->dailyAt('18:00');
 Schedule::job(new MarkNoShowJob)->hourly()->withoutOverlapping();
 Schedule::job(new CleanupExpiredDataJob)->dailyAt('02:00');
 
+// Backup berkala database & arsip data (UU PDP & Disaster Recovery)
+Schedule::command('app:backup')->dailyAt('01:00')->withoutOverlapping();
+
 // Perintah manual konsol cadangan
 Schedule::command('booking:send-reminders')
     ->hourly()

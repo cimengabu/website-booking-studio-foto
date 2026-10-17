@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -82,6 +83,46 @@ class ProfileController extends Controller
         return back()->with('success', 'Foto profil berhasil diperbarui!');
     }
 
+    /**
+     * Hak Akses & Portabilitas Data (UU PDP No. 27 Tahun 2022)
+     * Mengunduh seluruh arsip data pribadi pelanggan dalam format JSON
+     */
+    public function exportPersonalData()
+    {
+        $user = Auth::user();
+
+        $data = [
+            'app' => 'SnapSpace Studio',
+            'export_date' => now()->toIso8601String(),
+            'pdp_compliance' => 'UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi',
+            'user_profile' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
+                'loyalty_points' => $user->loyalty_points,
+                'privacy_consent_at' => $user->privacy_consent_at?->toIso8601String(),
+                'created_at' => $user->created_at?->toIso8601String(),
+            ],
+            'bookings' => $user->bookings()->with(['room', 'package', 'bookingAddons.addon', 'payments'])->get(),
+            'reviews' => $user->reviews()->get(),
+            'favorites' => $user->favorites()->with('room')->get(),
+        ];
+
+        $filename = "SnapSpace-Data-Pribadi-{$user->id}-".date('Ymd').'.json';
+
+        return response()->streamDownload(function () use ($data) {
+            echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }, $filename, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    /**
+     * Hak Penghapusan Data / Right to be Forgotten (UU PDP No. 27 Tahun 2022)
+     * Menghapus identitas akun pengguna dan menganonimkan riwayat transaksi
+     */
     public function deleteAccount(Request $request)
     {
         $request->validate([
@@ -91,9 +132,25 @@ class ProfileController extends Controller
         ]);
 
         $user = Auth::user();
+
+        // 1. Catat Audit Log penghapusan akun atas permintaan pemilik data
+        ActivityLog::record(
+            $user->id,
+            'pdp_account_erasure',
+            "Akun {$user->name} ({$user->email}) dihapus atas permintaan pemilik data (UU PDP No. 27/2022)."
+        );
+
+        // 2. Hapus file avatar fisik jika ada
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         $user->delete();
 
-        return redirect('/')->with('success', 'Akun Anda telah berhasil dihapus.');
+        return redirect('/')->with('success', 'Akun dan seluruh data pribadi Anda telah berhasil dihapus dari sistem SnapSpace Studio.');
     }
 }

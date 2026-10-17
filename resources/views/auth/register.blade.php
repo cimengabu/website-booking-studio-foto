@@ -14,6 +14,9 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Zod (Client-side Schema Validation) -->
+    <script src="https://cdn.jsdelivr.net/npm/zod@3.22.4/lib/index.umd.min.js"></script>
+
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -66,11 +69,94 @@
 </head>
 <body class="font-sans bg-cream text-ink antialiased min-h-screen">
 
-<div class="min-h-screen flex flex-col lg:flex-row" x-data="{ showPass: false, showConfirm: false }">
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('registerForm', () => ({
+            name: '{{ old('name') }}',
+            email: '{{ old('email') }}',
+            phone: '{{ old('phone') }}',
+            password: '',
+            password_confirmation: '',
+            consent_pdp: true,
+            showPass: false,
+            showConfirm: false,
+            errors: {},
+
+            // Zod Client Validation Schema
+            getSchema() {
+                const z = window.Zod || window.z;
+                if (!z) return null;
+
+                return z.object({
+                    name: z.string().min(3, "Nama lengkap minimal 3 karakter"),
+                    email: z.string().email("Format alamat email tidak valid"),
+                    phone: z.string().regex(/^(\+62|62|0)8[1-9][0-9]{6,11}$/, "Nomor WhatsApp harus valid (contoh: 08123456789)"),
+                    password: z.string().min(8, "Password minimal 8 karakter"),
+                    password_confirmation: z.string(),
+                    consent_pdp: z.literal(true, { errorMap: () => ({ message: "Wajib menyetujui Pemrosesan Data Pribadi (UU PDP No. 27/2022)" }) })
+                }).refine((data) => data.password === data.password_confirmation, {
+                    message: "Konfirmasi password tidak cocok",
+                    path: ["password_confirmation"]
+                });
+            },
+
+            validateField(field) {
+                const schema = this.getSchema();
+                if (!schema) return;
+
+                const result = schema.safeParse({
+                    name: this.name,
+                    email: this.email,
+                    phone: this.phone,
+                    password: this.password,
+                    password_confirmation: this.password_confirmation,
+                    consent_pdp: Boolean(this.consent_pdp)
+                });
+
+                if (!result.success) {
+                    const formatted = result.error.format();
+                    this.errors[field] = formatted[field]?._errors?.[0] || '';
+                } else {
+                    this.errors[field] = '';
+                }
+            },
+
+            handleSubmit(e) {
+                const schema = this.getSchema();
+                if (!schema) return true;
+
+                const result = schema.safeParse({
+                    name: this.name,
+                    email: this.email,
+                    phone: this.phone,
+                    password: this.password,
+                    password_confirmation: this.password_confirmation,
+                    consent_pdp: Boolean(this.consent_pdp)
+                });
+
+                if (!result.success) {
+                    e.preventDefault();
+                    const formatted = result.error.format();
+                    this.errors = {
+                        name: formatted.name?._errors?.[0] || '',
+                        email: formatted.email?._errors?.[0] || '',
+                        phone: formatted.phone?._errors?.[0] || '',
+                        password: formatted.password?._errors?.[0] || '',
+                        password_confirmation: formatted.password_confirmation?._errors?.[0] || '',
+                        consent_pdp: formatted.consent_pdp?._errors?.[0] || '',
+                    };
+                    return false;
+                }
+                return true;
+            }
+        }));
+    });
+</script>
+
+<div class="min-h-screen flex flex-col lg:flex-row" x-data="registerForm">
 
     <!-- LEFT SIDE: Editorial Photography Branding (Hidden on mobile) -->
     <div class="hidden lg:flex lg:w-1/2 relative bg-ink overflow-hidden items-end p-12">
-        <!-- Background Image with Overlay -->
         <img src="{{ asset('images/couple.jpg') }}" alt="SnapSpace Studio Sesi Foto" class="absolute inset-0 w-full h-full object-cover opacity-60">
         <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-ink/70 via-transparent to-transparent"></div>
@@ -101,12 +187,12 @@
 
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/15 text-xs text-white/70">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-gold"></i>
-                    <span>Akses galeri digital instan</span>
+                    <i class="fa-solid fa-shield-halved text-gold"></i>
+                    <span>Kepatuhan UU PDP No. 27/2022</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-gold"></i>
-                    <span>Diskon member berkala</span>
+                    <i class="fa-solid fa-lock text-gold"></i>
+                    <span>Tautan Galeri Digital Terenkripsi</span>
                 </div>
             </div>
         </div>
@@ -137,7 +223,7 @@
                 <p class="text-sm text-ink-muted">Daftar sekarang untuk booking jadwal foto tercepat dan simpan riwayat galeri Anda.</p>
             </div>
 
-            <!-- Flash Error Message -->
+            <!-- Server Flash Error Message -->
             @if($errors->any())
                 <div class="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs font-medium space-y-1">
                     <div class="font-bold flex items-center gap-2">
@@ -152,8 +238,8 @@
                 </div>
             @endif
 
-            <!-- Registration Form -->
-            <form method="POST" action="{{ route('register') }}" class="space-y-4">
+            <!-- Registration Form with Zod Validation -->
+            <form method="POST" action="{{ route('register') }}" @submit="handleSubmit($event)" class="space-y-4">
                 @csrf
 
                 <!-- Name -->
@@ -163,10 +249,11 @@
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-light">
                             <i class="fa-regular fa-user text-sm"></i>
                         </div>
-                        <input type="text" id="name" name="name" value="{{ old('name') }}" required autofocus
+                        <input type="text" id="name" name="name" x-model="name" @input="validateField('name')" required autofocus
                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                placeholder="Contoh: Clarissa Wijaya">
                     </div>
+                    <p x-show="errors.name" x-text="errors.name" class="text-danger text-[11px] mt-1 font-medium"></p>
                 </div>
 
                 <!-- Email -->
@@ -176,10 +263,11 @@
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-light">
                             <i class="fa-regular fa-envelope text-sm"></i>
                         </div>
-                        <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                        <input type="email" id="email" name="email" x-model="email" @input="validateField('email')" required
                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                placeholder="email@kamu.com">
                     </div>
+                    <p x-show="errors.email" x-text="errors.email" class="text-danger text-[11px] mt-1 font-medium"></p>
                 </div>
 
                 <!-- Phone (WhatsApp) -->
@@ -189,11 +277,12 @@
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-light">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                         </div>
-                        <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" required
+                        <input type="tel" id="phone" name="phone" x-model="phone" @input="validateField('phone')" required
                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                placeholder="081234567890">
                     </div>
-                    <p class="text-[11px] text-ink-light mt-1">Digunakan untuk mengirimkan e-ticket QR dan notifikasi status sesi.</p>
+                    <p x-show="errors.phone" x-text="errors.phone" class="text-danger text-[11px] mt-1 font-medium"></p>
+                    <p class="text-[11px] text-ink-light mt-1">Digunakan untuk mengirimkan e-ticket QR dan link unduhan foto privat.</p>
                 </div>
 
                 <!-- Password -->
@@ -201,7 +290,7 @@
                     <div>
                         <label for="password" class="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-1.5">Password *</label>
                         <div class="relative">
-                            <input :type="showPass ? 'text' : 'password'" id="password" name="password" required
+                            <input :type="showPass ? 'text' : 'password'" id="password" name="password" x-model="password" @input="validateField('password')" required
                                    class="w-full px-3.5 pr-9 py-2.5 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                    placeholder="Min. 8 karakter">
                             <button type="button" @click="showPass = !showPass"
@@ -209,12 +298,13 @@
                                 <i class="fa-regular text-xs" :class="showPass ? 'fa-eye-slash' : 'fa-eye'"></i>
                             </button>
                         </div>
+                        <p x-show="errors.password" x-text="errors.password" class="text-danger text-[11px] mt-1 font-medium"></p>
                     </div>
 
                     <div>
                         <label for="password_confirmation" class="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-1.5">Ulangi Password *</label>
                         <div class="relative">
-                            <input :type="showConfirm ? 'text' : 'password'" id="password_confirmation" name="password_confirmation" required
+                            <input :type="showConfirm ? 'text' : 'password'" id="password_confirmation" name="password_confirmation" x-model="password_confirmation" @input="validateField('password_confirmation')" required
                                    class="w-full px-3.5 pr-9 py-2.5 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                    placeholder="Konfirmasi">
                             <button type="button" @click="showConfirm = !showConfirm"
@@ -222,17 +312,19 @@
                                 <i class="fa-regular text-xs" :class="showConfirm ? 'fa-eye-slash' : 'fa-eye'"></i>
                             </button>
                         </div>
+                        <p x-show="errors.password_confirmation" x-text="errors.password_confirmation" class="text-danger text-[11px] mt-1 font-medium"></p>
                     </div>
                 </div>
 
-                <!-- Terms agreement checkbox -->
-                <div class="pt-1">
+                <!-- UU PDP Consent Agreement Checkbox -->
+                <div class="pt-2">
                     <label class="flex items-start gap-2.5 cursor-pointer select-none">
-                        <input type="checkbox" required class="w-4 h-4 mt-0.5 rounded border-cream-dark text-gold focus:ring-gold/30">
+                        <input type="checkbox" name="consent_pdp" value="1" x-model="consent_pdp" @change="validateField('consent_pdp')" required class="w-4 h-4 mt-0.5 rounded border-cream-dark text-gold focus:ring-gold/30">
                         <span class="text-xs text-ink-muted leading-relaxed">
-                            Saya menyetujui <a href="{{ route('terms') }}" target="_blank" class="text-gold font-medium hover:underline">Syarat & Ketentuan</a> serta <a href="{{ route('privacy') }}" target="_blank" class="text-gold font-medium hover:underline">Kebijakan Privasi</a> SnapSpace Studio.
+                            Saya menyetujui Pemrosesan Data Pribadi sesuai dengan <strong>UU No. 27 Tahun 2022 (UU PDP)</strong>, <a href="{{ route('terms') }}" target="_blank" class="text-gold font-medium hover:underline">Syarat & Ketentuan</a>, serta <a href="{{ route('privacy') }}" target="_blank" class="text-gold font-medium hover:underline">Kebijakan Privasi</a> SnapSpace Studio.
                         </span>
                     </label>
+                    <p x-show="errors.consent_pdp" x-text="errors.consent_pdp" class="text-danger text-[11px] mt-1 font-medium"></p>
                 </div>
 
                 <!-- Submit Button -->
@@ -253,12 +345,13 @@
                 </p>
             </div>
 
-            <!-- Trust Badge -->
-            <div class="pt-4 border-t border-cream-dark text-center">
-                <p class="text-[11px] text-ink-light flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-lock text-gold"></i>
-                    <span>Data pribadi Anda aman & dilindungi kerahasiaannya.</span>
+            <!-- Trust Badge & PDP Protection -->
+            <div class="pt-4 border-t border-cream-dark text-center space-y-1">
+                <p class="text-[11px] text-ink-light flex items-center justify-center gap-1.5 font-medium">
+                    <i class="fa-solid fa-shield-halved text-gold"></i>
+                    <span>Dilindungi Enkripsi SSL/TLS & Kepatuhan UU PDP</span>
                 </p>
+                <p class="text-[10px] text-ink-light/80">Hak Akses, Koreksi, dan Penghapusan Akun dapat diakses kapan saja dari Dashboard.</p>
             </div>
 
         </div>

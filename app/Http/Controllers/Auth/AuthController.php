@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,12 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
+            ActivityLog::record(
+                $user->id,
+                'auth_login_success',
+                "User {$user->name} ({$user->email}) berhasil login dengan role {$user->role}."
+            );
+
             if ($user->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard'));
             } elseif ($user->isStaff()) {
@@ -35,6 +42,12 @@ class AuthController extends Controller
 
             return redirect()->intended(route('home'));
         }
+
+        ActivityLog::record(
+            null,
+            'auth_login_failed',
+            "Percobaan login gagal untuk email: {$request->input('email')}."
+        );
 
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan salah.',
@@ -52,7 +65,8 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:20'],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'consent_pdp' => ['nullable'], // optional if sent from API or required if in form
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Alamat email wajib diisi.',
@@ -68,7 +82,15 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'role' => 'customer',
+            'privacy_consent_at' => now(),
+            'privacy_consent_ip' => $request->ip(),
         ]);
+
+        ActivityLog::record(
+            $user->id,
+            'auth_register',
+            "Pengguna {$user->name} ({$user->email}) mendaftar akun baru dan menyetujui pemrosesan data (UU PDP)."
+        );
 
         Auth::login($user);
 

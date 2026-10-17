@@ -215,14 +215,59 @@
         </div>
     </div>
 
+    {{-- ── HAK PELINDUNGAN DATA PRIBADI (UU PDP NO. 27/2022) ── --}}
+    <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-2xl p-6" data-aos="fade-up" data-aos-delay="175">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+                <h2 class="font-heading font-bold text-lg text-white flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-[#C8A27A] text-sm"></i>
+                    Hak Privasi & Perlindungan Data (UU PDP)
+                </h2>
+                <p class="text-xs text-gray-400 mt-1">
+                    Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi, Anda memiliki hak penuh atas transparansi, akses, dan portabilitas data Anda di SnapSpace Studio.
+                </p>
+            </div>
+            <div class="flex-shrink-0">
+                <a href="{{ route('dashboard.profile.export-data') }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#C8A27A]/15 border border-[#C8A27A]/30 text-[#C8A27A] hover:bg-[#C8A27A]/25 rounded-xl font-semibold text-xs transition-colors shadow-xs">
+                    <i class="fa-solid fa-file-arrow-down text-xs"></i>
+                    Unduh Salinan Data Saya (JSON)
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[#2D2B26] text-xs">
+            <div class="p-3 rounded-xl bg-[#141311] border border-[#2D2B26]">
+                <div class="text-[#C8A27A] font-semibold flex items-center gap-1.5 mb-1">
+                    <i class="fa-solid fa-check-double text-[10px]"></i> Status Persetujuan
+                </div>
+                <div class="text-gray-400 text-[11px]">
+                    {{ Auth::user()->privacy_consent_at ? 'Disetujui pada ' . Auth::user()->privacy_consent_at->format('d M Y, H:i') : 'Persetujuan Aktif' }}
+                </div>
+            </div>
+            <div class="p-3 rounded-xl bg-[#141311] border border-[#2D2B26]">
+                <div class="text-emerald-400 font-semibold flex items-center gap-1.5 mb-1">
+                    <i class="fa-solid fa-lock text-[10px]"></i> Enkripsi Data
+                </div>
+                <div class="text-gray-400 text-[11px]">Password di-hash bcrypt & data transmisi terenkripsi TLS/SSL.</div>
+            </div>
+            <div class="p-3 rounded-xl bg-[#141311] border border-[#2D2B26]">
+                <div class="text-sky-400 font-semibold flex items-center gap-1.5 mb-1">
+                    <i class="fa-solid fa-file-signature text-[10px]"></i> Tautan Foto Terproteksi
+                </div>
+                <div class="text-gray-400 text-[11px]">Akses unduhan foto hasil menggunakan Cryptographic Signed URLs.</div>
+            </div>
+        </div>
+    </div>
+
     {{-- ── DANGER ZONE ── --}}
     <div class="bg-rose-950/20 border border-rose-500/20 rounded-2xl p-6" data-aos="fade-up" data-aos-delay="200">
         <h2 class="font-heading font-bold text-lg text-rose-400 mb-2 flex items-center gap-2">
             <i class="fa-solid fa-triangle-exclamation text-sm"></i>
-            Zona Berbahaya
+            Zona Berbahaya & Hak Penghapusan Akun
         </h2>
         <p class="text-sm text-rose-300/70 mb-5">
-            Menghapus akun bersifat permanen dan tidak dapat dipulihkan. Semua data booking, galeri foto, dan riwayat transaksi akan ikut terhapus.
+            Menghapus akun bersifat permanen dan tidak dapat dipulihkan. Sesuai Hak Penghapusan (Right to Erasure) UU PDP, data pribadi Anda akan dihapus dari sistem.
         </p>
 
         <div x-data="{ open: false, confirm: '' }">

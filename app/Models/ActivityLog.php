@@ -14,6 +14,7 @@ class ActivityLog extends Model
         'action',
         'description',
         'ip_address',
+        'user_agent',
     ];
 
     public function user()
@@ -28,6 +29,7 @@ class ActivityLog extends Model
             'action' => $action,
             'description' => $description,
             'ip_address' => request()->ip(),
+            'user_agent' => substr((string) request()->userAgent(), 0, 500),
         ]);
     }
 }

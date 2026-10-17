@@ -51,9 +51,9 @@
             {{-- Download actions --}}
             <div class="flex flex-wrap gap-2 flex-shrink-0">
                 @if($booking->status === 'delivered' || $booking->remaining_balance <= 0)
-                    <a href="{{ route('photos.zip', $booking->booking_code) }}"
+                    <a href="{{ $booking->signed_zip_url }}"
                        class="inline-flex items-center gap-2 px-4 py-2 bg-[#E8451E] text-white rounded-xl text-xs font-semibold hover:bg-[#d03a16] shadow-lg shadow-[#E8451E]/20 transition-all hover:scale-[1.02]">
-                        <i class="fa-solid fa-download text-[10px]"></i>Unduh Semua (ZIP)
+                        <i class="fa-solid fa-download text-[10px]"></i>Unduh Semua (ZIP Privat)
                     </a>
                 @else
                     <div class="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/25 text-amber-400 rounded-xl text-xs font-semibold">
@@ -109,8 +109,9 @@
                             <i class="fa-solid fa-expand text-white text-xs"></i>
                         </button>
                         @if($booking->status === 'delivered' || $booking->remaining_balance <= 0)
-                        <a href="{{ route('photos.download', $photo->id) }}"
+                        <a href="{{ $photo->signed_download_url }}"
                            class="w-8 h-8 rounded-full bg-[#E8451E]/80 backdrop-blur-sm flex items-center justify-center hover:bg-[#E8451E] transition-colors"
+                           title="Unduh foto privat ini"
                            @click.stop>
                             <i class="fa-solid fa-download text-white text-xs"></i>
                         </a>

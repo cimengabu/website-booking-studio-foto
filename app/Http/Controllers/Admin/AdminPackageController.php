@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Package;
 use App\Models\PricingRule;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class AdminPackageController extends Controller
             'price' => 'required|numeric|min:0',
         ]);
 
-        Package::create([
+        $package = Package::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description,
@@ -38,6 +39,8 @@ class AdminPackageController extends Controller
             'price' => $request->price,
             'is_active' => $request->boolean('is_active', true),
         ]);
+
+        ActivityLog::record(auth()->id(), 'admin_create_package', "Menambahkan paket foto baru: {$package->name}");
 
         return back()->with('success', 'Paket foto berhasil ditambahkan.');
     }
@@ -62,12 +65,18 @@ class AdminPackageController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        ActivityLog::record(auth()->id(), 'admin_update_package', "Memperbarui data paket: {$package->name}");
+
         return back()->with('success', 'Paket berhasil diperbarui.');
     }
 
     public function destroy(int $id)
     {
-        Package::findOrFail($id)->delete();
+        $package = Package::findOrFail($id);
+        $name = $package->name;
+        $package->delete();
+
+        ActivityLog::record(auth()->id(), 'admin_delete_package', "Menghapus paket foto: {$name}");
 
         return back()->with('success', 'Paket berhasil dihapus.');
     }

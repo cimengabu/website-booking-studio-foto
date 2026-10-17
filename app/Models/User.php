@@ -23,6 +23,8 @@ class User extends Authenticatable
         'role',
         'avatar',
         'loyalty_points',
+        'privacy_consent_at',
+        'privacy_consent_ip',
     ];
 
     /**
@@ -44,6 +46,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'privacy_consent_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

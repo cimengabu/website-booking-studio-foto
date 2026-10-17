@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\BlockedSlot;
 use App\Models\Room;
 use App\Models\RoomImage;
@@ -86,6 +87,8 @@ class AdminRoomController extends Controller
             'is_primary' => true,
         ]);
 
+        ActivityLog::record(auth()->id(), 'admin_create_room', "Menambahkan studio/ruangan baru: {$room->name}");
+
         return redirect()->route('admin.rooms.index')->with('success', 'Ruangan / Tema berhasil ditambahkan.');
     }
 
@@ -116,13 +119,18 @@ class AdminRoomController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        ActivityLog::record(auth()->id(), 'admin_update_room', "Memperbarui data ruangan: {$room->name}");
+
         return redirect()->route('admin.rooms.index')->with('success', 'Data ruangan berhasil diperbarui.');
     }
 
     public function destroy(int $id)
     {
         $room = Room::findOrFail($id);
+        $name = $room->name;
         $room->delete();
+
+        ActivityLog::record(auth()->id(), 'admin_delete_room', "Menghapus data ruangan: {$name}");
 
         return redirect()->route('admin.rooms.index')->with('success', 'Ruangan berhasil dihapus.');
     }
