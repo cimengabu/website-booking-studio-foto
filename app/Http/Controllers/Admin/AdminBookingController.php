@@ -73,12 +73,49 @@ class AdminBookingController extends Controller
             'photographer_id' => 'nullable|exists:users,id',
         ]);
 
+        // Edge case: Fotografer berhalangan / bentrok jadwal
+        if ($request->photographer_id) {
+            $conflict = Booking::where('photographer_id', $request->photographer_id)
+                ->where('id', '!=', $booking->id)
+                ->whereDate('booking_date', $booking->booking_date)
+                ->whereIn('status', ['confirmed', 'paid', 'dp_paid', 'in_progress', 'checked_in'])
+                ->where(function ($q) use ($booking) {
+                    $q->where('start_time', '<', $booking->end_time)
+                        ->where('end_time', '>', $booking->start_time);
+                })
+                ->first();
+
+            if ($conflict) {
+                return back()->withErrors(['photographer_error' => "Bentrok Jadwal: Fotografer tersebut sudah memiliki jadwal sesi ({$conflict->booking_code} pukul {$conflict->start_time}-{$conflict->end_time}). Silakan pilih fotografer lain."]);
+            }
+        }
+
         $booking->update(['photographer_id' => $request->photographer_id]);
 
         $name = $booking->photographer ? $booking->photographer->name : 'Dikosongkan';
         ActivityLog::record(Auth::id(), 'assign_photographer', "Menugaskan fotografer {$name} untuk booking {$booking->booking_code}");
 
         return back()->with('success', "Fotografer untuk {$booking->booking_code} berhasil diperbarui ({$name}).");
+    }
+
+    /**
+     * Edge case: Fotografer berhalangan mendadak (sakit/darurat)
+     */
+    public function emergencyPhotographerUnavailable(int $id)
+    {
+        $booking = Booking::with(['user', 'room', 'photographer'])->findOrFail($id);
+        $prevPhotographer = $booking->photographer?->name ?? 'Fotografer';
+
+        $emergencyNote = "\n[FOTOGRAFER BERHALANGAN: {$prevPhotographer} berhalangan mendadak pada ".now()->format('d/m/Y H:i').'. Segera tugaskan pengganti atau berikan opsi reschedule/refund gratis.]';
+
+        $booking->update([
+            'photographer_id' => null,
+            'internal_notes' => trim(($booking->internal_notes ?? '').$emergencyNote),
+        ]);
+
+        ActivityLog::record(Auth::id(), 'admin_emergency_photographer', "Fotografer {$prevPhotographer} berhalangan untuk booking {$booking->booking_code}.");
+
+        return back()->with('warning', "Fotografer ({$prevPhotographer}) telah ditandai berhalangan untuk booking {$booking->booking_code}. Segera pilih fotografer pengganti.");
     }
 
     public function show(int $id)

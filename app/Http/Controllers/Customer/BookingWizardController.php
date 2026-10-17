@@ -172,6 +172,85 @@ class BookingWizardController extends Controller
             ->with('success', 'Pembayaran berhasil dikonfirmasi! E-Tiket QR Anda telah terbit.');
     }
 
+    /**
+     * Edge case handling: Pembayaran berhasil tapi webhook terlambat / user menutup halaman
+     * Verifikasi langsung ke payment gateway tanpa harus menunggu webhook
+     */
+    public function checkPaymentStatus(Request $request, string $code)
+    {
+        $booking = Booking::with('payments')->where('booking_code', $code)->firstOrFail();
+
+        // 1. Jika sudah dikonfirmasi
+        if (in_array($booking->status, ['confirmed', 'paid', 'dp_paid', 'completed'])) {
+            return response()->json([
+                'status' => 'success',
+                'is_paid' => true,
+                'redirect_url' => route('my-bookings.show', $booking->booking_code),
+                'message' => 'Pembayaran Anda telah terkonfirmasi!',
+            ]);
+        }
+
+        // 2. Cek apakah expired
+        if ($booking->status === 'pending' && $booking->expires_at && $booking->expires_at->isPast()) {
+            $booking->update(['status' => 'expired']);
+
+            return response()->json([
+                'status' => 'expired',
+                'is_paid' => false,
+                'redirect_url' => route('booking.pay', $booking->booking_code),
+                'message' => 'Waktu pembayaran telah habis. Slot telah dilepaskan kembali ke sistem.',
+            ]);
+        }
+
+        // 3. Query Midtrans API langsung jika order_id ada
+        $latestPayment = $booking->payments()->latest()->first();
+        if ($latestPayment) {
+            $serverKey = config('services.midtrans.server_key');
+            $isProduction = config('services.midtrans.is_production', false);
+
+            if (! empty($serverKey) && ! str_starts_with($latestPayment->order_id, 'SIMULATED')) {
+                try {
+                    $url = $isProduction
+                        ? "https://api.midtrans.com/v2/{$latestPayment->order_id}/status"
+                        : "https://api.sandbox.midtrans.com/v2/{$latestPayment->order_id}/status";
+
+                    $res = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                        ->timeout(5)
+                        ->get($url);
+
+                    if ($res->successful()) {
+                        $data = $res->json();
+                        $status = $data['transaction_status'] ?? '';
+                        $fraud = $data['fraud_status'] ?? 'accept';
+
+                        if ($status === 'settlement' || ($status === 'capture' && $fraud === 'accept')) {
+                            $this->paymentService->processPaymentSuccess(
+                                $latestPayment,
+                                $data['payment_type'] ?? 'midtrans',
+                                $data
+                            );
+
+                            return response()->json([
+                                'status' => 'success',
+                                'is_paid' => true,
+                                'redirect_url' => route('my-bookings.show', $booking->booking_code),
+                                'message' => 'Pembayaran berhasil diverifikasi langsung dari Gateway!',
+                            ]);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning("Direct Midtrans status check error: {$e->getMessage()}");
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'pending',
+            'is_paid' => false,
+            'message' => 'Pembayaran belum terdeteksi. Silakan selesaikan transaksi pada aplikasi pembayaran Anda.',
+        ]);
+    }
+
     public function checkBookingApi(Request $request)
     {
         $request->validate([

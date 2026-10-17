@@ -277,7 +277,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" :disabled="!selectedMethod || submitting"
+                            <button type="submit" :disabled="!selectedMethod || submitting || !online"
                                     class="btn-gold btn-bounce w-full py-4 rounded-2xl text-white font-bold text-base mt-6 shadow-warm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-spinner animate-spin" x-show="submitting"></i>
                                 <i class="fa-solid fa-lock" x-show="!submitting"></i>
@@ -285,12 +285,42 @@
                             </button>
                         </form>
 
+                        {{-- Edge case 2: Pembayaran Berhasil tapi Webhook Terlambat --}}
+                        <div class="mt-4 pt-4 border-t border-cream-dark flex flex-col sm:flex-row items-center justify-between gap-3 bg-cream/50 p-4 rounded-2xl">
+                            <div class="text-xs text-ink-muted text-center sm:text-left">
+                                <span class="font-bold text-ink block">Sudah transfer / scan QR di aplikasi?</span>
+                                <span>Klik tombol di samping jika status belum otomatis berubah.</span>
+                            </div>
+                            <button type="button" @click="checkStatusManual()" :disabled="checkingStatus"
+                                    class="px-4 py-2.5 rounded-xl bg-ink text-white text-xs font-bold hover:bg-ink-soft transition-all flex items-center gap-2 shadow-xs disabled:opacity-50 flex-shrink-0">
+                                <i class="fa-solid fa-rotate text-xs" :class="checkingStatus ? 'animate-spin' : ''"></i>
+                                <span x-text="checkingStatus ? 'Mengecek...' : 'Cek Status Sekarang'"></span>
+                            </button>
+                        </div>
+                        <p x-show="checkMessage" x-text="checkMessage" class="text-xs text-center font-medium mt-2" :class="checkSuccess ? 'text-success font-bold' : 'text-ink-muted'"></p>
+
+                        {{-- Edge case 12: Pengguna Mengganti Perangkat saat Bayar (Cross-Device Payment) --}}
+                        <div class="mt-4 p-4 rounded-2xl border border-gold/30 bg-gold/5 flex flex-col sm:flex-row items-center gap-4">
+                            <div class="w-16 h-16 rounded-xl bg-white p-1 border border-gold/30 flex-shrink-0 flex items-center justify-center shadow-xs">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}"
+                                     alt="Scan untuk Bayar di HP" class="w-full h-full object-contain">
+                            </div>
+                            <div class="text-xs text-center sm:text-left flex-1">
+                                <span class="font-bold text-ink block flex items-center justify-center sm:justify-start gap-1.5 text-gold">
+                                    <i class="fa-solid fa-mobile-screen-button"></i> Bayar Lewat Ponsel (Cross-Device)
+                                </span>
+                                <span class="text-ink-muted mt-0.5 block leading-relaxed">
+                                    Pindai QR ini dengan kamera HP untuk melanjutkan pembayaran langsung dari aplikasi BCA Mobile, GoPay, atau ShopeePay di smartphone Anda.
+                                </span>
+                            </div>
+                        </div>
+
                         {{-- Trust badges --}}
                         <div class="flex items-center justify-center gap-4 mt-5 pt-5 border-t border-cream-dark">
                             @foreach([
-                                ['fa-shield-halved', 'Terenkripsi SSL'],
+                                ['fa-shield-halved', 'Terenkripsi SSL/TLS'],
                                 ['fa-lock', 'Pembayaran Aman'],
-                                ['fa-building-columns', 'Berlisensi BI'],
+                                ['fa-building-columns', 'Berlisensi Bank Indonesia'],
                             ] as [$icon, $label])
                                 <div class="flex items-center gap-1.5 text-xs text-ink-muted">
                                     <i class="fa-solid fa-{{ $icon }} text-success text-[10px]"></i>
@@ -315,11 +345,19 @@ function paymentPage() {
     return {
         selectedMethod: '',
         submitting: false,
+        checkingStatus: false,
+        checkMessage: '',
+        checkSuccess: false,
         minutes: 0,
         seconds: 0,
         interval: null,
+        pollInterval: null,
+        online: navigator.onLine,
 
         startCountdown() {
+            window.addEventListener('online', () => { this.online = true; });
+            window.addEventListener('offline', () => { this.online = false; });
+
             @if($booking->expires_at && $booking->status === 'pending')
                 const expiresAt = new Date('{{ $booking->expires_at->toISOString() }}').getTime();
                 this.interval = setInterval(() => {
@@ -329,17 +367,68 @@ function paymentPage() {
                     this.seconds = diff % 60;
                     if (diff <= 0) {
                         clearInterval(this.interval);
+                        clearInterval(this.pollInterval);
                         window.location.reload();
                     }
                 }, 1000);
+
+                // Auto poll status every 8 seconds in background
+                this.pollInterval = setInterval(() => {
+                    if (this.online && !this.submitting) {
+                        this.silentCheckStatus();
+                    }
+                }, 8000);
             @else
                 this.minutes = 0;
                 this.seconds = 0;
             @endif
         },
 
+        async silentCheckStatus() {
+            try {
+                const res = await fetch('{{ route('booking.check-payment-status', $booking->booking_code) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                const data = await res.json();
+                if (data.is_paid && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                }
+            } catch(e) {}
+        },
+
+        async checkStatusManual() {
+            if (this.checkingStatus) return;
+            this.checkingStatus = true;
+            this.checkMessage = '';
+            try {
+                const res = await fetch('{{ route('booking.check-payment-status', $booking->booking_code) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                const data = await res.json();
+                this.checkMessage = data.message || 'Pemeriksaan status selesai.';
+                if (data.is_paid && data.redirect_url) {
+                    this.checkSuccess = true;
+                    setTimeout(() => { window.location.href = data.redirect_url; }, 1000);
+                } else {
+                    this.checkSuccess = false;
+                }
+            } catch(e) {
+                this.checkMessage = 'Gagal memeriksa ke gateway. Mohon periksa koneksi internet Anda.';
+            } finally {
+                this.checkingStatus = false;
+            }
+        },
+
         submitPayment(event) {
-            if (this.submitting || !this.selectedMethod) return;
+            if (this.submitting || !this.selectedMethod || !this.online) return;
             this.submitting = true;
             event.target.submit();
         },

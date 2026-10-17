@@ -22,6 +22,13 @@ class ExpireBookingJob implements ShouldQueue
             ->chunkById(100, function ($bookings) {
                 foreach ($bookings as $booking) {
                     $booking->update(['status' => 'expired']);
+
+                    if ($booking->promo_code) {
+                        \App\Models\Promo::where('code', $booking->promo_code)
+                            ->where('used_count', '>', 0)
+                            ->decrement('used_count');
+                    }
+
                     ActivityLog::record(
                         $booking->user_id,
                         'booking_expired',

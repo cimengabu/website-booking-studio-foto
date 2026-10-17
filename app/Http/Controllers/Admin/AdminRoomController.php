@@ -36,7 +36,7 @@ class AdminRoomController extends Controller
             'reason' => 'required|string|max:255',
         ]);
 
-        BlockedSlot::create([
+        $blockedSlot = BlockedSlot::create([
             'room_id' => $request->room_id ?: null,
             'date' => $request->date,
             'start_time' => $request->start_time,
@@ -44,7 +44,43 @@ class AdminRoomController extends Controller
             'reason' => $request->reason,
         ]);
 
-        return back()->with('success', 'Jadwal blok libur / maintenance berhasil ditambahkan.');
+        // Edge case: Hari libur mendadak / penutupan studio darurat
+        // Deteksi booking aktif yang bertabrakan dengan jadwal blokir ini
+        $affectedBookings = \App\Models\Booking::with('user')
+            ->whereDate('booking_date', $request->date)
+            ->when($request->room_id, fn ($q) => $q->where('room_id', $request->room_id))
+            ->whereIn('status', ['confirmed', 'paid', 'dp_paid', 'pending', 'checked_in'])
+            ->where(function ($q) use ($request) {
+                $q->where('start_time', '<', $request->end_time)
+                    ->where('end_time', '>', $request->start_time);
+            })
+            ->get();
+
+        if ($affectedBookings->isNotEmpty()) {
+            $codes = $affectedBookings->pluck('booking_code')->implode(', ');
+            foreach ($affectedBookings as $b) {
+                $emergencyNote = "\n[STUDIO TUTUP/MAINTENANCE DARURAT: Alasan '{$request->reason}' pada {$request->date}]. Pelanggan berhak atas Reschedule Bebas Biaya atau Full Refund.";
+                $b->update([
+                    'internal_notes' => trim(($b->internal_notes ?? '').$emergencyNote),
+                ]);
+            }
+
+            \App\Models\ActivityLog::record(
+                auth()->id(),
+                'admin_blocked_slot_with_conflicts',
+                "Menambahkan blokir studio ({$request->reason}) yang berdampak pada {$affectedBookings->count()} booking: {$codes}"
+            );
+
+            return back()->with('warning', "Blokir jadwal berhasil dibuat. PERHATIAN: Terdapat {$affectedBookings->count()} booking pelanggan terdampak ({$codes}). Catatan darurat telah disematkan untuk penanganan reschedule/refund bebas biaya.");
+        }
+
+        \App\Models\ActivityLog::record(
+            auth()->id(),
+            'admin_blocked_slot',
+            "Menambahkan jadwal blokir studio: {$request->reason} pada {$request->date} ({$request->start_time} - {$request->end_time})"
+        );
+
+        return back()->with('success', 'Jadwal blok libur / maintenance berhasil ditambahkan (Aman: tidak ada booking pelanggan yang bertabrakan).');
     }
 
     public function destroyBlockedSlot(int $id)

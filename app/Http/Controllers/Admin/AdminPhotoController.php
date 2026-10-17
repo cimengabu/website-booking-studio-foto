@@ -43,9 +43,14 @@ class AdminPhotoController extends Controller
         $booking = Booking::findOrFail($bookingId);
 
         $request->validate([
-            'photos' => 'nullable|array',
-            'photos.*' => 'image|mimes:jpeg,jpg,png,webp|max:15360', // max 15MB each
+            'photos' => 'nullable|array|max:50', // max 50 photos per batch
+            'photos.*' => 'image|mimes:jpeg,jpg,png,webp|max:25600', // up to 25MB each
             'image_urls' => 'nullable|array',
+        ], [
+            'photos.*.image' => 'Setiap file harus berupa gambar yang valid.',
+            'photos.*.mimes' => 'Format file yang didukung: JPEG, JPG, PNG, WEBP.',
+            'photos.*.max' => 'Ukuran maksimal per foto adalah 25MB. Silakan kompresi foto terlebih dahulu.',
+            'photos.max' => 'Maksimal 50 foto dalam sekali unggah. Silakan unggah bertahap jika lebih.',
         ]);
 
         $hasUrls = ! empty(array_filter($request->input('image_urls', [])));
@@ -53,20 +58,28 @@ class AdminPhotoController extends Controller
             return back()->withErrors(['photos' => 'Harap upload minimal 1 file foto atau masukkan 1 URL foto demo.']);
         }
 
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $file) {
-                $originalName = $file->getClientOriginalName();
-                $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
-                $path = $file->storeAs("photo_results/{$booking->booking_code}", $filename, 'public');
+        try {
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $file) {
+                    if (! $file->isValid()) {
+                        continue;
+                    }
 
-                PhotoResult::create([
-                    'booking_id' => $booking->id,
-                    'path' => $path,
-                    'thumb_path' => $path,
-                    'original_name' => $originalName,
-                    'size' => $file->getSize(),
-                ]);
+                    $originalName = $file->getClientOriginalName();
+                    $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                    $path = $file->storeAs("photo_results/{$booking->booking_code}", $filename, 'public');
+
+                    PhotoResult::create([
+                        'booking_id' => $booking->id,
+                        'path' => $path,
+                        'thumb_path' => $path,
+                        'original_name' => $originalName,
+                        'size' => $file->getSize(),
+                    ]);
+                }
             }
+        } catch (\Throwable $e) {
+            return back()->withErrors(['photos' => 'Gagal memproses unggahan file foto: '.$e->getMessage().'. Periksa ukuran file dan koneksi Anda.']);
         }
 
         // Demo URLs support (if provided via form)

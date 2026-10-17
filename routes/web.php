@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/booking', [BookingWizardController::class, 'storeBooking'])->name('booking.store');
     Route::get('/booking/{code}/pay', [BookingWizardController::class, 'showPaymentPage'])->name('booking.pay');
     Route::post('/booking/{code}/pay-simulated', [BookingWizardController::class, 'processSimulatedPayment'])->name('booking.pay-simulated');
+    Route::post('/booking/{code}/check-payment-status', [BookingWizardController::class, 'checkPaymentStatus'])->name('booking.check-payment-status');
 
     Route::get('/my-bookings', [MyBookingController::class, 'index'])->name('my-bookings.index');
     Route::get('/my-bookings/{code}', [MyBookingController::class, 'show'])->name('my-bookings.show');
@@ -132,6 +133,7 @@ Route::middleware(['auth', RoleMiddleware::class.':admin,owner,staff,kasir,photo
     Route::patch('/bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.update-status');
     Route::post('/bookings/{id}/pay-cash', [AdminBookingController::class, 'recordCashPayment'])->name('bookings.pay-cash');
     Route::patch('/bookings/{id}/assign-photographer', [AdminBookingController::class, 'assignPhotographer'])->name('bookings.assign-photographer');
+    Route::post('/bookings/{id}/emergency-photographer', [AdminBookingController::class, 'emergencyPhotographerUnavailable'])->name('bookings.emergency-photographer');
     Route::post('/bookings/{id}/notes', [AdminBookingController::class, 'saveInternalNotes'])->name('bookings.notes');
     Route::post('/bookings/{id}/resend-notification', [AdminBookingController::class, 'resendNotification'])->name('bookings.resend-notification');
     Route::post('/bookings/{id}/refund', [AdminBookingController::class, 'processRefund'])->name('bookings.refund');

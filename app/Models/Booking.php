@@ -54,6 +54,7 @@ class Booking extends Model
         'addons_total',
         'markup_amount',
         'discount',
+        'promo_code',
         'total_price',
         'paid_amount',
         'payment_option',
@@ -172,14 +173,32 @@ class Booking extends Model
     }
 
     /**
+     * Check if booking was affected by emergency studio closure or photographer absence
+     */
+    public function isEmergencyAffected(): bool
+    {
+        $notes = (string) $this->internal_notes;
+
+        return str_contains($notes, '[STUDIO TUTUP MENDADAK]')
+            || str_contains($notes, '[FOTOGRAFER BERHALANGAN]')
+            || str_contains($notes, '[EMERGENCY_OVERRIDE]');
+    }
+
+    /**
      * Check if booking can be rescheduled according to business rules:
      * - Reschedule max 1x (or setting 'reschedule_max_times')
      * - Minimum H-2 days before session (or setting 'reschedule_min_days')
+     * - Bypass rules if booking is affected by emergency
      */
     public function isReschedulable(): bool
     {
         if (! in_array($this->status, [self::STATUS_CONFIRMED, self::STATUS_DP_PAID, self::STATUS_PAID])) {
             return false;
+        }
+
+        // Emergency override: Bypass normal limit if studio closed or photographer unavailable
+        if ($this->isEmergencyAffected()) {
+            return true;
         }
 
         $maxTimes = (int) Setting::getByKey('reschedule_max_times', 1);

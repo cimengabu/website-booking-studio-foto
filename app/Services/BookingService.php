@@ -77,6 +77,26 @@ class BookingService
                 throw new SlotUnavailableException('Slot waktu tersebut sedang diblokir oleh admin.');
             }
 
+            // Validate promo quota with pessimistic lock (Edge case: voucher habis saat checkout)
+            $verifiedPromoCode = null;
+            if ($promoCode) {
+                $promo = \App\Models\Promo::where('code', strtoupper($promoCode))
+                    ->where('is_active', true)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $promo) {
+                    throw new \Exception("Kode voucher '{$promoCode}' tidak ditemukan atau sudah tidak aktif.");
+                }
+
+                if ($promo->used_count >= $promo->quota) {
+                    throw new \Exception("Mohon maaf, kuota voucher '{$promoCode}' baru saja habis terpakai sebelum pesanan Anda selesai.");
+                }
+
+                $verifiedPromoCode = $promo->code;
+                $promo->increment('used_count');
+            }
+
             // Calculate pricing
             $pricing = $this->pricingService->calculate(
                 $packageId,
@@ -84,7 +104,7 @@ class BookingService
                 $startTime,
                 $peopleCount,
                 $addonSelections,
-                $promoCode
+                $verifiedPromoCode
             );
 
             // Generate Booking Code & QR Token
@@ -92,6 +112,8 @@ class BookingService
             $randomStr = strtoupper(Str::random(4));
             $bookingCode = "SNAP-{$dateFormatted}-{$randomStr}";
             $qrToken = "QR-{$bookingCode}-".Str::random(6);
+
+            $expiryMinutes = (int) Setting::getByKey('booking_expiry_minutes', 30);
 
             $booking = Booking::create([
                 'booking_code' => $bookingCode,
@@ -106,11 +128,12 @@ class BookingService
                 'addons_total' => $pricing['addons_total'],
                 'markup_amount' => $pricing['markup_amount'],
                 'discount' => $pricing['discount'],
+                'promo_code' => $verifiedPromoCode,
                 'total_price' => $pricing['total_price'],
                 'paid_amount' => 0,
                 'payment_option' => $paymentOption,
                 'status' => 'pending',
-                'expires_at' => now()->addMinutes(15), // 15 min lock
+                'expires_at' => now()->addMinutes($expiryMinutes),
                 'qr_token' => $qrToken,
                 'notes' => $notes,
             ]);
