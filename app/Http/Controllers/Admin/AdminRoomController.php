@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlockedSlot;
 use App\Models\Room;
 use App\Models\RoomImage;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -13,8 +15,42 @@ class AdminRoomController extends Controller
     public function index()
     {
         $rooms = Room::with(['images', 'primaryImage'])->orderBy('sort_order')->get();
+        $blockedSlots = BlockedSlot::with('room')->latest()->take(20)->get();
+        $photographers = User::whereIn('role', ['photographer', 'fotografer'])
+            ->withCount(['photographerBookings as active_sessions_count' => function ($q) {
+                $q->whereIn('status', ['confirmed', 'paid', 'dp_paid', 'in_progress', 'checked_in']);
+            }])
+            ->get();
 
-        return view('admin.rooms.index', compact('rooms'));
+        return view('admin.rooms.index', compact('rooms', 'blockedSlots', 'photographers'));
+    }
+
+    public function storeBlockedSlot(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'room_id' => 'nullable|exists:rooms,id',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        BlockedSlot::create([
+            'room_id' => $request->room_id ?: null,
+            'date' => $request->date,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'reason' => $request->reason,
+        ]);
+
+        return back()->with('success', 'Jadwal blok libur / maintenance berhasil ditambahkan.');
+    }
+
+    public function destroyBlockedSlot(int $id)
+    {
+        BlockedSlot::findOrFail($id)->delete();
+
+        return back()->with('success', 'Blok jadwal berhasil dihapus.');
     }
 
     public function create()

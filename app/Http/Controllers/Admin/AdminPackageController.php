@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
+use App\Models\PricingRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -11,9 +12,10 @@ class AdminPackageController extends Controller
 {
     public function index()
     {
-        $packages = Package::all();
+        $packages = Package::latest()->get();
+        $pricingRules = PricingRule::all();
 
-        return view('admin.packages.index', compact('packages'));
+        return view('admin.packages.index', compact('packages', 'pricingRules'));
     }
 
     public function store(Request $request)

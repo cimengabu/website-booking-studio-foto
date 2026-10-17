@@ -14,6 +14,8 @@ class Review extends Model
         'user_id',
         'rating',
         'comment',
+        'admin_reply',
+        'admin_replied_at',
         'photo',
         'is_visible',
     ];
@@ -21,6 +23,7 @@ class Review extends Model
     protected $casts = [
         'rating' => 'integer',
         'is_visible' => 'boolean',
+        'admin_replied_at' => 'datetime',
     ];
 
     public function booking()

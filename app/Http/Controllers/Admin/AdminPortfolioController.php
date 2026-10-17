@@ -23,13 +23,26 @@ class AdminPortfolioController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string',
-            'image_url' => 'required|string',
+            'image_url' => 'nullable|string',
+            'image_file' => 'nullable|image|max:10240',
         ]);
+
+        $imagePath = $request->image_url;
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+            $path = $file->storeAs('portfolio', $filename, 'public');
+            $imagePath = '/storage/'.$path;
+        }
+
+        if (! $imagePath) {
+            return back()->withErrors(['image_url' => 'Harap masukkan URL foto atau unggah file foto.']);
+        }
 
         Portfolio::create([
             'title' => $request->title,
             'category' => $request->category,
-            'image_path' => $request->image_url,
+            'image_path' => $imagePath,
             'room_id' => $request->room_id ?: null,
             'is_featured' => $request->boolean('is_featured'),
         ]);

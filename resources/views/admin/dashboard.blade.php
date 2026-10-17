@@ -198,8 +198,59 @@
     {{-- ── 3. OWNER / ADMIN FULL ANALYTICS VIEW ── --}}
     {{-- ══════════════════════════════════════════════════════════ --}}
     @else
-        <!-- Financial Stats Cards Row -->
+        <!-- Warnings Alert Banner (Pending Payment & High Occupancy) -->
+        <div class="space-y-3">
+            @if($pendingPaymentsCount > 0)
+                <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-amber-300 font-mono">Peringatan Pembayaran Pending</p>
+                            <p class="text-[11px] text-gray-300">Terdapat <strong class="text-white font-bold">{{ $pendingPaymentsCount }} booking</strong> yang masih menunggu konfirmasi pembayaran atau transfer.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.bookings.index', ['status' => 'pending']) }}" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs font-mono whitespace-nowrap transition-all">
+                        Periksa &rarr;
+                    </a>
+                </div>
+            @endif
+
+            @if($occupancyRate >= 70)
+                <div class="p-4 rounded-2xl bg-[#E8451E]/10 border border-[#E8451E]/30 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-[#E8451E]/20 text-[#E8451E] flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-[#E8451E] font-mono">Slot Studio Hampir Penuh (High Occupancy)</p>
+                            <p class="text-[11px] text-gray-300">Tingkat keterisian studio hari ini mencapai <strong class="text-[#F2C94C] font-bold">{{ $occupancyRate }}%</strong> ({{ $bookingTodayCount }} sesi berjalan).</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.calendar.index') }}" class="px-3.5 py-1.5 rounded-xl bg-[#E8451E] hover:bg-[#d03a16] text-white font-bold text-xs font-mono whitespace-nowrap transition-all">
+                        Lihat Slot Kalender &rarr;
+                    </a>
+                </div>
+            @endif
+        </div>
+
+        <!-- Financial & KPI Stats Cards Row -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 sm:p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-calendar-day"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">Hari Ini</span>
+                </div>
+                <p class="text-xs font-mono text-gray-400 uppercase">Sesi & Okupansi Hari Ini</p>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <p class="font-heading font-black text-xl sm:text-2xl text-white">{{ $bookingTodayCount }} Sesi</p>
+                    <span class="text-xs font-mono text-amber-400 font-bold">({{ $occupancyRate }}%)</span>
+                </div>
+            </div>
+
             <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 sm:p-6 shadow-xl">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-10 h-10 rounded-2xl bg-[#E8451E]/20 text-[#E8451E] flex items-center justify-center text-xl shrink-0">
@@ -224,28 +275,17 @@
 
             <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 sm:p-6 shadow-xl">
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl shrink-0">
-                        <i class="fa-solid fa-calendar-check"></i>
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-hourglass-half"></i>
                     </div>
-                    <span class="text-[10px] font-mono text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">Booking</span>
+                    <span class="text-[10px] font-mono text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">Pending</span>
                 </div>
-                <p class="text-xs font-mono text-gray-400 uppercase">Total Booking Bulan Ini</p>
-                <p class="font-heading font-black text-xl sm:text-2xl text-white mt-1">{{ $totalBookingsMonth }}</p>
-            </div>
-
-            <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 sm:p-6 shadow-xl">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl shrink-0">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Member</span>
-                </div>
-                <p class="text-xs font-mono text-gray-400 uppercase">Total Pelanggan</p>
-                <p class="font-heading font-black text-xl sm:text-2xl text-white mt-1">{{ $totalCustomers }}</p>
+                <p class="text-xs font-mono text-gray-400 uppercase">Menunggu Pembayaran</p>
+                <p class="font-heading font-black text-xl sm:text-2xl text-amber-400 mt-1">{{ $pendingPaymentsCount }} Booking</p>
             </div>
         </div>
 
-        <!-- Hourly Heatmap Chart + Top Packages -->
+        <!-- Hourly Heatmap Chart + Top Packages & Activity Log -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8">
             <!-- Heatmap Chart -->
             <div class="xl:col-span-8 bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 shadow-xl">
@@ -258,26 +298,54 @@
                 <canvas id="hourlyChart" height="100"></canvas>
             </div>
 
-            <!-- Top Packages Leaderboard -->
-            <div class="xl:col-span-4 bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 shadow-xl">
-                <h3 class="font-heading font-bold text-lg text-white mb-6">Paket Terlaris</h3>
-                <div class="space-y-4">
-                    @foreach($topPackages as $pkg)
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <span class="w-7 h-7 rounded-full bg-[#141311] text-xs font-mono font-bold text-[#F2C94C] flex items-center justify-center border border-[#2D2B26]">{{ $loop->iteration }}</span>
-                                <p class="text-xs font-semibold text-white">{{ $pkg->name }}</p>
+            <!-- Top Packages Leaderboard & Recent Activity -->
+            <div class="xl:col-span-4 space-y-6">
+                <!-- Top Packages -->
+                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 shadow-xl">
+                    <h3 class="font-heading font-bold text-lg text-white mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-[#F2C94C]"></i> Paket Terlaris
+                    </h3>
+                    <div class="space-y-4">
+                        @foreach($topPackages as $pkg)
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-[#141311] text-xs font-mono font-bold text-[#F2C94C] flex items-center justify-center border border-[#2D2B26]">{{ $loop->iteration }}</span>
+                                    <p class="text-xs font-semibold text-white">{{ $pkg->name }}</p>
+                                </div>
+                                <span class="font-mono text-xs font-bold text-gray-300">{{ $pkg->total_bookings }}x</span>
                             </div>
-                            <span class="font-mono text-xs font-bold text-gray-300">{{ $pkg->total_bookings }}x</span>
-                        </div>
-                        <div class="h-1.5 bg-[#141311] rounded-full overflow-hidden">
-                            <div class="h-full bg-[#E8451E] rounded-full" style="width: {{ min(100, ($pkg->total_bookings / max(1, $topPackages->max('total_bookings'))) * 100) }}%"></div>
-                        </div>
-                    @endforeach
-                    @if($topPackages->isEmpty())
-                        <p class="text-xs text-gray-500 font-mono text-center py-4">Belum ada data booking</p>
-                    @endif
+                            <div class="h-1.5 bg-[#141311] rounded-full overflow-hidden">
+                                <div class="h-full bg-[#E8451E] rounded-full" style="width: {{ min(100, ($pkg->total_bookings / max(1, $topPackages->max('total_bookings'))) * 100) }}%"></div>
+                            </div>
+                        @endforeach
+                        @if($topPackages->isEmpty())
+                            <p class="text-xs text-gray-500 font-mono text-center py-4">Belum ada data booking</p>
+                        @endif
+                    </div>
                 </div>
+
+                <!-- Recent Activity Logs Mini Feed -->
+                @if(isset($recentActivities) && $recentActivities->isNotEmpty())
+                    <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 shadow-xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-heading font-bold text-sm text-white flex items-center gap-2">
+                                <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> Aktivitas Terbaru
+                            </h3>
+                            <a href="{{ route('admin.logs.index') }}" class="text-[10px] font-mono text-[#E8451E] hover:underline">Semua Log &rarr;</a>
+                        </div>
+                        <div class="space-y-3">
+                            @foreach($recentActivities as $act)
+                                <div class="text-xs font-mono flex items-start gap-2.5 pb-2.5 border-b border-[#2D2B26] last:border-0 last:pb-0">
+                                    <span class="w-2 h-2 rounded-full bg-[#E8451E] mt-1 shrink-0"></span>
+                                    <div>
+                                        <p class="text-gray-200 text-[11px] font-sans">{{ $act->description }}</p>
+                                        <span class="text-[9px] text-gray-500">{{ $act->created_at->diffForHumans() }} · {{ $act->user?->name ?? 'Sistem' }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     @endif

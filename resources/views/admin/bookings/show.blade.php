@@ -179,41 +179,111 @@
                     </a>
                 </div>
             @endif
-        </div>
-
-        <!-- Right Payment Summary -->
-        <div class="lg:col-span-4 space-y-6">
-            <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
-                <h3 class="font-heading font-bold text-sm text-white border-b border-[#2D2B26] pb-3">Rincian Biaya</h3>
-                <div class="space-y-2.5 text-xs font-mono text-gray-300">
-                    <div class="flex justify-between"><span>Subtotal</span><span>Rp {{ number_format($booking->subtotal, 0, ',', '.') }}</span></div>
-                    @if($booking->addons_total > 0)
-                        <div class="flex justify-between"><span>Add-on</span><span>Rp {{ number_format($booking->addons_total, 0, ',', '.') }}</span></div>
-                    @endif
-                    @if($booking->discount > 0)
-                        <div class="flex justify-between text-emerald-400"><span>Diskon</span><span>-Rp {{ number_format($booking->discount, 0, ',', '.') }}</span></div>
-                    @endif
-                    <div class="flex justify-between font-bold text-white pt-2 border-t border-[#2D2B26]"><span>TOTAL</span><span class="text-[#F2C94C]">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span></div>
-                    <div class="flex justify-between text-emerald-400"><span>Sudah Dibayar</span><span>Rp {{ number_format($booking->paid_amount, 0, ',', '.') }}</span></div>
-                    @if($booking->remaining_balance > 0)
-                        <div class="flex justify-between text-amber-300 font-bold"><span>Sisa Tagihan</span><span>Rp {{ number_format($booking->remaining_balance, 0, ',', '.') }}</span></div>
-                    @endif
-                </div>
-            </div>
-
-            @if($booking->payments->isNotEmpty())
+            <!-- Internal Notes (Staff & Owner) -->
+            @if(!auth()->user()->isPhotographer())
                 <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-3">
-                    <h3 class="font-heading font-bold text-sm text-white border-b border-[#2D2B26] pb-3">Riwayat Transaksi</h3>
-                    @foreach($booking->payments as $p)
-                        <div class="flex items-center justify-between text-xs font-mono">
-                            <div>
-                                <p class="font-bold text-white">{{ strtoupper($p->payment_kind) }}</p>
-                                <p class="text-gray-500 text-[10px]">{{ $p->payment_type }} · {{ $p->paid_at?->format('d M Y') }}</p>
-                            </div>
-                            <span class="text-emerald-400 font-bold">Rp {{ number_format($p->gross_amount, 0, ',', '.') }}</span>
+                    <div class="flex items-center justify-between border-b border-[#2D2B26] pb-3">
+                        <h3 class="font-heading font-bold text-sm text-white flex items-center gap-2">
+                            <i class="fa-solid fa-note-sticky text-[#F2C94C]"></i>
+                            Catatan Internal Tim
+                        </h3>
+                        <span class="text-[9px] text-gray-500 font-mono">Privat (Hanya Staf)</span>
+                    </div>
+                    <form method="POST" action="{{ route('admin.bookings.notes', $booking->id) }}" class="space-y-3">
+                        @csrf
+                        <textarea name="internal_notes" rows="3" placeholder="Catatan khusus staf, permintaan lighting, properti tambahan..." class="w-full bg-[#141311] border border-[#2D2B26] text-white px-3 py-2.5 rounded-xl text-xs focus:outline-none focus:border-[#E8451E] font-sans">{{ $booking->internal_notes }}</textarea>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 rounded-xl bg-[#141311] border border-[#2D2B26] hover:border-[#E8451E] text-xs font-mono font-bold text-gray-300 hover:text-white transition-all">
+                                Simpan Catatan
+                            </button>
                         </div>
-                    @endforeach
+                    </form>
                 </div>
+
+                <!-- Notification & WhatsApp Dispatcher -->
+                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
+                    <h3 class="font-heading font-bold text-sm text-white border-b border-[#2D2B26] pb-3 flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+                        Kirim Ulang Notifikasi
+                    </h3>
+                    <div class="space-y-2">
+                        <form method="POST" action="{{ route('admin.bookings.resend-notification', $booking->id) }}">
+                            @csrf
+                            <input type="hidden" name="type" value="confirmation">
+                            <button type="submit" class="w-full text-left px-3.5 py-2 rounded-xl bg-[#141311] border border-[#2D2B26] hover:border-emerald-500/40 text-xs font-mono text-gray-300 hover:text-emerald-400 flex items-center justify-between transition-all">
+                                <span><i class="fa-solid fa-paper-plane mr-2 text-[10px]"></i> Konfirmasi Booking</span>
+                                <i class="fa-solid fa-chevron-right text-[9px] text-gray-600"></i>
+                            </button>
+                        </form>
+
+                        <form method="POST" action="{{ route('admin.bookings.resend-notification', $booking->id) }}">
+                            @csrf
+                            <input type="hidden" name="type" value="h1">
+                            <button type="submit" class="w-full text-left px-3.5 py-2 rounded-xl bg-[#141311] border border-[#2D2B26] hover:border-blue-500/40 text-xs font-mono text-gray-300 hover:text-blue-400 flex items-center justify-between transition-all">
+                                <span><i class="fa-solid fa-bell mr-2 text-[10px]"></i> Pengingat H-1</span>
+                                <i class="fa-solid fa-chevron-right text-[9px] text-gray-600"></i>
+                            </button>
+                        </form>
+
+                        @if($booking->photoResults->isNotEmpty())
+                            <form method="POST" action="{{ route('admin.bookings.resend-notification', $booking->id) }}">
+                                @csrf
+                                <input type="hidden" name="type" value="photos">
+                                <button type="submit" class="w-full text-left px-3.5 py-2 rounded-xl bg-[#141311] border border-[#2D2B26] hover:border-purple-500/40 text-xs font-mono text-gray-300 hover:text-purple-400 flex items-center justify-between transition-all">
+                                    <span><i class="fa-solid fa-images mr-2 text-[10px]"></i> Notifikasi Foto Siap</span>
+                                    <i class="fa-solid fa-chevron-right text-[9px] text-gray-600"></i>
+                                </button>
+                            </form>
+                        @endif
+
+                        @php
+                            $waPhone = preg_replace('/[^0-9]/', '', $booking->user->phone ?? '');
+                            if (str_starts_with($waPhone, '0')) $waPhone = '62' . substr($waPhone, 1);
+                            $waText = urlencode("Halo {$booking->user->name}, mengenai booking Anda di SnapSpace ({$booking->booking_code}) pada " . $booking->booking_date->format('d M Y') . "...");
+                        @endphp
+                        @if($waPhone)
+                            <a href="https://wa.me/{{ $waPhone }}?text={{ $waText }}" target="_blank" class="w-full block text-center px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs font-mono transition-all mt-3">
+                                <i class="fa-brands fa-whatsapp text-sm mr-1.5"></i> Chat Klien via WhatsApp
+                            </a>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Refund Action (if not cancelled yet and has payment) -->
+                @if($booking->paid_amount > 0 && !in_array($booking->status, ['cancelled', 'no_show', 'closed']))
+                    <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4" x-data="{ openRefund: false }">
+                        <div class="flex items-center justify-between border-b border-[#2D2B26] pb-3">
+                            <h3 class="font-heading font-bold text-sm text-rose-400 flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-rotate-left"></i>
+                                Pembatalan & Refund
+                            </h3>
+                            <button @click="openRefund = !openRefund" class="text-xs text-gray-400 hover:text-white font-mono">
+                                <span x-text="openRefund ? 'Tutup' : 'Buka Form'"></span>
+                            </button>
+                        </div>
+
+                        <div x-show="openRefund" x-cloak class="space-y-3">
+                            <form method="POST" action="{{ route('admin.bookings.refund', $booking->id) }}" class="space-y-3 text-xs font-mono" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan booking ini dan memproses refund?')">
+                                @csrf
+                                <div>
+                                    <label class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Nominal Refund (Rp)</label>
+                                    <input type="number" name="refund_amount" value="{{ $booking->paid_amount }}" required min="0" class="w-full bg-[#141311] border border-[#2D2B26] text-white px-3 py-2 rounded-xl focus:border-[#E8451E] focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Nominal Penalti (Rp)</label>
+                                    <input type="number" name="penalty_amount" value="0" min="0" class="w-full bg-[#141311] border border-[#2D2B26] text-white px-3 py-2 rounded-xl focus:border-[#E8451E] focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-400 uppercase font-bold block mb-1">Alasan Pembatalan</label>
+                                    <input type="text" name="cancellation_reason" required placeholder="Permintaan pelanggan / keadaan darurat..." class="w-full bg-[#141311] border border-[#2D2B26] text-white px-3 py-2 rounded-xl focus:border-[#E8451E] focus:outline-none">
+                                </div>
+                                <button type="submit" class="w-full py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white font-bold text-xs transition-all">
+                                    Proses Pembatalan & Refund
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endif
             @endif
         </div>
     </div>

@@ -3,7 +3,33 @@
 @section('page-title', 'Kelola Booking')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="{
+    selectedBookings: [],
+    selectAll: false,
+    toggleAll() {
+        if (this.selectAll) {
+            this.selectedBookings = [{{ $bookings->pluck('id')->implode(',') }}];
+        } else {
+            this.selectedBookings = [];
+        }
+    }
+}">
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-heading font-black text-white flex items-center gap-2">
+                <i class="fa-solid fa-calendar-check text-[#E8451E]"></i>
+                Kelola Booking & Operasional Sesi
+            </h2>
+            <p class="text-xs text-gray-400 font-mono mt-0.5">Filter status, penugasan kru fotografer, walk-in manual, dan aksi massal booking.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.bookings.walkin') }}" class="px-5 py-2.5 rounded-xl bg-[#E8451E] hover:bg-[#d03a16] text-white font-bold text-xs font-mono shadow-lg transition-all flex items-center gap-2">
+                <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i> Booking Walk-In / Manual
+            </a>
+        </div>
+    </div>
+
     <!-- Filters -->
     <form method="GET" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
         <div class="grid grid-cols-2 {{ auth()->user()->isPhotographer() ? 'md:grid-cols-5' : 'md:grid-cols-6' }} gap-4 items-end">
@@ -62,11 +88,16 @@
     </form>
 
     <!-- Booking Table -->
-    <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl shadow-xl overflow-hidden">
+    <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl shadow-xl overflow-hidden relative">
         <div class="overflow-x-auto">
             <table class="w-full text-xs font-mono">
                 <thead class="bg-[#141311] text-gray-400 text-[10px] uppercase">
                     <tr>
+                        @if(!auth()->user()->isPhotographer())
+                            <th class="px-4 py-3 text-center w-10">
+                                <input type="checkbox" x-model="selectAll" @change="toggleAll()" class="rounded border-[#2D2B26] text-[#E8451E] focus:ring-0">
+                            </th>
+                        @endif
                         @foreach(['Kode Booking', 'Pelanggan', 'Ruangan / Paket', 'Tanggal Sesi', 'Jam', 'Fotografer', 'Total', 'Dibayar', 'Status', 'Aksi'] as $h)
                             <th class="text-left px-4 py-3">{{ $h }}</th>
                         @endforeach
@@ -91,7 +122,12 @@
                                 'expired'     => 'text-rose-400 bg-rose-900/20 border-rose-900/40',
                             ];
                         @endphp
-                        <tr class="hover:bg-[#141311] transition-colors">
+                        <tr class="hover:bg-[#141311] transition-colors" :class="selectedBookings.includes({{ $b->id }}) ? 'bg-[#141311]/80' : ''">
+                            @if(!auth()->user()->isPhotographer())
+                                <td class="px-4 py-3 text-center">
+                                    <input type="checkbox" value="{{ $b->id }}" x-model.number="selectedBookings" class="rounded border-[#2D2B26] text-[#E8451E] focus:ring-0">
+                                </td>
+                            @endif
                             <td class="px-4 py-3 font-bold text-[#F2C94C]">{{ $b->booking_code }}</td>
                             <td class="px-4 py-3 text-gray-200">
                                 <p class="font-semibold">{{ $b->user->name }}</p>
@@ -126,12 +162,41 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="10" class="text-center py-12 text-gray-500">Tidak ada data booking yang ditemukan.</td></tr>
+                        <tr><td colspan="11" class="text-center py-12 text-gray-500">Tidak ada data booking yang ditemukan.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
         <div class="p-4 border-t border-[#2D2B26]">{{ $bookings->withQueryString()->links() }}</div>
+
+        <!-- Floating Bulk Action Bar -->
+        <div x-show="selectedBookings.length > 0" x-transition.opacity class="sticky bottom-4 left-4 right-4 mx-4 p-4 rounded-2xl bg-[#141311] border border-[#E8451E]/60 shadow-2xl flex flex-wrap items-center justify-between gap-4 z-30">
+            <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-[#E8451E] text-white font-bold text-xs flex items-center justify-center font-mono" x-text="selectedBookings.length"></span>
+                <span class="text-xs font-mono text-white font-bold">Booking Terpilih untuk Aksi Massal</span>
+            </div>
+
+            <form method="POST" action="{{ route('admin.bookings.bulk-status') }}" class="flex items-center gap-3">
+                @csrf
+                <template x-for="id in selectedBookings" :key="id">
+                    <input type="hidden" name="booking_ids[]" :value="id">
+                </template>
+                <select name="status" class="bg-[#1E1D1A] border border-[#2D2B26] text-white text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-[#E8451E]">
+                    <option value="confirmed">Ubah Status: Dikonfirmasi</option>
+                    <option value="completed">Ubah Status: Selesai Sesi</option>
+                    <option value="closed">Ubah Status: Ditutup (Closed)</option>
+                    <option value="cancelled">Ubah Status: Dibatalkan</option>
+                    <option value="no_show">Ubah Status: No-Show</option>
+                </select>
+                <button type="submit" class="px-4 py-2 rounded-xl bg-[#E8451E] hover:bg-[#d03a16] text-white font-bold text-xs font-mono transition-all">
+                    Terapkan
+                </button>
+                <button type="button" @click="selectedBookings = []; selectAll = false" class="text-xs text-gray-400 hover:text-white px-2">
+                    Batal
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 @endsection
+

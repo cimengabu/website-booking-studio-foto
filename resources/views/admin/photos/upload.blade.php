@@ -16,31 +16,88 @@
             Pelanggan: {{ $booking->user->name }} · {{ $booking->room->name }} · {{ $booking->booking_date->format('d M Y') }} · {{ substr($booking->start_time, 0, 5) }}
         </p>
 
-        <!-- Upload via URL Form (Demo Friendly) -->
-        <form method="POST" action="{{ route('admin.photos.store', $booking->id) }}" enctype="multipart/form-data" x-data="{ urlCount: 1 }" class="space-y-6">
+        <!-- Upload Form with Delivery Options -->
+        <form method="POST" action="{{ route('admin.photos.store', $booking->id) }}" enctype="multipart/form-data" x-data="{ urlCount: 1, watermarkEnabled: true, isDragging: false }" class="space-y-6">
             @csrf
             
             <div class="space-y-4">
-                <p class="text-xs font-semibold text-gray-300">Masukkan URL Foto (Unsplash / Link Publik):</p>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-gray-300">Masukkan URL Foto (Unsplash / Link Cloud):</p>
+                    <button type="button" @click="urlCount++" class="text-xs font-semibold text-[#E8451E] hover:underline flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus text-[10px]"></i> Tambah Kolom URL
+                    </button>
+                </div>
                 <template x-for="i in urlCount" :key="i">
                     <div class="flex gap-3 items-center">
-                        <input type="url" :name="`image_urls[${i-1}]`" placeholder="https://images.unsplash.com/..." class="flex-grow bg-[#141311] border border-[#2D2B26] focus:border-[#E8451E] text-white px-4 py-2.5 rounded-xl text-xs focus:outline-none">
+                        <input type="url" :name="`image_urls[${i-1}]`" placeholder="https://images.unsplash.com/photo-..." class="flex-grow bg-[#141311] border border-[#2D2B26] focus:border-[#E8451E] text-white px-4 py-2.5 rounded-xl text-xs focus:outline-none">
                     </div>
                 </template>
-                <button type="button" @click="urlCount++" class="text-xs font-semibold text-[#E8451E] hover:underline flex items-center gap-1.5">
-                    <i class="fa-solid fa-plus text-[10px]"></i> Tambah URL Foto
-                </button>
             </div>
 
             <div class="border-t border-[#2D2B26] pt-4">
-                <p class="text-xs font-semibold text-gray-300 mb-3">Atau Upload File Foto (JPG/PNG/WEBP):</p>
-                <input type="file" name="photos[]" multiple accept="image/jpeg,image/jpg,image/png,image/webp" class="w-full bg-[#141311] border border-dashed border-[#2D2B26] hover:border-[#E8451E] text-gray-400 text-xs px-4 py-6 rounded-xl text-center cursor-pointer">
-                <p class="text-[10px] text-gray-500 font-mono mt-1">*Maks 15MB per file. Format: JPG, PNG, WEBP.</p>
+                <p class="text-xs font-semibold text-gray-300 mb-2">Upload File Foto Langsung (JPG/PNG/WEBP):</p>
+                <div 
+                    @dragover.prevent="isDragging = true" 
+                    @dragleave.prevent="isDragging = false" 
+                    @drop="isDragging = false"
+                    :class="isDragging ? 'border-[#E8451E] bg-[#E8451E]/5' : 'border-[#2D2B26] bg-[#141311]'"
+                    class="relative border-2 border-dashed rounded-2xl p-6 text-center transition-all">
+                    <input type="file" name="photos[]" multiple accept="image/jpeg,image/jpg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <div class="flex flex-col items-center justify-center space-y-2 pointer-events-none">
+                        <div class="w-12 h-12 rounded-full bg-[#1E1D1A] flex items-center justify-center text-[#E8451E]">
+                            <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-300">Drag & drop foto ke sini, atau <span class="text-[#E8451E] underline">pilih dari file</span></p>
+                        <p class="text-[10px] text-gray-500 font-mono">Format didukung: JPG, PNG, WEBP (Maks 15MB/file)</p>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit" class="px-8 py-3.5 rounded-full bg-[#E8451E] text-white font-bold text-sm hover:bg-[#d03a16] shadow-lg flex items-center gap-2">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Notifikasi Pelanggan
-            </button>
+            <!-- Delivery Settings: Watermark & Expiration -->
+            <div class="border-t border-[#2D2B26] pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-[#141311] border border-[#2D2B26] rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-gray-300 flex items-center gap-2">
+                            <i class="fa-solid fa-stamp text-amber-400"></i> Watermark Preview
+                        </label>
+                        <input type="checkbox" name="watermark_enabled" value="1" x-model="watermarkEnabled" class="accent-[#E8451E] w-4 h-4 rounded">
+                    </div>
+                    <p class="text-[11px] text-gray-500 leading-relaxed">
+                        Tampilkan watermark transparan di foto pratinjau sebelum file diunduh lunas.
+                    </p>
+                    <div x-show="watermarkEnabled" class="pt-1">
+                        <label class="block text-[10px] font-mono text-gray-400 mb-1">Teks Watermark:</label>
+                        <input type="text" name="watermark_text" value="{{ $booking->photoDelivery?->watermark_text ?? 'SNAPSPACE STUDIO PREVIEW' }}" class="w-full bg-[#1E1D1A] border border-[#2D2B26] focus:border-[#E8451E] text-white px-3 py-1.5 rounded-lg text-xs font-mono">
+                    </div>
+                </div>
+
+                <div class="bg-[#141311] border border-[#2D2B26] rounded-2xl p-4 space-y-3">
+                    <label class="block text-xs font-semibold text-gray-300 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> Masa Aktif Link Unduh
+                    </label>
+                    <p class="text-[11px] text-gray-500 leading-relaxed">
+                        Batas waktu pelanggan dapat mengunduh foto beresolusi penuh.
+                    </p>
+                    <select name="expires_days" class="w-full bg-[#1E1D1A] border border-[#2D2B26] focus:border-[#E8451E] text-white px-3 py-2 rounded-xl text-xs font-mono">
+                        <option value="7">7 Hari (1 Minggu)</option>
+                        <option value="14">14 Hari (2 Minggu)</option>
+                        <option value="30" selected>30 Hari (Rekomendasi 1 Bulan)</option>
+                        <option value="60">60 Hari (2 Bulan)</option>
+                        <option value="90">90 Hari (3 Bulan)</option>
+                        <option value="0">Selamanya (Tanpa Batas Waktu)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-[#2D2B26] pt-4">
+                <label class="flex items-center gap-2.5 text-xs text-gray-300 cursor-pointer">
+                    <input type="checkbox" name="send_notification" value="1" checked class="accent-[#E8451E] w-4 h-4 rounded">
+                    <span>Kirim notifikasi otomatis WhatsApp & Email ke pelanggan bahwa foto sudah siap</span>
+                </label>
+                <button type="submit" class="px-8 py-3 rounded-full bg-[#E8451E] text-white font-bold text-xs hover:bg-[#d03a16] shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Simpan & Kirim Foto
+                </button>
+            </div>
         </form>
     </div>
 

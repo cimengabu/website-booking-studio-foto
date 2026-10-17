@@ -120,16 +120,21 @@ Route::middleware(['auth', RoleMiddleware::class.':admin,owner,staff,kasir,photo
 
     // Booking Management (Owner, Staff, Photographer)
     Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+    Route::post('/bookings/bulk-status', [AdminBookingController::class, 'bulkUpdateStatus'])->name('bookings.bulk-status');
     Route::get('/bookings/walkin', [AdminBookingController::class, 'createWalkin'])->name('bookings.walkin');
     Route::post('/bookings/walkin', [AdminBookingController::class, 'storeWalkin'])->name('bookings.walkin.store');
     Route::get('/bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
     Route::patch('/bookings/{id}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.update-status');
     Route::post('/bookings/{id}/pay-cash', [AdminBookingController::class, 'recordCashPayment'])->name('bookings.pay-cash');
     Route::patch('/bookings/{id}/assign-photographer', [AdminBookingController::class, 'assignPhotographer'])->name('bookings.assign-photographer');
+    Route::post('/bookings/{id}/notes', [AdminBookingController::class, 'saveInternalNotes'])->name('bookings.notes');
+    Route::post('/bookings/{id}/resend-notification', [AdminBookingController::class, 'resendNotification'])->name('bookings.resend-notification');
+    Route::post('/bookings/{id}/refund', [AdminBookingController::class, 'processRefund'])->name('bookings.refund');
 
     // Calendar
     Route::get('/calendar', [AdminCalendarController::class, 'index'])->name('calendar.index');
     Route::get('/calendar/events', [AdminCalendarController::class, 'eventsApi'])->name('calendar.events');
+    Route::post('/calendar/reschedule/{id}', [AdminCalendarController::class, 'rescheduleApi'])->name('calendar.reschedule');
 
     // Photos Results Upload & Management (Owner, Staff, Photographer)
     Route::get('/photos', [AdminPhotoController::class, 'index'])->name('photos.index');
@@ -139,10 +144,12 @@ Route::middleware(['auth', RoleMiddleware::class.':admin,owner,staff,kasir,photo
 
     // Customers (Owner & Staff)
     Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
+    Route::get('/customers/export', [AdminCustomerController::class, 'export'])->name('customers.export');
 
     // Reviews Moderation (Owner & Staff)
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
     Route::patch('/reviews/{id}/toggle', [AdminReviewController::class, 'toggleVisibility'])->name('reviews.toggle');
+    Route::post('/reviews/{id}/reply', [AdminReviewController::class, 'reply'])->name('reviews.reply');
 
     // ── OWNER EXCLUSIVE MODULES (Master Data, Keuangan, Settings, RBAC Team) ──
     Route::middleware([RoleMiddleware::class.':admin,owner'])->group(function () {
@@ -154,6 +161,8 @@ Route::middleware(['auth', RoleMiddleware::class.':admin,owner,staff,kasir,photo
 
         // Master Data: Rooms, Packages, Addons, Portfolio
         Route::resource('rooms', AdminRoomController::class);
+        Route::post('/blocked-slots', [AdminRoomController::class, 'storeBlockedSlot'])->name('blocked-slots.store');
+        Route::delete('/blocked-slots/{id}', [AdminRoomController::class, 'destroyBlockedSlot'])->name('blocked-slots.destroy');
         Route::resource('packages', AdminPackageController::class)->except(['create', 'edit', 'show']);
         Route::resource('addons', AdminAddonController::class)->except(['create', 'edit', 'show']);
 

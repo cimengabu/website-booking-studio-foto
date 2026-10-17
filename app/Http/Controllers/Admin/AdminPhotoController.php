@@ -85,22 +85,29 @@ class AdminPhotoController extends Controller
         }
 
         // Update / Create Photo Delivery Status
+        $expiresDays = (int) $request->input('expires_days', 30);
+        $expiresAt = $expiresDays > 0 ? now()->addDays($expiresDays) : null;
+
         PhotoDelivery::updateOrCreate(
             ['booking_id' => $booking->id],
             [
                 'delivered_at' => now(),
-                'expires_at' => now()->addDays(30), // 30 days active download link
+                'expires_at' => $expiresAt,
+                'watermark_enabled' => $request->boolean('watermark_enabled', true),
+                'watermark_text' => $request->input('watermark_text', 'SNAPSPACE STUDIO PREVIEW'),
             ]
         );
 
         $booking->update(['status' => 'delivered']);
 
-        ActivityLog::record(request()->user()?->id, 'admin_upload_photos', "Mengunggah hasil foto untuk booking {$booking->booking_code}");
+        ActivityLog::record(request()->user()?->id, 'admin_upload_photos', "Mengunggah hasil foto untuk booking {$booking->booking_code} (Link aktif {$expiresDays} hari)");
 
-        app(NotificationService::class)->sendPhotosReadyNotification($booking);
+        if ($request->boolean('send_notification', true)) {
+            app(NotificationService::class)->sendPhotosReadyNotification($booking);
+        }
 
         return redirect()->route('admin.photos.upload', $booking->id)
-            ->with('success', 'Hasil foto berhasil diunggah! Notifikasi WhatsApp foto siap unduh telah dikirimkan ke pelanggan.');
+            ->with('success', 'Hasil foto berhasil diunggah! Link unduh aktif hingga '.($expiresAt ? $expiresAt->format('d M Y') : 'Selamanya').' & notifikasi disiapkan.');
     }
 
     public function destroyPhoto(int $photoId)

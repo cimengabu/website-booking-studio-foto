@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
+use App\Models\BlockedSlot;
 use App\Models\Booking;
 use App\Models\Room;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AdminCalendarController extends Controller
@@ -46,10 +49,63 @@ class AdminCalendarController extends Controller
                     'booking_id' => $b->id,
                     'status' => $b->status,
                     'package' => $b->package->name,
+                    'type' => 'booking',
+                ],
+            ];
+        }
+
+        // Include Blocked Slots (Holidays / Maintenance)
+        $blockedSlots = BlockedSlot::with('room')->get();
+        foreach ($blockedSlots as $block) {
+            $roomName = $block->room ? $block->room->name : 'Semua Ruangan';
+            $events[] = [
+                'id' => 'block_'.$block->id,
+                'title' => "[TUTUP] {$roomName}: {$block->reason}",
+                'start' => $block->date.'T'.$block->start_time,
+                'end' => $block->date.'T'.$block->end_time,
+                'color' => '#BE123C', // Rose 700
+                'editable' => false,
+                'extendedProps' => [
+                    'type' => 'blocked',
+                    'reason' => $block->reason,
                 ],
             ];
         }
 
         return response()->json($events);
+    }
+
+    public function rescheduleApi(Request $request, int $id)
+    {
+        $booking = Booking::with('package')->findOrFail($id);
+        $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required',
+        ]);
+
+        $start = Carbon::parse($request->start_time);
+        $duration = $booking->package->duration_minutes ?? 30;
+        $end = (clone $start)->addMinutes($duration);
+
+        $booking->update([
+            'original_booking_date' => $booking->original_booking_date ?? $booking->booking_date,
+            'original_start_time' => $booking->original_start_time ?? $booking->start_time,
+            'booking_date' => $request->date,
+            'start_time' => $start->format('H:i:s'),
+            'end_time' => $end->format('H:i:s'),
+            'status' => 'rescheduled',
+            'reschedule_count' => ($booking->reschedule_count ?? 0) + 1,
+        ]);
+
+        ActivityLog::record(
+            auth()->id(),
+            'reschedule',
+            "Reschedule booking {$booking->booking_code} ke {$request->date} jam {$start->format('H:i')} WIB via kalender"
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => "Jadwal booking {$booking->booking_code} berhasil dipindahkan ke {$request->date} jam {$start->format('H:i')} WIB.",
+        ]);
     }
 }

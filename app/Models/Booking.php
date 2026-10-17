@@ -67,6 +67,7 @@ class Booking extends Model
         'qr_token',
         'checked_in_at',
         'notes',
+        'internal_notes',
     ];
 
     protected $casts = [

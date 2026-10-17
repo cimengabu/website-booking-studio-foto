@@ -192,4 +192,89 @@ class AdminBookingController extends Controller
 
         return back()->with('success', 'Pembayaran tunai berhasil dicatat.');
     }
+
+    public function saveInternalNotes(Request $request, int $id)
+    {
+        $booking = Booking::findOrFail($id);
+        $booking->update([
+            'internal_notes' => $request->internal_notes,
+        ]);
+
+        ActivityLog::record(Auth::id(), 'admin_internal_notes', "Memperbarui catatan internal untuk {$booking->booking_code}");
+
+        return back()->with('success', 'Catatan internal staf berhasil disimpan.');
+    }
+
+    public function resendNotification(Request $request, int $id)
+    {
+        $booking = Booking::findOrFail($id);
+        $type = $request->input('type', 'confirmation');
+
+        $notifService = app(NotificationService::class);
+        if ($type === 'confirmation') {
+            $notifService->sendBookingConfirmation($booking);
+            $msg = 'Notifikasi konfirmasi booking berhasil dikirim ulang.';
+        } elseif ($type === 'h1') {
+            $notifService->sendH1Reminder($booking);
+            $msg = 'Notifikasi pengingat H-1 berhasil dikirim.';
+        } elseif ($type === 'h2') {
+            $notifService->sendH2Reminder($booking);
+            $msg = 'Notifikasi pengingat H-2 jam berhasil dikirim.';
+        } elseif ($type === 'photos') {
+            $notifService->sendPhotosReadyNotification($booking);
+            $msg = 'Notifikasi foto siap unduh berhasil dikirim ulang.';
+        } else {
+            $notifService->sendBookingConfirmation($booking);
+            $msg = 'Notifikasi berhasil dikirim ulang.';
+        }
+
+        ActivityLog::record(Auth::id(), 'admin_resend_notification', "Mengirim ulang notifikasi ({$type}) untuk {$booking->booking_code}");
+
+        return back()->with('success', $msg);
+    }
+
+    public function processRefund(Request $request, int $id)
+    {
+        $booking = Booking::findOrFail($id);
+        $request->validate([
+            'refund_amount' => 'required|numeric|min:0',
+            'penalty_amount' => 'required|numeric|min:0',
+            'cancellation_reason' => 'required|string|max:255',
+        ]);
+
+        $booking->update([
+            'status' => 'cancelled',
+            'refund_amount' => $request->refund_amount,
+            'penalty_amount' => $request->penalty_amount,
+            'cancellation_reason' => $request->cancellation_reason,
+        ]);
+
+        ActivityLog::record(Auth::id(), 'admin_process_refund', 'Memproses refund Rp '.number_format($request->refund_amount, 0, ',', '.')." untuk {$booking->booking_code}");
+
+        app(NotificationService::class)->sendCancellationNotification($booking, $request->cancellation_reason);
+
+        return back()->with('success', 'Pembatalan & pencatatan refund booking berhasil diproses.');
+    }
+
+    public function bulkUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'booking_ids' => 'required|array|min:1',
+            'booking_ids.*' => 'exists:bookings,id',
+            'status' => 'required|in:confirmed,completed,closed,cancelled,no_show',
+        ]);
+
+        $count = 0;
+        foreach ($request->booking_ids as $bId) {
+            $booking = Booking::find($bId);
+            if ($booking) {
+                $booking->update(['status' => $request->status]);
+                $count++;
+            }
+        }
+
+        ActivityLog::record(Auth::id(), 'admin_bulk_status', "Mengubah status {$count} booking secara massal ke {$request->status}");
+
+        return back()->with('success', "Berhasil memperbarui status {$count} booking.");
+    }
 }

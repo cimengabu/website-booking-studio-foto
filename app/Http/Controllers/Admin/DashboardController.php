@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\Review;
@@ -109,6 +110,11 @@ class DashboardController extends Controller
             ->take(8)
             ->get();
 
+        $totalRooms = Room::count();
+        $bookingTodayCount = $todayBookings->count();
+        $occupancyRate = min(100, round(($bookingTodayCount / max(1, $totalRooms * 12)) * 100));
+        $recentActivities = ActivityLog::with('user')->latest()->take(6)->get();
+
         return view('admin.dashboard', compact(
             'user',
             'incomeToday',
@@ -119,11 +125,14 @@ class DashboardController extends Controller
             'topPackages',
             'hourlyDistribution',
             'todayBookings',
+            'bookingTodayCount',
+            'occupancyRate',
             'pendingPaymentsCount',
             'checkedInTodayCount',
             'myPhotographerBookings',
             'myPendingUploads',
-            'photographerStats'
+            'photographerStats',
+            'recentActivities'
         ));
     }
 
