@@ -147,6 +147,9 @@
                                     </a>
                                 @endif
 
+                                <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:bg-[#E8451E]/10 hover:text-[#E8451E]">
+                                    <i class="fa-solid fa-house-chimney text-xs w-4"></i> Dashboard Saya
+                                </a>
                                 <a href="{{ route('my-bookings.index') }}" class="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:bg-[#E8451E]/10 hover:text-[#E8451E]">
                                     <i class="fa-solid fa-ticket text-xs w-4"></i> Booking Saya
                                 </a>

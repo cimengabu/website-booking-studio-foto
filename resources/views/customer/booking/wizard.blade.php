@@ -161,7 +161,7 @@
                             </div>
                         @endif
 
-                        <button @click="step = 2" :disabled="!selectedPackageId"
+                        <button @click="goToSchedule()" :disabled="!selectedPackageId"
                                 class="btn-gold btn-bounce w-full py-4 rounded-2xl text-white font-bold text-base mt-6 shadow-warm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                             Lanjut: Pilih Jadwal <i class="fa-solid fa-arrow-right"></i>
                         </button>
@@ -222,6 +222,7 @@
                                    x-model="selectedDate"
                                    :min="today"
                                    @change="fetchSlots()"
+                                   @input="fetchSlots()"
                                    class="w-full px-4 py-3.5 rounded-xl border border-cream-dark bg-cream text-sm text-ink focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all"
                                    id="booking_date">
                         </div>
@@ -283,6 +284,13 @@
                                     <i class="fa-solid fa-hand-pointer text-gold text-[11px]"></i>
                                     <span>Pilih salah satu jam yang berwarna putih di atas.</span>
                                 </p>
+                            </div>
+
+                            {{-- All slots full/past banner --}}
+                            <div x-show="!loadingSlots && slots.length > 0 && slots.every(s => !s.available)" class="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
+                                <i class="fa-solid fa-clock-rotate-left text-amber-500 text-xl mb-1.5 block"></i>
+                                <p class="text-xs font-bold text-ink">Semua jam pada tanggal ini sudah lewat atau telah terisi penuh.</p>
+                                <p class="text-[11px] text-ink-muted mt-1">Silakan pilih tanggal lain atau besok untuk melihat jam yang masih tersedia.</p>
                             </div>
 
                             {{-- No slots --}}
@@ -505,6 +513,7 @@
                             <input type="hidden" name="people_count"    :value="form.people_count">
                             <input type="hidden" name="payment_option"  :value="form.payment_option">
                             <input type="hidden" name="promo_code"      :value="form.promo_code">
+                            <input type="hidden" name="redeem_points"   :value="form.redeem_points">
                             <input type="hidden" name="notes"           :value="form.notes">
                             <template x-for="id in selectedAddons" :key="id">
                                 <input type="hidden" name="addon_ids[]" :value="id">
@@ -570,9 +579,56 @@
                                 <span class="font-semibold text-warning" x-text="'+ Rp ' + formatNum(markupAmount)"></span>
                             </div>
                             <div class="price-row" x-show="discountAmount > 0">
-                                <span class="text-ink-muted">Diskon</span>
+                                <span class="text-ink-muted">Diskon Promo</span>
                                 <span class="font-semibold text-success" x-text="'- Rp ' + formatNum(discountAmount)"></span>
                             </div>
+                            <div class="price-row" x-show="pointsDiscountAmount > 0">
+                                <span class="text-ink-muted">Tukar Poin</span>
+                                <span class="font-semibold text-success" x-text="'- Rp ' + formatNum(pointsDiscountAmount)"></span>
+                            </div>
+                        </div>
+
+                        {{-- Promo Code & Loyalty Points Redemption --}}
+                        <div class="py-4 border-t border-cream-dark space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-ink-muted uppercase tracking-wide mb-1.5">Kode Promo</label>
+                                <div class="flex gap-2">
+                                    <input type="text" x-model="form.promo_code" placeholder="Punya voucher?"
+                                           class="flex-1 px-3 py-2 rounded-xl border border-cream-dark bg-cream text-xs uppercase font-mono text-ink placeholder-ink-light focus:outline-none focus:border-gold">
+                                    <button type="button" @click="applyPromo()" :disabled="!form.promo_code || loadingPromo"
+                                            class="px-3 py-2 rounded-xl bg-gold text-white text-xs font-bold hover:bg-gold-dark disabled:opacity-50 transition-colors">
+                                        <i class="fa-solid fa-spinner animate-spin" x-show="loadingPromo"></i>
+                                        <span x-show="!loadingPromo">Pakai</span>
+                                    </button>
+                                </div>
+                                <p x-show="promoMessage" class="text-[11px] text-emerald-600 font-medium mt-1" x-text="promoMessage"></p>
+                                <p x-show="promoError" class="text-[11px] text-rose-500 font-medium mt-1" x-text="promoError"></p>
+                            </div>
+
+                            @auth
+                                @if(Auth::user()->loyalty_points > 0)
+                                <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-bold text-ink flex items-center gap-1.5">
+                                            <i class="fa-solid fa-coins text-amber-500"></i> SnapPoints
+                                        </span>
+                                        <span class="text-[11px] font-mono text-amber-600 font-bold">{{ number_format(Auth::user()->loyalty_points, 0, ',', '.') }} pts</span>
+                                    </div>
+                                    <p class="text-[10px] text-ink-muted mb-2">Tukar poin jadi diskon (1 poin = Rp 100)</p>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" x-model.number="form.redeem_points" min="0" max="{{ Auth::user()->loyalty_points }}"
+                                               placeholder="Poin"
+                                               @input="recalculatePoints()"
+                                               class="w-24 px-2 py-1.5 rounded-lg border border-cream-dark bg-white text-xs font-mono text-ink focus:outline-none focus:border-gold">
+                                        <button type="button" @click="form.redeem_points = {{ Auth::user()->loyalty_points }}; recalculatePoints()"
+                                                class="text-[10px] text-gold font-bold hover:underline">Gunakan Semua</button>
+                                    </div>
+                                    <div x-show="pointsDiscountAmount > 0" class="mt-1.5 text-[11px] text-emerald-600 font-semibold">
+                                        Hemat Rp <span x-text="formatNum(pointsDiscountAmount)"></span>
+                                    </div>
+                                </div>
+                                @endif
+                            @endauth
                         </div>
 
                         {{-- Total --}}
@@ -645,6 +701,7 @@ function bookingWizard(initRoomId, initPackageId) {
             people_count: 1,
             payment_option: 'full',
             promo_code: '',
+            redeem_points: 0,
             notes: '',
         },
 
@@ -653,8 +710,9 @@ function bookingWizard(initRoomId, initPackageId) {
         addonsTotal: 0,
         markupAmount: 0,
         discountAmount: 0,
+        pointsDiscountAmount: 0,
         get totalPrice() {
-            return Math.max(0, this.packagePrice + this.addonsTotal + this.markupAmount - this.discountAmount);
+            return Math.max(0, this.packagePrice + this.addonsTotal + this.markupAmount - this.discountAmount - (this.pointsDiscountAmount || 0));
         },
 
         // State
@@ -684,29 +742,47 @@ function bookingWizard(initRoomId, initPackageId) {
                 this.selectedDate = `${year}-${month}-${day}`;
             }
 
-            // Pre-populate selections from URL params
-            if (this.selectedPackageId) {
-                const pkgEl = document.querySelector(`input[name="package"][value="${this.selectedPackageId}"]`);
-                if (pkgEl) pkgEl.dispatchEvent(new Event('click'));
-            }
             // Pre-populate known packages
             @foreach($packages as $pkg)
             if (this.selectedPackageId === {{ $pkg->id }}) {
-                this.selectedPackageName = '{{ $pkg->name }}';
+                this.selectedPackageName = '{{ addslashes($pkg->name) }}';
                 this.packagePrice = {{ $pkg->price }};
                 this.selectedPackageMaxPeople = {{ $pkg->max_people }};
-                this.selectedPackage = { id: {{ $pkg->id }}, name: '{{ $pkg->name }}', price: {{ $pkg->price }}, max_people: {{ $pkg->max_people }} };
+                this.selectedPackage = { id: {{ $pkg->id }}, name: '{{ addslashes($pkg->name) }}', price: {{ $pkg->price }}, max_people: {{ $pkg->max_people }} };
             }
             @endforeach
 
             @foreach($rooms as $room)
             if (this.selectedRoomId === {{ $room->id }}) {
-                this.selectedRoomName = '{{ $room->name }}';
+                this.selectedRoomName = '{{ addslashes($room->name) }}';
             }
             @endforeach
 
+            // Default fallbacks if none selected
+            if (!this.selectedPackageId && {{ $packages->count() }} > 0) {
+                this.selectedPackageId = {{ $packages->first()->id }};
+                this.selectedPackageName = '{{ addslashes($packages->first()->name) }}';
+                this.packagePrice = {{ $packages->first()->price }};
+                this.selectedPackageMaxPeople = {{ $packages->first()->max_people }};
+                this.selectedPackage = { id: {{ $packages->first()->id }}, name: '{{ addslashes($packages->first()->name) }}', price: {{ $packages->first()->price }}, max_people: {{ $packages->first()->max_people }} };
+            }
+            if (!this.selectedRoomId && {{ $rooms->count() }} > 0) {
+                this.selectedRoomId = {{ $rooms->first()->id }};
+                this.selectedRoomName = '{{ addslashes($rooms->first()->name) }}';
+            }
+
+            // Auto-watchers for reactivity
+            this.$watch('selectedDate', () => this.fetchSlots());
+            this.$watch('selectedRoomId', () => this.fetchSlots());
+            this.$watch('selectedPackageId', () => this.fetchSlots());
+
             // Immediately load slots for default room & date
-            if (this.selectedRoomId && this.selectedDate) {
+            this.fetchSlots();
+        },
+
+        goToSchedule() {
+            this.step = 2;
+            if (this.slots.length === 0) {
                 this.fetchSlots();
             }
         },
@@ -776,6 +852,13 @@ function bookingWizard(initRoomId, initPackageId) {
             }
         },
 
+        recalculatePoints() {
+            const userMax = {{ Auth::user()?->loyalty_points ?? 0 }};
+            const pts = Math.min(Math.max(0, parseInt(this.form.redeem_points) || 0), userMax);
+            this.form.redeem_points = pts;
+            this.pointsDiscountAmount = pts * 100;
+        },
+
         async applyPromo() {
             this.promoMessage = '';
             this.promoError = '';
@@ -786,19 +869,24 @@ function bookingWizard(initRoomId, initPackageId) {
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
                     body: JSON.stringify({
                         package_id: this.selectedPackageId,
-                        addon_ids: this.selectedAddons,
+                        date: this.selectedDate,
+                        start_time: this.selectedSlot?.start || '09:00',
+                        people_count: this.form.people_count || 1,
+                        addons: this.selectedAddons.reduce((acc, id) => { acc[id] = 1; return acc; }, {}),
                         promo_code: this.form.promo_code,
-                        booking_date: this.selectedDate,
-                        start_time: this.selectedSlot?.start,
+                        redeem_points: this.form.redeem_points || 0,
                     })
                 });
                 const data = await res.json();
-                if (data.error) {
-                    this.promoError = data.error;
+                if (data.pricing) {
+                    this.discountAmount = data.pricing.discount ?? 0;
+                    this.markupAmount = data.pricing.markup_amount ?? 0;
+                    this.pointsDiscountAmount = data.pricing.points_discount ?? 0;
+                    this.promoMessage = data.pricing.discount > 0 ? `Promo berhasil diterapkan!` : 'Kode promo valid.';
+                } else if (data.message) {
+                    this.promoError = data.message;
                 } else {
-                    this.discountAmount = data.discount ?? 0;
-                    this.markupAmount = data.markup ?? 0;
-                    this.promoMessage = data.discount > 0 ? `Promo berhasil! Diskon Rp ${this.formatNum(data.discount)}` : 'Promo tidak memberikan diskon.';
+                    this.promoError = 'Kode promo tidak dapat digunakan.';
                 }
             } catch(e) {
                 this.promoError = 'Gagal memvalidasi promo.';

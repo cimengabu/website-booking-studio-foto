@@ -1,6 +1,7 @@
-@extends('layouts.public')
+@extends('layouts.dashboard')
 
 @section('title', 'Detail Booking '.$booking->booking_code.' — SnapSpace')
+@section('breadcrumb', 'Detail Booking #'.$booking->booking_code)
 
 @section('content')
 
@@ -391,12 +392,18 @@
                             @endfor
                         </div>
                         <p class="text-sm text-ink-soft leading-relaxed italic">"{{ $booking->review->comment }}"</p>
+                        @if($booking->review->photo)
+                            <div class="mt-3 rounded-xl overflow-hidden border border-cream-dark max-w-xs">
+                                <img src="{{ Storage::url($booking->review->photo) }}" alt="Foto Testimoni" class="w-full h-40 object-cover">
+                            </div>
+                        @endif
                         <p class="text-xs text-ink-muted mt-3">Dikirim {{ $booking->review->created_at->translatedFormat('d M Y H:i') }}</p>
                     @elseif(in_array($booking->status, ['completed', 'delivered', 'closed', 'checked_in', 'paid']))
                         <h2 class="font-serif font-semibold text-lg text-ink mb-2">Bagaimana Pengalaman Sesi Anda?</h2>
-                        <p class="text-xs text-ink-muted mb-4">Beri ulasan dan rating untuk membantu meningkatkan kualitas layanan kami.</p>
+                        <p class="text-xs text-ink-muted mb-4">Beri ulasan dan upload foto testimoni untuk mendapatkan +50 Poin Loyalti!</p>
                         <form method="POST" action="{{ route('my-bookings.review', $booking->booking_code) }}"
-                              x-data="{ rating: 5, comment: '' }">
+                              enctype="multipart/form-data"
+                              x-data="{ rating: 5, comment: '', photoPreview: null }">
                             @csrf
                             <div class="flex gap-1 mb-4">
                                 @for($i=1; $i<=5; $i++)
@@ -410,10 +417,27 @@
                             </div>
                             <textarea name="comment" x-model="comment" rows="3" required
                                       placeholder="Ceritakan pengalaman sesi foto Anda bersama tim SnapSpace..."
-                                      class="w-full px-4 py-3 rounded-xl border border-cream-dark bg-cream text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all resize-none mb-4"></textarea>
+                                      class="w-full px-4 py-3 rounded-xl border border-cream-dark bg-cream text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all resize-none mb-3"></textarea>
+
+                            {{-- Upload Foto Testimoni --}}
+                            <div class="mb-4">
+                                <label class="block text-xs font-semibold text-ink-muted mb-1.5 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-camera text-gold"></i>
+                                    <span>Upload Foto Testimoni (Opsional - Bonus +50 Poin)</span>
+                                </label>
+                                <input type="file" name="photo" accept="image/*"
+                                       class="text-xs text-ink-muted file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gold/10 file:text-gold hover:file:bg-gold/20"
+                                       @change="photoPreview = URL.createObjectURL($event.target.files[0])">
+                                <template x-if="photoPreview">
+                                    <div class="mt-2.5 relative inline-block">
+                                        <img :src="photoPreview" class="w-24 h-24 rounded-xl object-cover border border-gold/40 shadow-sm">
+                                    </div>
+                                </template>
+                            </div>
+
                             <button type="submit" :disabled="!comment"
                                     class="btn-gold btn-bounce px-6 py-3 rounded-xl text-white font-bold text-sm shadow-warm disabled:opacity-40">
-                                <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Ulasan
+                                <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Ulasan & Dapatkan Poin
                             </button>
                         </form>
                     @else

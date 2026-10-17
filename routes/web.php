@@ -18,12 +18,14 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\AboutController;
 use App\Http\Controllers\Customer\BookingWizardController;
 use App\Http\Controllers\Customer\ContactController;
+use App\Http\Controllers\Customer\CustomerDashboardController;
 use App\Http\Controllers\Customer\FaqController;
 use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\MyBookingController;
 use App\Http\Controllers\Customer\PackageController;
 use App\Http\Controllers\Customer\PortfolioController;
+use App\Http\Controllers\Customer\ProfileController;
 use App\Http\Controllers\Customer\RoomController;
 use App\Http\Controllers\Staff\CheckinController;
 use App\Http\Middleware\RoleMiddleware;
@@ -69,6 +71,18 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Customer Protected Routes
 Route::middleware(['auth'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard/galeri', [CustomerDashboardController::class, 'gallery'])->name('dashboard.gallery');
+    Route::get('/dashboard/pembayaran', [CustomerDashboardController::class, 'payments'])->name('dashboard.payments');
+
+    // Profile & Settings
+    Route::get('/dashboard/profil', [ProfileController::class, 'index'])->name('dashboard.profile');
+    Route::patch('/dashboard/profil', [ProfileController::class, 'update'])->name('dashboard.profile.update');
+    Route::patch('/dashboard/profil/password', [ProfileController::class, 'updatePassword'])->name('dashboard.profile.password');
+    Route::patch('/dashboard/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('dashboard.profile.avatar');
+    Route::delete('/dashboard/profil', [ProfileController::class, 'deleteAccount'])->name('dashboard.profile.delete');
+
     Route::get('/booking', [BookingWizardController::class, 'showWizard'])->name('booking.wizard');
     Route::post('/booking', [BookingWizardController::class, 'storeBooking'])->name('booking.store');
     Route::get('/booking/{code}/pay', [BookingWizardController::class, 'showPaymentPage'])->name('booking.pay');

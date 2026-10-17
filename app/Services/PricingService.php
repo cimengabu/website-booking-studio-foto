@@ -17,7 +17,8 @@ class PricingService
         string $startTime,
         int $peopleCount = 1,
         array $addonSelections = [], // [addon_id => qty]
-        ?string $promoCode = null
+        ?string $promoCode = null,
+        int $redeemPoints = 0
     ): array {
         $package = Package::findOrFail($packageId);
         $carbonDate = Carbon::parse($date);
@@ -111,7 +112,15 @@ class PricingService
             }
         }
 
-        $totalDiscount = $saverDiscountAmount + $promoDiscount;
+        // Loyalty Points Discount (1 pt = Rp 100, max 50% of subtotal)
+        $pointsDiscount = 0;
+        if ($redeemPoints > 0) {
+            $pointValue = 100; // 1 point = Rp 100
+            $maxPointsDiscount = ($subtotal + $addonsTotal) * 0.5;
+            $pointsDiscount = min($redeemPoints * $pointValue, $maxPointsDiscount);
+        }
+
+        $totalDiscount = $saverDiscountAmount + $promoDiscount + $pointsDiscount;
         $totalPrice = max(0, $subtotal + $addonsTotal + $markupAmount - $totalDiscount);
 
         // DP Calculation (50%)
@@ -130,6 +139,8 @@ class PricingService
             'saver_discount_percent' => $saverDiscountPercent,
             'saver_discount_amount' => $saverDiscountAmount,
             'applied_promo' => $appliedPromo,
+            'points_discount' => $pointsDiscount,
+            'points_redeemed' => $redeemPoints,
             'discount' => $totalDiscount,
             'total_price' => $totalPrice,
             'dp_amount' => $dpAmount,

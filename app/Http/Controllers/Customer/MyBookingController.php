@@ -16,10 +16,15 @@ class MyBookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with(['room', 'package', 'payments'])
+        $query = Booking::with(['room.images', 'package', 'payments'])
             ->where('user_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+            ->latest();
+
+        if (request('status') && request('status') !== 'all') {
+            $query->where('status', request('status'));
+        }
+
+        $bookings = $query->paginate(10);
 
         return view('customer.my-bookings.index', compact('bookings'));
     }
@@ -45,22 +50,37 @@ class MyBookingController extends Controller
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:1000',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ], [
             'rating.required' => 'Bintang rating wajib dipilih.',
             'comment.required' => 'Komentar ulasan wajib diisi.',
+            'photo.image' => 'File foto testimoni harus berupa gambar.',
+            'photo.max' => 'Ukuran foto testimoni maksimal 5MB.',
         ]);
 
+        $reviewData = [
+            'user_id' => Auth::id(),
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+            'is_visible' => true,
+        ];
+
+        if ($request->hasFile('photo')) {
+            $reviewData['photo'] = $request->file('photo')->store('reviews', 'public');
+        }
+
+        $existingReview = Review::where('booking_id', $booking->id)->first();
         Review::updateOrCreate(
             ['booking_id' => $booking->id],
-            [
-                'user_id' => Auth::id(),
-                'rating' => $request->rating,
-                'comment' => $request->comment,
-                'is_visible' => true,
-            ]
+            $reviewData
         );
 
-        return back()->with('success', 'Terima kasih! Ulasan dan rating Anda telah berhasil dikirim.');
+        // Reward 50 loyalty points on first-time review
+        if (! $existingReview && Auth::user()) {
+            Auth::user()->increment('loyalty_points', 50);
+        }
+
+        return back()->with('success', 'Terima kasih! Ulasan dan rating Anda telah berhasil dikirim. (+50 Poin Loyalti didapatkan!)');
     }
 
     public function downloadPhoto(int $photoId)

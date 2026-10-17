@@ -38,20 +38,25 @@ class BookingWizardController extends Controller
 
     public function getSlotsApi(Request $request)
     {
-        $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'date' => 'required|date',
-            'package_id' => 'required|exists:packages,id',
-        ]);
+        $roomId = (int) ($request->query('room_id') ?: Room::where('is_active', true)->orderBy('sort_order')->value('id'));
+        $packageId = (int) ($request->query('package_id') ?: Package::where('is_active', true)->value('id'));
+        $date = $request->query('date') ?: now()->toDateString();
 
-        $slots = $this->availabilityService->getSlots(
-            (int) $request->room_id,
-            $request->date,
-            (int) $request->package_id
-        );
+        if (! Room::where('id', $roomId)->where('is_active', true)->exists()) {
+            $roomId = (int) (Room::where('is_active', true)->orderBy('sort_order')->value('id') ?? 1);
+        }
+
+        if (! Package::where('id', $packageId)->where('is_active', true)->exists()) {
+            $packageId = (int) (Package::where('is_active', true)->value('id') ?? 1);
+        }
+
+        $slots = $this->availabilityService->getSlots($roomId, $date, $packageId);
 
         return response()->json([
             'status' => 'success',
+            'room_id' => $roomId,
+            'package_id' => $packageId,
+            'date' => $date,
             'slots' => $slots,
         ]);
     }
@@ -65,7 +70,11 @@ class BookingWizardController extends Controller
             'people_count' => 'nullable|integer|min:1',
             'addons' => 'nullable|array',
             'promo_code' => 'nullable|string',
+            'redeem_points' => 'nullable|integer|min:0',
         ]);
+
+        $maxUserPoints = Auth::user()?->loyalty_points ?? 0;
+        $redeemPoints = min((int) ($request->redeem_points ?? 0), $maxUserPoints);
 
         $pricing = $this->pricingService->calculate(
             (int) $request->package_id,
@@ -73,7 +82,8 @@ class BookingWizardController extends Controller
             $request->start_time,
             (int) ($request->people_count ?? 1),
             $request->addons ?? [],
-            $request->promo_code
+            $request->promo_code,
+            $redeemPoints
         );
 
         return response()->json([
@@ -93,6 +103,7 @@ class BookingWizardController extends Controller
             'payment_option' => 'required|in:dp,full',
             'addons' => 'nullable|array',
             'promo_code' => 'nullable|string',
+            'redeem_points' => 'nullable|integer|min:0',
             'notes' => 'nullable|string|max:500',
         ], [
             'booking_date.required' => 'Tanggal booking wajib dipilih.',
@@ -103,6 +114,14 @@ class BookingWizardController extends Controller
         try {
             $data = $request->all();
             $data['user_id'] = Auth::id();
+
+            // Deduct redeemed points if used
+            if (! empty($data['redeem_points']) && Auth::user()) {
+                $pointsToDeduct = min((int) $data['redeem_points'], Auth::user()->loyalty_points);
+                if ($pointsToDeduct > 0) {
+                    Auth::user()->decrement('loyalty_points', $pointsToDeduct);
+                }
+            }
 
             $booking = $this->bookingService->createBooking($data);
 

@@ -64,6 +64,19 @@ class PaymentService
 
         ActivityLog::record($booking->user_id, 'payment_success', "Pembayaran {$payment->payment_kind} untuk {$booking->booking_code} sebesar Rp ".number_format($payment->gross_amount, 0, ',', '.').' berhasil.');
 
+        // Award loyalty points (1 point per Rp 1.000 paid)
+        if ($booking->user_id && $booking->user) {
+            $pointsEarned = (int) floor($payment->gross_amount / 1000);
+            if ($pointsEarned > 0) {
+                $booking->user->increment('loyalty_points', $pointsEarned);
+                ActivityLog::record(
+                    $booking->user_id,
+                    'loyalty_points_earned',
+                    "Mendapatkan +{$pointsEarned} Poin Loyalti dari pembayaran {$booking->booking_code}"
+                );
+            }
+        }
+
         if ($payment->payment_kind === 'remaining') {
             $this->notificationService->sendSettlementReceived($payment);
         } else {
