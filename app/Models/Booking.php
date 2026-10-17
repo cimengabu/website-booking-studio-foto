@@ -179,8 +179,8 @@ class Booking extends Model
     {
         $notes = (string) $this->internal_notes;
 
-        return str_contains($notes, '[STUDIO TUTUP MENDADAK]')
-            || str_contains($notes, '[FOTOGRAFER BERHALANGAN]')
+        return str_contains($notes, '[STUDIO TUTUP')
+            || str_contains($notes, '[FOTOGRAFER BERHALANGAN')
             || str_contains($notes, '[EMERGENCY_OVERRIDE]');
     }
 

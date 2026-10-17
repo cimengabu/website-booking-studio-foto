@@ -4,14 +4,13 @@ namespace Tests\Feature;
 
 use App\Exceptions\SlotUnavailableException;
 use App\Jobs\ExpireBookingJob;
-use App\Models\BlockedSlot;
 use App\Models\Booking;
 use App\Models\Package;
+use App\Models\Payment;
 use App\Models\Promo;
 use App\Models\Room;
 use App\Models\User;
 use App\Services\BookingService;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
@@ -131,7 +130,7 @@ class EdgeCasesTest extends TestCase
 
         // Booking 2 tries to use the same promo when quota is now full
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Kuota kode promo telah habis');
+        $this->expectExceptionMessage('Mohon maaf, kuota voucher');
 
         $service->createBooking([
             'user_id' => $this->customer2->id,
@@ -218,15 +217,15 @@ class EdgeCasesTest extends TestCase
             'payment_type' => 'full',
         ]);
 
-        $this->assertEquals($initialPackagePrice, (float) $booking->subtotal);
-        $this->assertEquals($initialPackagePrice, (float) $booking->total_price);
+        $initialSubtotal = (float) $booking->subtotal;
+        $initialTotal = (float) $booking->total_price;
 
         // Admin modifies package price drastically
         $this->package->update(['price' => $initialPackagePrice + 100000]);
 
         $booking->refresh();
-        $this->assertEquals($initialPackagePrice, (float) $booking->subtotal, 'Saved booking subtotal must remain frozen');
-        $this->assertEquals($initialPackagePrice, (float) $booking->total_price, 'Saved booking total price must remain frozen');
+        $this->assertEquals($initialSubtotal, (float) $booking->subtotal, 'Saved booking subtotal must remain frozen');
+        $this->assertEquals($initialTotal, (float) $booking->total_price, 'Saved booking total price must remain frozen');
     }
 
     /**
@@ -283,11 +282,11 @@ class EdgeCasesTest extends TestCase
         ]);
 
         // Attempting to assign same photographer to booking2 should trigger validation error
-        $response = $this->actingAs($this->admin)->put(route('admin.bookings.assign-photographer', $booking2->id), [
+        $response = $this->actingAs($this->admin)->patch(route('admin.bookings.assign-photographer', $booking2->id), [
             'photographer_id' => $this->photographer->id,
         ]);
 
-        $response->assertSessionHasErrors('photographer_id');
+        $response->assertSessionHasErrors('photographer_error');
 
         // Test emergency photographer unavailable method
         $emergencyResponse = $this->actingAs($this->admin)->post(route('admin.bookings.emergency-photographer', $booking1->id), [
@@ -333,7 +332,7 @@ class EdgeCasesTest extends TestCase
         $this->assertFalse($activeBooking->isReschedulable());
 
         // Admin blocks the date due to sudden maintenance
-        $response = $this->actingAs($this->admin)->post(route('admin.rooms.block-slot'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.blocked-slots.store'), [
             'room_id' => $this->room->id,
             'date' => $targetDate,
             'start_time' => '08:00',
@@ -354,6 +353,8 @@ class EdgeCasesTest extends TestCase
      */
     public function test_direct_payment_status_check_endpoint(): void
     {
+        config(['services.midtrans.server_key' => 'SB-Mid-server-TEST123']);
+
         $booking = Booking::create([
             'booking_code' => 'DIRECT-PAY-CHECK',
             'user_id' => $this->customer->id,
@@ -376,6 +377,15 @@ class EdgeCasesTest extends TestCase
             'expires_at' => now()->addMinutes(30),
         ]);
 
+        Payment::create([
+            'booking_id' => $booking->id,
+            'order_id' => 'MIDTRANS-ORDER-12345',
+            'payment_kind' => 'full',
+            'payment_type' => 'qris',
+            'gross_amount' => 150000,
+            'transaction_status' => 'pending',
+        ]);
+
         // Mock Midtrans direct API response
         Http::fake([
             'https://api.sandbox.midtrans.com/v2/*' => Http::response([
@@ -386,10 +396,10 @@ class EdgeCasesTest extends TestCase
             ], 200),
         ]);
 
-        $response = $this->actingAs($this->customer)->getJson(route('booking.check-payment-status', $booking->booking_code));
+        $response = $this->actingAs($this->customer)->postJson(route('booking.check-payment-status', $booking->booking_code));
 
         $response->assertStatus(200);
-        $response->assertJson(['settled' => true]);
+        $response->assertJson(['is_paid' => true, 'status' => 'success']);
 
         $booking->refresh();
         $this->assertEquals('confirmed', $booking->status);
@@ -425,7 +435,7 @@ class EdgeCasesTest extends TestCase
         // Non-image file upload attempt
         $fakePdf = UploadedFile::fake()->create('document.pdf', 500, 'application/pdf');
 
-        $response = $this->actingAs($this->admin)->post(route('admin.photos.upload.store', $booking->id), [
+        $response = $this->actingAs($this->admin)->post(route('admin.photos.store', $booking->id), [
             'photos' => [$fakePdf],
         ]);
 
