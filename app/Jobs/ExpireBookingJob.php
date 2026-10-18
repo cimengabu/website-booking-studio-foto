@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\ActivityLog;
 use App\Models\Booking;
+use App\Models\Promo;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -24,7 +25,7 @@ class ExpireBookingJob implements ShouldQueue
                     $booking->update(['status' => 'expired']);
 
                     if ($booking->promo_code) {
-                        \App\Models\Promo::where('code', $booking->promo_code)
+                        Promo::where('code', $booking->promo_code)
                             ->where('used_count', '>', 0)
                             ->decrement('used_count');
                     }

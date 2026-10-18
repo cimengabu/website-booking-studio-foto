@@ -57,10 +57,12 @@
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border {{ $bg }} {{ $textColor }} {{ $border }} flex items-center gap-1">
                         <i class="fa-solid {{ $icon }} text-[8px]"></i>{{ $label }}
                     </span>
-                    @if($payment->payment_type === 'dp')
+                    @if(($payment->payment_kind ?? '') === 'dp' || ($payment->payment_type ?? '') === 'dp')
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">DP 50%</span>
-                    @elseif($payment->payment_type === 'settlement')
+                    @elseif(($payment->payment_kind ?? '') === 'remaining' || ($payment->payment_type ?? '') === 'settlement')
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Pelunasan</span>
+                    @elseif(($payment->payment_kind ?? '') === 'full')
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Lunas Penuh</span>
                     @endif
                 </div>
                 <p class="text-sm font-medium text-white truncate">
@@ -73,12 +75,12 @@
                     </span>
                     <span class="flex items-center gap-1 capitalize">
                         <i class="fa-solid {{ $methodIcon }} text-[10px]"></i>
-                        {{ str_replace('_', ' ', $payment->payment_method ?? 'Online') }}
+                        {{ str_replace('_', ' ', $payment->payment_type ?? $payment->payment_method ?? 'Online') }}
                     </span>
-                    @if($payment->transaction_id)
+                    @if($payment->order_id ?? $payment->transaction_id)
                     <span class="flex items-center gap-1 font-mono">
                         <i class="fa-solid fa-hashtag text-[10px]"></i>
-                        {{ $payment->transaction_id }}
+                        {{ $payment->order_id ?? $payment->transaction_id }}
                     </span>
                     @endif
                 </div>

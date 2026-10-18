@@ -215,6 +215,22 @@ class NotificationService
     }
 
     /**
+     * Alias for sendReminderHMinus1
+     */
+    public function sendH1Reminder(Booking $booking): array
+    {
+        return $this->sendReminderHMinus1($booking);
+    }
+
+    /**
+     * Alias for sendReminderHMinus2Hours
+     */
+    public function sendH2Reminder(Booking $booking): array
+    {
+        return $this->sendReminderHMinus2Hours($booking);
+    }
+
+    /**
      * 6. Reschedule / Pembatalan
      */
     public function sendRescheduleNotification(Booking $booking, string $oldDate, string $oldTime): array

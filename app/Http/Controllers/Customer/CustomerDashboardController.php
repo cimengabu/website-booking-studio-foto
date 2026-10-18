@@ -70,8 +70,8 @@ class CustomerDashboardController extends Controller
             ->paginate(12);
 
         $totalPaid = Payment::whereHas('booking', fn ($q) => $q->where('user_id', $user->id))
-            ->where('status', 'success')
-            ->sum('amount');
+            ->whereIn('transaction_status', ['settlement', 'success', 'capture'])
+            ->sum('gross_amount');
 
         return view('customer.dashboard.payments', compact('payments', 'totalPaid'));
     }

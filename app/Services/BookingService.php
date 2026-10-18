@@ -8,7 +8,9 @@ use App\Models\BlockedSlot;
 use App\Models\Booking;
 use App\Models\BookingAddon;
 use App\Models\Package;
+use App\Models\Promo;
 use App\Models\Setting;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -32,6 +34,7 @@ class BookingService
             $paymentOption = $data['payment_option'] ?? 'full'; // dp or full
             $addonSelections = $data['addons'] ?? []; // [addon_id => qty]
             $promoCode = $data['promo_code'] ?? null;
+            $redeemPoints = (int) ($data['redeem_points'] ?? 0);
             $notes = $data['notes'] ?? null;
 
             $package = Package::findOrFail($packageId);
@@ -80,7 +83,7 @@ class BookingService
             // Validate promo quota with pessimistic lock (Edge case: voucher habis saat checkout)
             $verifiedPromoCode = null;
             if ($promoCode) {
-                $promo = \App\Models\Promo::where('code', strtoupper($promoCode))
+                $promo = Promo::where('code', strtoupper($promoCode))
                     ->where('is_active', true)
                     ->lockForUpdate()
                     ->first();
@@ -97,6 +100,16 @@ class BookingService
                 $promo->increment('used_count');
             }
 
+            // Validate and deduct loyalty points atomically inside transaction
+            $actualRedeemPoints = 0;
+            if ($redeemPoints > 0 && $userId) {
+                $user = User::where('id', $userId)->lockForUpdate()->first();
+                if ($user && $user->loyalty_points > 0) {
+                    $actualRedeemPoints = min($redeemPoints, $user->loyalty_points);
+                    $user->decrement('loyalty_points', $actualRedeemPoints);
+                }
+            }
+
             // Calculate pricing
             $pricing = $this->pricingService->calculate(
                 $packageId,
@@ -104,7 +117,8 @@ class BookingService
                 $startTime,
                 $peopleCount,
                 $addonSelections,
-                $verifiedPromoCode
+                $verifiedPromoCode,
+                $actualRedeemPoints
             );
 
             // Generate Booking Code & QR Token
@@ -249,6 +263,12 @@ class BookingService
             $booking->penalty_amount = $calc['penalty_amount'];
             $booking->save();
 
+            if ($booking->promo_code) {
+                Promo::where('code', $booking->promo_code)
+                    ->where('used_count', '>', 0)
+                    ->decrement('used_count');
+            }
+
             ActivityLog::record(
                 $booking->user_id,
                 'booking_cancelled',
@@ -270,6 +290,13 @@ class BookingService
         $count = 0;
         foreach ($expired as $b) {
             $b->update(['status' => 'expired']);
+
+            if ($b->promo_code) {
+                Promo::where('code', $b->promo_code)
+                    ->where('used_count', '>', 0)
+                    ->decrement('used_count');
+            }
+
             ActivityLog::record($b->user_id, 'booking_expired', "Booking {$b->booking_code} otomatis expired.");
             $count++;
         }

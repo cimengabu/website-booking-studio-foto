@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Payment;
+use App\Models\Promo;
 use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -96,6 +97,11 @@ class PaymentWebhookController extends Controller
                 $booking = $payment->booking;
                 if ($booking && $booking->status === 'pending' && (float) $booking->paid_amount <= 0) {
                     $booking->update(['status' => $transactionStatus === 'expire' ? 'expired' : 'cancelled']);
+                    if ($booking->promo_code) {
+                        Promo::where('code', $booking->promo_code)
+                            ->where('used_count', '>', 0)
+                            ->decrement('used_count');
+                    }
                     ActivityLog::record(
                         $booking->user_id,
                         'payment_failed',

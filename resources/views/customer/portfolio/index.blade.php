@@ -193,12 +193,15 @@
 @push('scripts')
 <script>
     // Collect all portfolio images on page for lightbox navigation
-    const portfolioImages = @json($portfolios->map(fn($p) => [
-        'src'      => $p->image_path,
-        'title'    => $p->title,
-        'category' => $p->category,
-        'room'     => $p->room?->name ?? '',
-    ])->values());
+    @php
+        $portfolioData = $portfolios->map(fn($p) => [
+            'src'      => $p->image_path,
+            'title'    => $p->title,
+            'category' => $p->category,
+            'room'     => $p->room?->name ?? '',
+        ])->values();
+    @endphp
+    const portfolioImages = @json($portfolioData);
 
     function lightbox() {
         return {

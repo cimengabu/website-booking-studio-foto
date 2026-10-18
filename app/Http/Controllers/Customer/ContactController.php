@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
@@ -28,9 +29,7 @@ class ContactController extends Controller
             'message.min' => 'Pesan minimal 10 karakter.',
         ]);
 
-        // TODO: Send email notification or store to DB / queue
-        // For now, log the contact submission
-        \Log::info('Contact form submission', $validated);
+        Log::info('Contact form submission', $validated);
 
         return redirect()->route('contact')->with('contact_success', true);
     }

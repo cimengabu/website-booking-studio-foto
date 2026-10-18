@@ -216,7 +216,7 @@ class AdminBookingController extends Controller
 
         $newPaidAmount = (float) $booking->paid_amount + (float) $request->amount;
         $booking->paid_amount = $newPaidAmount;
-        $booking->status = 'confirmed';
+        $booking->status = $newPaidAmount >= (float) $booking->total_price ? 'confirmed' : 'dp_paid';
         $booking->save();
 
         ActivityLog::record(Auth::id(), 'admin_record_cash', 'Mencatat pembayaran tunai Rp '.number_format($request->amount, 0, ',', '.')." untuk {$booking->booking_code}");

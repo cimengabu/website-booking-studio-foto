@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\BlockedSlot;
+use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\User;
@@ -46,7 +47,7 @@ class AdminRoomController extends Controller
 
         // Edge case: Hari libur mendadak / penutupan studio darurat
         // Deteksi booking aktif yang bertabrakan dengan jadwal blokir ini
-        $affectedBookings = \App\Models\Booking::with('user')
+        $affectedBookings = Booking::with('user')
             ->whereDate('booking_date', $request->date)
             ->when($request->room_id, fn ($q) => $q->where('room_id', $request->room_id))
             ->whereIn('status', ['confirmed', 'paid', 'dp_paid', 'pending', 'checked_in'])
@@ -65,7 +66,7 @@ class AdminRoomController extends Controller
                 ]);
             }
 
-            \App\Models\ActivityLog::record(
+            ActivityLog::record(
                 auth()->id(),
                 'admin_blocked_slot_with_conflicts',
                 "Menambahkan blokir studio ({$request->reason}) yang berdampak pada {$affectedBookings->count()} booking: {$codes}"
@@ -74,7 +75,7 @@ class AdminRoomController extends Controller
             return back()->with('warning', "Blokir jadwal berhasil dibuat. PERHATIAN: Terdapat {$affectedBookings->count()} booking pelanggan terdampak ({$codes}). Catatan darurat telah disematkan untuk penanganan reschedule/refund bebas biaya.");
         }
 
-        \App\Models\ActivityLog::record(
+        ActivityLog::record(
             auth()->id(),
             'admin_blocked_slot',
             "Menambahkan jadwal blokir studio: {$request->reason} pada {$request->date} ({$request->start_time} - {$request->end_time})"

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Addon;
 use App\Models\Booking;
 use App\Models\Package;
+use App\Models\Promo;
 use App\Models\Room;
 use App\Services\AvailabilityService;
 use App\Services\BookingService;
@@ -14,6 +15,8 @@ use App\Services\PaymentService;
 use App\Services\PricingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class BookingWizardController extends Controller
 {
@@ -115,14 +118,6 @@ class BookingWizardController extends Controller
             $data = $request->all();
             $data['user_id'] = Auth::id();
 
-            // Deduct redeemed points if used
-            if (! empty($data['redeem_points']) && Auth::user()) {
-                $pointsToDeduct = min((int) $data['redeem_points'], Auth::user()->loyalty_points);
-                if ($pointsToDeduct > 0) {
-                    Auth::user()->decrement('loyalty_points', $pointsToDeduct);
-                }
-            }
-
             $booking = $this->bookingService->createBooking($data);
 
             return redirect()->route('booking.pay', $booking->booking_code)
@@ -194,6 +189,12 @@ class BookingWizardController extends Controller
         if ($booking->status === 'pending' && $booking->expires_at && $booking->expires_at->isPast()) {
             $booking->update(['status' => 'expired']);
 
+            if ($booking->promo_code) {
+                Promo::where('code', $booking->promo_code)
+                    ->where('used_count', '>', 0)
+                    ->decrement('used_count');
+            }
+
             return response()->json([
                 'status' => 'expired',
                 'is_paid' => false,
@@ -214,7 +215,7 @@ class BookingWizardController extends Controller
                         ? "https://api.midtrans.com/v2/{$latestPayment->order_id}/status"
                         : "https://api.sandbox.midtrans.com/v2/{$latestPayment->order_id}/status";
 
-                    $res = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                    $res = Http::withBasicAuth($serverKey, '')
                         ->timeout(5)
                         ->get($url);
 
@@ -239,7 +240,7 @@ class BookingWizardController extends Controller
                         }
                     }
                 } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::warning("Direct Midtrans status check error: {$e->getMessage()}");
+                    Log::warning("Direct Midtrans status check error: {$e->getMessage()}");
                 }
             }
         }

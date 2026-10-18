@@ -31,4 +31,30 @@ class Payment extends Model
     {
         return $this->belongsTo(Booking::class);
     }
+
+    public function getAmountAttribute(): float
+    {
+        return (float) $this->gross_amount;
+    }
+
+    public function getStatusAttribute(): string
+    {
+        return match ($this->transaction_status) {
+            'settlement', 'capture' => 'success',
+            'pending' => 'pending',
+            'expire', 'cancel', 'deny' => 'failed',
+            'refund' => 'refunded',
+            default => $this->transaction_status ?? 'pending',
+        };
+    }
+
+    public function getPaymentMethodAttribute(): ?string
+    {
+        return $this->payment_type;
+    }
+
+    public function getTransactionIdAttribute(): ?string
+    {
+        return $this->order_id;
+    }
 }

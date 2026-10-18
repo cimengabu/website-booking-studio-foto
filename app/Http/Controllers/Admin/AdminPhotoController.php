@@ -10,6 +10,7 @@ use App\Models\PhotoResult;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class AdminPhotoController extends Controller
 {
@@ -127,6 +128,11 @@ class AdminPhotoController extends Controller
     {
         $photo = PhotoResult::findOrFail($photoId);
         $bookingId = $photo->booking_id;
+
+        if (Storage::disk('public')->exists($photo->path)) {
+            Storage::disk('public')->delete($photo->path);
+        }
+
         $photo->delete();
 
         return redirect()->route('admin.photos.upload', $bookingId)
