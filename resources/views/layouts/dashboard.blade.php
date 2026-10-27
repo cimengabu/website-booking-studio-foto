@@ -12,35 +12,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
 
     <!-- FontAwesome, Alpine.js, AOS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aos.css') }}" />
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
+    <script src="{{ asset('js/aos.js') }}"></script>
+    <script src="{{ asset('js/tailwindcss.js') }}"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            paper: '#F3EFE6',
-                            ink: '#1B1A17',
-                            safelight: '#E8451E',
-                            forest: '#1F3A2E',
-                            butter: '#F2C94C',
-                            darkroom: '#141311',
-                            cardDark: '#1E1D1A',
-                            borderDark: '#2D2B26'
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            brand: {
+                                paper: '#F3EFE6',
+                                ink: '#1B1A17',
+                                safelight: '#E8451E',
+                                forest: '#1F3A2E',
+                                butter: '#F2C94C',
+                                darkroom: '#141311',
+                                cardDark: '#1E1D1A',
+                                borderDark: '#2D2B26'
+                            }
+                        },
+                        fontFamily: {
+                            sans: ['Plus Jakarta Sans', 'sans-serif'],
+                            heading: ['Bricolage Grotesque', 'sans-serif'],
+                            mono: ['JetBrains Mono', 'monospace'],
                         }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        heading: ['Bricolage Grotesque', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
                     }
                 }
-            }
+            };
         }
     </script>
     <style>

@@ -16,85 +16,87 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/all.min.css') }}">
 
     <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="{{ asset('js/tailwindcss.js') }}"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        // Primary — Champagne Gold
-                        gold: {
-                            DEFAULT: '#C8A27A',
-                            light: '#DEC4A0',
-                            dark: '#A07C52',
-                            50: '#FAF5EE',
-                            100: '#F3E8D8',
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            // Primary — Champagne Gold
+                            gold: {
+                                DEFAULT: '#C8A27A',
+                                light: '#DEC4A0',
+                                dark: '#A07C52',
+                                50: '#FAF5EE',
+                                100: '#F3E8D8',
+                            },
+                            // Backgrounds
+                            cream: {
+                                DEFAULT: '#F8F6F3',
+                                dark: '#EDE9E3',
+                                warm: '#F2EDE6',
+                            },
+                            // Neutral / Dark
+                            ink: {
+                                DEFAULT: '#1A1A1A',
+                                soft: '#2D2D2D',
+                                muted: '#6B6560',
+                                light: '#9C9490',
+                            },
+                            // Secondary accent — Deep Teal
+                            teal: {
+                                DEFAULT: '#2F4F4F',
+                                light: '#3D6464',
+                                50: '#EEF4F4',
+                            },
+                            // Status colors
+                            success: '#2E9E6B',
+                            warning: '#E5A53B',
+                            danger: '#D64545',
+                            info: '#3B82F6',
                         },
-                        // Backgrounds
-                        cream: {
-                            DEFAULT: '#F8F6F3',
-                            dark: '#EDE9E3',
-                            warm: '#F2EDE6',
+                        fontFamily: {
+                            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
                         },
-                        // Neutral / Dark
-                        ink: {
-                            DEFAULT: '#1A1A1A',
-                            soft: '#2D2D2D',
-                            muted: '#6B6560',
-                            light: '#9C9490',
+                        fontSize: {
+                            'display': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+                            'display-lg': ['3.75rem', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
                         },
-                        // Secondary accent — Deep Teal
-                        teal: {
-                            DEFAULT: '#2F4F4F',
-                            light: '#3D6464',
-                            50: '#EEF4F4',
+                        borderRadius: {
+                            'xl': '12px',
+                            '2xl': '16px',
+                            '3xl': '24px',
+                            '4xl': '32px',
                         },
-                        // Status colors
-                        success: '#2E9E6B',
-                        warning: '#E5A53B',
-                        danger: '#D64545',
-                        info: '#3B82F6',
-                    },
-                    fontFamily: {
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-                    },
-                    fontSize: {
-                        'display': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-                        'display-lg': ['3.75rem', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
-                    },
-                    borderRadius: {
-                        'xl': '12px',
-                        '2xl': '16px',
-                        '3xl': '24px',
-                        '4xl': '32px',
-                    },
-                    boxShadow: {
-                        'warm': '0 4px 24px -4px rgba(200, 162, 122, 0.18)',
-                        'warm-lg': '0 12px 48px -8px rgba(200, 162, 122, 0.25)',
-                        'card': '0 2px 16px -2px rgba(26, 26, 26, 0.08)',
-                        'card-hover': '0 8px 40px -8px rgba(26, 26, 26, 0.16)',
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.6s ease forwards',
-                        'slide-up': 'slideUp 0.6s ease forwards',
-                        'float': 'float 4s ease-in-out infinite',
-                        'shimmer': 'shimmer 2.5s linear infinite',
-                    },
-                    keyframes: {
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-8px)' } },
-                        shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
-                    },
+                        boxShadow: {
+                            'warm': '0 4px 24px -4px rgba(200, 162, 122, 0.18)',
+                            'warm-lg': '0 12px 48px -8px rgba(200, 162, 122, 0.25)',
+                            'card': '0 2px 16px -2px rgba(26, 26, 26, 0.08)',
+                            'card-hover': '0 8px 40px -8px rgba(26, 26, 26, 0.16)',
+                        },
+                        animation: {
+                            'fade-in': 'fadeIn 0.6s ease forwards',
+                            'slide-up': 'slideUp 0.6s ease forwards',
+                            'float': 'float 4s ease-in-out infinite',
+                            'shimmer': 'shimmer 2.5s linear infinite',
+                        },
+                        keyframes: {
+                            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                            slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                            float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-8px)' } },
+                            shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+                        },
+                    }
                 }
-            }
+            };
         }
     </script>
 
