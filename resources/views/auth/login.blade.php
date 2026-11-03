@@ -12,15 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/all.min.css') }}">
 
     <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="{{ asset('js/tailwindcss.js') }}"></script>
     <script>
-        tailwind.config = {
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -60,7 +61,7 @@
                         'warm': '0 8px 30px -4px rgba(200, 162, 122, 0.25)',
                     }
                 }
-            }
+            };
         }
     </script>
 </head>

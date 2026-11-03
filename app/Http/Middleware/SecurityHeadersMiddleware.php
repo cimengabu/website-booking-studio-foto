@@ -32,7 +32,7 @@ class SecurityHeadersMiddleware
 
         // Content Security Policy (compatible with Alpine.js, Tailwind CDN, Google Fonts, and Midtrans Snap)
         $csp = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; "
-            ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com https://app.midtrans.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+            ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com https://app.midtrans.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com https://unpkg.com; "
             ."style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
             ."font-src 'self' https://fonts.gstatic.com data:; "
             ."img-src 'self' data: https: blob:; "

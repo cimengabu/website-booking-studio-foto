@@ -370,6 +370,10 @@
         }
     });
 </script>
-@stack('scripts')
+
+    {{-- ── ADMIN SECRET PORTAL (Ketik "admin" di keyboard) ─────────────── --}}
+    @include('components.admin-secret-portal')
+
+    @stack('scripts')
 </body>
 </html>

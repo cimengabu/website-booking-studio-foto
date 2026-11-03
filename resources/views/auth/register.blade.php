@@ -12,58 +12,60 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/all.min.css') }}">
 
     <!-- Zod (Client-side Schema Validation) -->
     <script src="https://cdn.jsdelivr.net/npm/zod@3.22.4/lib/index.umd.min.js"></script>
 
     <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="{{ asset('js/tailwindcss.js') }}"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        gold: {
-                            DEFAULT: '#C8A27A',
-                            light: '#DEC4A0',
-                            dark: '#A07C52',
-                            50: '#FAF5EE',
-                            100: '#F3E8D8',
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            gold: {
+                                DEFAULT: '#C8A27A',
+                                light: '#DEC4A0',
+                                dark: '#A07C52',
+                                50: '#FAF5EE',
+                                100: '#F3E8D8',
+                            },
+                            cream: {
+                                DEFAULT: '#F8F6F3',
+                                dark: '#EDE9E3',
+                                warm: '#F2EDE6',
+                            },
+                            ink: {
+                                DEFAULT: '#1A1A1A',
+                                soft: '#2D2D2D',
+                                muted: '#6B6560',
+                                light: '#9C9490',
+                            },
+                            teal: {
+                                DEFAULT: '#2F4F4F',
+                                light: '#3D6464',
+                                50: '#EEF4F4',
+                            },
+                            success: '#2E9E6B',
+                            warning: '#E5A53B',
+                            danger: '#D9534F',
                         },
-                        cream: {
-                            DEFAULT: '#F8F6F3',
-                            dark: '#EDE9E3',
-                            warm: '#F2EDE6',
+                        fontFamily: {
+                            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                            serif: ['"Playfair Display"', 'Georgia', 'serif'],
                         },
-                        ink: {
-                            DEFAULT: '#1A1A1A',
-                            soft: '#2D2D2D',
-                            muted: '#6B6560',
-                            light: '#9C9490',
-                        },
-                        teal: {
-                            DEFAULT: '#2F4F4F',
-                            light: '#3D6464',
-                            50: '#EEF4F4',
-                        },
-                        success: '#2E9E6B',
-                        warning: '#E5A53B',
-                        danger: '#D9534F',
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                    },
-                    boxShadow: {
-                        'card': '0 4px 20px -2px rgba(26, 26, 26, 0.05), 0 2px 6px -1px rgba(26, 26, 26, 0.03)',
-                        'warm': '0 8px 30px -4px rgba(200, 162, 122, 0.25)',
+                        boxShadow: {
+                            'card': '0 4px 20px -2px rgba(26, 26, 26, 0.05), 0 2px 6px -1px rgba(26, 26, 26, 0.03)',
+                            'warm': '0 8px 30px -4px rgba(200, 162, 122, 0.25)',
+                        }
                     }
                 }
-            }
+            };
         }
     </script>
 </head>

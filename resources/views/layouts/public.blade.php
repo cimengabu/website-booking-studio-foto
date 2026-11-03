@@ -642,6 +642,10 @@
             reveals.forEach(el => observer.observe(el));
         });
     </script>
+
+    {{-- ── ADMIN SECRET PORTAL (Ketik "admin" di keyboard) ─────────────── --}}
+    @include('components.admin-secret-portal')
+
     @stack('scripts')
 </body>
 </html>

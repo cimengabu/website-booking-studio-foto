@@ -12,15 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/all.min.css') }}">
 
     <!-- HTML5 QR Code Scanner Library -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="{{ asset('js/tailwindcss.js') }}"></script>
     <script>
-        tailwind.config = {
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -36,7 +37,7 @@
                         mono: ['"JetBrains Mono"', 'monospace'],
                     }
                 }
-            }
+            };
         }
     </script>
     <style>
