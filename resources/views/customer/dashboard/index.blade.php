@@ -45,7 +45,7 @@
 @if($nextBooking)
 <div class="mb-8" data-aos="fade-up" data-aos-delay="100">
     <h2 class="font-heading font-bold text-lg text-white mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-calendar-star text-[#E8451E]"></i>
+        <i class="fa-solid fa-calendar-day text-[#E8451E]"></i>
         Sesi Foto Berikutnya
     </h2>
 
@@ -67,7 +67,7 @@
 
             {{-- Room image --}}
             <div class="w-full sm:w-40 h-32 sm:h-36 rounded-2xl overflow-hidden flex-shrink-0 ring-2 ring-[#E8451E]/20">
-                <img src="{{ $nextBooking->room->images->first()?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=400' }}"
+                <img src="{{ $nextBooking->room->images->first()?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=400' }}"
                      alt="{{ $nextBooking->room->name }}"
                      class="w-full h-full object-cover">
             </div>
@@ -204,7 +204,7 @@
             <a href="{{ route('my-bookings.show', $b->booking_code) }}"
                class="flex items-center gap-4 bg-[#1E1D1A] border border-[#2D2B26] rounded-2xl p-4 hover:border-[#E8451E]/30 transition-all group">
                 <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
-                    <img src="{{ $b->room->images->first()?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=100' }}"
+                    <img src="{{ $b->room->images->first()?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=100' }}"
                          alt="{{ $b->room->name }}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1 min-w-0">

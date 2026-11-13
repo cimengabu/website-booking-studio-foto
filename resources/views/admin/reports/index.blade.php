@@ -30,14 +30,14 @@
     <!-- Summary Stats -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
         @foreach([
-            ['Pendapatan Bruto', 'Rp ' . number_format($summary['total_revenue'], 0, ',', '.'), '#E8451E', 'fa-sack-dollar'],
-            ['Total Booking Selesai', $summary['total_bookings'], '#F2C94C', 'fa-calendar-check'],
-            ['Rata-rata per Booking', 'Rp ' . number_format($summary['avg_booking'], 0, ',', '.'), '#60A5FA', 'fa-calculator'],
-            ['Booking Dibatalkan', $summary['cancelled_count'], '#EF4444', 'fa-ban'],
+            ['Pendapatan Bruto', 'Rp ' . number_format($summary['total_revenue'], 0, ',', '.'), '#E8451E', 'sack-dollar'],
+            ['Total Booking Selesai', $summary['total_bookings'], '#F2C94C', 'calendar-check'],
+            ['Rata-rata per Booking', 'Rp ' . number_format($summary['avg_booking'], 0, ',', '.'), '#60A5FA', 'calculator'],
+            ['Booking Dibatalkan', $summary['cancelled_count'], '#EF4444', 'ban'],
         ] as [$label, $value, $color, $icon])
             <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 flex items-center gap-4 shadow-xl">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0" style="background-color: {{ $color }}22; color: {{ $color }}">
-                    <i class="fa-solid fa-{{ $icon }}"></i>
+                    <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }}"></i>
                 </div>
                 <div>
                     <p class="text-[10px] font-mono text-gray-400 uppercase">{{ $label }}</p>

@@ -25,6 +25,10 @@ class User extends Authenticatable
         'loyalty_points',
         'privacy_consent_at',
         'privacy_consent_ip',
+        'failed_login_count',
+        'login_otp',
+        'login_otp_expires_at',
+        'otp_verified_at',
     ];
 
     /**
@@ -47,6 +51,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'privacy_consent_at' => 'datetime',
+            'login_otp_expires_at' => 'datetime',
+            'otp_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

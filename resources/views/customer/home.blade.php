@@ -118,7 +118,7 @@
                     <div>
                         <!-- Image Container -->
                         <div class="relative aspect-[16/10] overflow-hidden bg-gray-900">
-                            <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800&auto=format&fit=crop' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $room->name }}">
+                            <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=800&auto=format&fit=crop' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $room->name }}">
                             <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#141311]/80 backdrop-blur-md text-[#F2C94C] text-xs font-mono font-semibold">
                                 {{ $room->theme }}
                             </span>

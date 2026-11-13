@@ -52,7 +52,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($rooms as $room)
                 @php
-                    $primaryImg = $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800&auto=format&fit=crop';
+                    $primaryImg = $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=800&auto=format&fit=crop';
                 @endphp
                 <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between group hover:border-[#E8451E]/40 transition-all">
                     <!-- Image Banner -->

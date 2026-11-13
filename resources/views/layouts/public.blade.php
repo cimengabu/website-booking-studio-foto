@@ -101,6 +101,7 @@
     </script>
 
     <style>
+        [x-cloak] { display: none !important; }
         /* ── Global ──────────────────────────────── */
         *, *::before, *::after { box-sizing: border-box; }
 
@@ -379,7 +380,7 @@
                                 <div class="border-t border-cream-dark mt-1 pt-1">
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
-                                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger hover:bg-red-50 transition-colors">
+                                        <button type="submit" onclick="return confirmLogout2X(event, this)" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-danger hover:bg-red-50 transition-colors">
                                             <i class="fa-solid fa-right-from-bracket w-4"></i> Keluar
                                         </button>
                                     </form>
@@ -432,7 +433,7 @@
                         </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-danger hover:bg-red-50">
+                            <button type="submit" onclick="return confirmLogout2X(event, this)" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-danger hover:bg-red-50">
                                 <i class="fa-solid fa-right-from-bracket w-4"></i> Keluar
                             </button>
                         </form>
@@ -645,6 +646,8 @@
 
     {{-- ── ADMIN SECRET PORTAL (Ketik "admin" di keyboard) ─────────────── --}}
     @include('components.admin-secret-portal')
+
+    <x-logout-confirm-modal />
 
     @stack('scripts')
 </body>

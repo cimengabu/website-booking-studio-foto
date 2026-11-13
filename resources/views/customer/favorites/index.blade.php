@@ -46,7 +46,7 @@
                 @foreach($favorites as $fav)
                     @php
                         $room = $fav->room;
-                        $img = $room->primaryImage ? asset('storage/'.$room->primaryImage->image_path) : asset('images/hero-studio.jpg');
+                        $img = $room->primaryImage?->path ?? asset('images/hero-studio.jpg');
                     @endphp
                     <div class="bg-white rounded-3xl overflow-hidden border border-cream-dark shadow-card hover:shadow-warm transition-all duration-300 flex flex-col group">
                         {{-- Image & Badges --}}

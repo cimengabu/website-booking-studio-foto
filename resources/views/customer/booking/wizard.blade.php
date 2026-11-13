@@ -52,10 +52,10 @@
         <div class="hidden md:flex items-center justify-center gap-0">
             @php
                 $stepDefs = [
-                    ['Paket','fa-box-open'],
-                    ['Jadwal','fa-calendar-days'],
-                    ['Data Diri','fa-user'],
-                    ['Ringkasan','fa-receipt'],
+                    ['Paket','box-open'],
+                    ['Jadwal','calendar-days'],
+                    ['Data Diri','user'],
+                    ['Ringkasan','receipt'],
                 ];
             @endphp
             @foreach($stepDefs as $i => [$lbl, $ico])
@@ -64,7 +64,7 @@
                         <div class="w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all duration-300 step-dot"
                              :class="step > {{ $i+1 }} ? 'done' : (step === {{ $i+1 }} ? 'active' : 'pending')">
                             <i x-show="step > {{ $i+1 }}" class="fa-solid fa-check text-white text-xs"></i>
-                            <i x-show="step <= {{ $i+1 }}" class="fa-solid fa-{{ $ico }} text-xs"
+                            <i x-show="step <= {{ $i+1 }}" class="fa-solid fa-{{ ltrim($ico, 'fa-') }} text-xs"
                                 :class="step === {{ $i+1 }} ? 'text-white' : 'text-ink-muted'"></i>
                         </div>
                         <span class="text-[10px] font-bold uppercase tracking-wide transition-colors"
@@ -170,6 +170,8 @@
 
                 {{-- ── STEP 2: PILIH RUANGAN & JADWAL ── --}}
                 <div x-show="step === 2"
+                     x-cloak
+                     style="display: none;"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-4"
                      x-transition:enter-end="opacity-100 translate-y-0">
@@ -191,7 +193,7 @@
                                         <div class="rounded-2xl overflow-hidden border-2 transition-all duration-200"
                                              :class="selectedRoomId === {{ $room->id }} ? 'border-gold shadow-warm' : 'border-cream-dark hover:border-gold/50'">
                                             <div class="relative aspect-[16/9] bg-cream-dark">
-                                                <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=400' }}"
+                                                <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=400' }}"
                                                      alt="{{ $room->name }}"
                                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 
@@ -310,6 +312,8 @@
 
                 {{-- ── STEP 3: DATA DIRI ── --}}
                 <div x-show="step === 3"
+                     x-cloak
+                     style="display: none;"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-4"
                      x-transition:enter-end="opacity-100 translate-y-0">
@@ -430,6 +434,8 @@
 
                 {{-- ── STEP 4: RINGKASAN & SUBMIT ── --}}
                 <div x-show="step === 4"
+                     x-cloak
+                     style="display: none;"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-4"
                      x-transition:enter-end="opacity-100 translate-y-0">
@@ -445,16 +451,16 @@
                         {{-- Booking details --}}
                         <div class="space-y-4 mb-6">
                             @foreach([
-                                ['fa-box-open', 'Paket', 'selectedPackageName'],
-                                ['fa-door-open', 'Ruangan', 'selectedRoomName'],
-                                ['fa-calendar', 'Tanggal', 'selectedDate'],
-                                ['fa-clock', 'Jam Sesi', 'selectedSlot?.start'],
-                                ['fa-users', 'Jumlah Orang', 'form.people_count + \" orang\"'],
-                                ['fa-user', 'Pemesan', 'form.name'],
+                                ['box-open', 'Paket', 'selectedPackageName'],
+                                ['door-open', 'Ruangan', 'selectedRoomName'],
+                                ['calendar', 'Tanggal', 'selectedDate'],
+                                ['clock', 'Jam Sesi', 'selectedSlot?.start'],
+                                ['users', 'Jumlah Orang', 'form.people_count + \" orang\"'],
+                                ['user', 'Pemesan', 'form.name'],
                             ] as [$icon, $label, $val])
                                 <div class="flex items-center gap-3 py-3 border-b border-cream-dark last:border-0">
                                     <div class="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                                        <i class="fa-solid fa-{{ $icon }} text-gold text-xs"></i>
+                                        <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-gold text-xs"></i>
                                     </div>
                                     <div class="flex-1">
                                         <p class="text-xs text-ink-muted">{{ $label }}</p>

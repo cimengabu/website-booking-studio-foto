@@ -98,18 +98,37 @@
                     </div>
                 </div>
 
-                {{-- Google Maps Embed --}}
-                <div class="rounded-3xl overflow-hidden border border-cream-dark shadow-card reveal" data-delay="100">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.3!2d112.74!3d-7.26!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sJl.+Tunjungan+Surabaya!5e0!3m2!1sen!2sid!4v1000000000"
-                        width="100%"
-                        height="280"
-                        style="border:0;"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        title="Lokasi SnapSpace Studio di Google Maps">
-                    </iframe>
+                {{-- Google Maps Embed & Interactive Map Card --}}
+                <div class="rounded-3xl overflow-hidden border border-cream-dark shadow-card reveal bg-cream" data-delay="100">
+                    <div class="relative w-full h-[280px] bg-cream-dark">
+                        <iframe
+                            src="https://maps.google.com/maps?q=Jl.+Tunjungan+No.88,+Genteng,+Surabaya,+Jawa+Timur+60275&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                            width="100%"
+                            height="100%"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Peta Lokasi SnapSpace Studio Surabaya">
+                        </iframe>
+                    </div>
+                    <div class="p-4 bg-white border-t border-cream-dark flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-gold/15 flex items-center justify-center text-gold shrink-0">
+                                <i class="fa-solid fa-diamond-turn-right text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-ink">SnapSpace Studio Tunjungan</p>
+                                <p class="text-[11px] text-ink-muted">Jl. Tunjungan No. 88, Surabaya</p>
+                            </div>
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Jl.+Tunjungan+No.88+Surabaya"
+                           target="_blank" rel="noopener"
+                           class="px-3.5 py-1.5 rounded-xl bg-gold hover:bg-gold-dark text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 shrink-0">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <span>Buka Maps</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -204,13 +223,13 @@
         <p class="text-xs font-bold text-ink-muted uppercase tracking-widest mb-4">Ikuti Kami</p>
         <div class="flex gap-4 justify-center">
             @foreach([
-                ['fa-instagram', 'bg-gradient-to-br from-purple-500 to-pink-500', '@snapspace.id', 'https://instagram.com'],
-                ['fa-tiktok', 'bg-ink', '@snapspacestudio', 'https://tiktok.com'],
-                ['fa-youtube', 'bg-red-600', 'SnapSpace Studio', 'https://youtube.com'],
+                ['instagram', 'bg-gradient-to-br from-purple-500 to-pink-500', '@snapspace.id', 'https://instagram.com'],
+                ['tiktok', 'bg-ink', '@snapspacestudio', 'https://tiktok.com'],
+                ['youtube', 'bg-red-600', 'SnapSpace Studio', 'https://youtube.com'],
             ] as [$icon, $bg, $handle, $url])
                 <a href="{{ $url }}" target="_blank" rel="noopener"
                    class="flex items-center gap-3 px-5 py-3 rounded-2xl {{ $bg }} text-white text-sm font-semibold hover:opacity-90 transition-all shadow-card btn-bounce">
-                    <i class="fa-brands fa-{{ $icon }}"></i>
+                    <i class="fa-brands fa-{{ ltrim($icon, 'fa-') }}"></i>
                     <span class="hidden sm:inline">{{ $handle }}</span>
                 </a>
             @endforeach

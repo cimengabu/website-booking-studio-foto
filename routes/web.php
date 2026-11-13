@@ -38,6 +38,7 @@ Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
 Route::get('/rooms/{slug}', [RoomController::class, 'show'])->name('rooms.show');
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
 Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+Route::post('/testimonials', [HomeController::class, 'storeReview'])->name('testimonials.store');
 
 // New Public Informational Pages
 Route::get('/tentang-kami', [AboutController::class, 'index'])->name('about');
@@ -68,6 +69,9 @@ Route::get('/photos/signed-zip/{code}', [MyBookingController::class, 'downloadSi
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+    Route::get('/login/otp', [AuthController::class, 'showOtp'])->name('login.otp');
+    Route::post('/login/otp', [AuthController::class, 'verifyOtp'])->name('login.otp.verify')->middleware('throttle:6,1');
+    Route::post('/login/otp/resend', [AuthController::class, 'resendOtp'])->name('login.otp.resend')->middleware('throttle:3,5');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
 });

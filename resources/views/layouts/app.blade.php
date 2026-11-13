@@ -26,6 +26,13 @@
                 theme: {
                     extend: {
                         colors: {
+                            gold: { DEFAULT: '#C8A27A', light: '#DEC4A0', dark: '#A07C52', 50: '#FAF5EE' },
+                            cream: { DEFAULT: '#F8F6F3', dark: '#EDE9E3', warm: '#F2EDE6' },
+                            ink: { DEFAULT: '#1A1A1A', soft: '#2D2D2D', muted: '#6B6560', light: '#9C9490' },
+                            teal: { DEFAULT: '#2F4F4F', light: '#3D6464' },
+                            success: '#2E9E6B',
+                            warning: '#E5A53B',
+                            danger: '#D9534F',
                             brand: {
                                 paper: '#F3EFE6',
                                 ink: '#1B1A17',
@@ -48,6 +55,7 @@
         }
     </script>
     <style>
+        [x-cloak] { display: none !important; }
         @keyframes scanbeam {
             0% { top: 0%; opacity: 0.8; }
             50% { top: 92%; opacity: 1; }
@@ -161,7 +169,7 @@
 
                                 <form method="POST" action="{{ route('logout') }}" class="border-t border-[#2D2B26] mt-1 pt-1">
                                     @csrf
-                                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-red-500/10 hover:text-red-300">
+                                    <button type="submit" onclick="return confirmLogout2X(event, this)" class="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-red-500/10 hover:text-red-300">
                                         <i class="fa-solid fa-right-from-bracket text-xs w-4"></i> Keluar
                                     </button>
                                 </form>
@@ -289,6 +297,8 @@
 
     {{-- ── ADMIN SECRET PORTAL (Ketik "admin" di keyboard) ─────────────── --}}
     @include('components.admin-secret-portal')
+
+    <x-logout-confirm-modal />
 
     @stack('scripts')
 </body>

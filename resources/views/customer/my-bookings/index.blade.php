@@ -96,7 +96,7 @@
 
                 {{-- Room image --}}
                 <div class="w-full sm:w-20 h-16 sm:h-20 rounded-xl overflow-hidden bg-[#141311] flex-shrink-0">
-                    <img src="{{ $b->room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=200' }}"
+                    <img src="{{ $b->room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=200' }}"
                          alt="{{ $b->room->name }}" class="w-full h-full object-cover" loading="lazy">
                 </div>
 

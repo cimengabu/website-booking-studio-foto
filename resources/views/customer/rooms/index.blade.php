@@ -33,7 +33,7 @@
 
                         {{-- Image --}}
                         <a href="{{ route('rooms.show', $room->slug) }}" class="block relative aspect-[4/3] overflow-hidden bg-cream-dark flex-shrink-0">
-                            <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800' }}"
+                            <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=800' }}"
                                  alt="{{ $room->name }}"
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                  loading="lazy">
@@ -72,13 +72,13 @@
                             {{-- Specs --}}
                             <div class="grid grid-cols-2 gap-2 mb-4 pt-4 border-t border-cream-dark">
                                 @foreach([
-                                    ['fa-users', 'text-gold', $room->capacity.' orang'],
-                                    ['fa-expand', 'text-teal', $room->area_m2.' m²'],
-                                    ['fa-camera-retro', 'text-success', 'Remote Shutter'],
-                                    ['fa-bolt', 'text-gold', 'Lighting Studio'],
+                                    ['users', 'text-gold', $room->capacity.' orang'],
+                                    ['expand', 'text-teal', $room->area_m2.' m²'],
+                                    ['camera-retro', 'text-success', 'Remote Shutter'],
+                                    ['bolt', 'text-gold', 'Lighting Studio'],
                                 ] as [$icon, $color, $label])
                                     <div class="flex items-center gap-2 text-xs text-ink-muted">
-                                        <i class="fa-solid fa-{{ $icon }} {{ $color }} flex-shrink-0"></i>
+                                        <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} {{ $color }} flex-shrink-0"></i>
                                         {{ $label }}
                                     </div>
                                 @endforeach
@@ -119,16 +119,16 @@
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 reveal" data-delay="100">
             @foreach([
-                ['fa-camera', '#C8A27A', 'Kamera Full-Frame'],
-                ['fa-bolt', '#2F4F4F', 'Lighting Godox'],
-                ['fa-wifi', '#2E9E6B', 'WiFi Kencang'],
-                ['fa-snowflake', '#3B82F6', 'AC & Nyaman'],
-                ['fa-person-dress', '#C8A27A', 'Ruang Ganti'],
-                ['fa-shield-halved', '#2F4F4F', 'Sesi Privat'],
+                ['camera', '#C8A27A', 'Kamera Full-Frame'],
+                ['bolt', '#2F4F4F', 'Lighting Godox'],
+                ['wifi', '#2E9E6B', 'WiFi Kencang'],
+                ['snowflake', '#3B82F6', 'AC & Nyaman'],
+                ['person-booth', '#C8A27A', 'Ruang Ganti'],
+                ['shield-halved', '#2F4F4F', 'Sesi Privat'],
             ] as [$icon, $color, $label])
                 <div class="flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border border-cream-dark text-center shadow-card">
                     <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: {{ $color }}15;">
-                        <i class="fa-solid fa-{{ $icon }} text-base" style="color: {{ $color }}"></i>
+                        <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-base" style="color: {{ $color }}"></i>
                     </div>
                     <p class="text-xs font-semibold text-ink leading-snug">{{ $label }}</p>
                 </div>

@@ -74,8 +74,8 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
             'sort_order' => 1,
         ]);
-        RoomImage::create(['room_id' => $room1->id, 'path' => 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800&auto=format&fit=crop', 'is_primary' => true]);
-        RoomImage::create(['room_id' => $room1->id, 'path' => 'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=800&auto=format&fit=crop', 'is_primary' => false]);
+        RoomImage::create(['room_id' => $room1->id, 'path' => 'https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=1200&auto=format&fit=crop', 'is_primary' => true]);
+        RoomImage::create(['room_id' => $room1->id, 'path' => 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1200&auto=format&fit=crop', 'is_primary' => false]);
 
         $room2 = Room::create([
             'name' => 'Vintage Darkroom',
@@ -87,7 +87,8 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
             'sort_order' => 2,
         ]);
-        RoomImage::create(['room_id' => $room2->id, 'path' => 'https://images.unsplash.com/photo-1520390138845-fd2d229dd553?q=80&w=800&auto=format&fit=crop', 'is_primary' => true]);
+        RoomImage::create(['room_id' => $room2->id, 'path' => 'https://images.unsplash.com/photo-1674507887903-ef7d4712500b?q=80&w=1200&auto=format&fit=crop', 'is_primary' => true]);
+        RoomImage::create(['room_id' => $room2->id, 'path' => 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1200&auto=format&fit=crop', 'is_primary' => false]);
 
         $room3 = Room::create([
             'name' => 'Minimalist White Box',
@@ -99,7 +100,8 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
             'sort_order' => 3,
         ]);
-        RoomImage::create(['room_id' => $room3->id, 'path' => 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop', 'is_primary' => true]);
+        RoomImage::create(['room_id' => $room3->id, 'path' => 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop', 'is_primary' => true]);
+        RoomImage::create(['room_id' => $room3->id, 'path' => 'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop', 'is_primary' => false]);
 
         // 4. Packages
         $pkg1 = Package::create([
@@ -145,14 +147,16 @@ class DatabaseSeeder extends Seeder
         Promo::create(['code' => 'SNAP20', 'type' => 'percent', 'value' => 20, 'min_order' => 100000, 'max_discount' => 30000, 'quota' => 50, 'used_count' => 5, 'is_active' => true]);
         Promo::create(['code' => 'STUDIOBARU', 'type' => 'fixed', 'value' => 25000, 'min_order' => 90000, 'quota' => 100, 'used_count' => 12, 'is_active' => true]);
 
-        // 7. Portfolios
+        // 7. Portfolios (Studio Portrait Photos)
         $portfolioData = [
-            ['title' => 'Momen Kelulusan Unair 2026', 'category' => 'wisuda', 'image_path' => 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop'],
-            ['title' => 'Couple Casual Prewedding', 'category' => 'prewedding', 'image_path' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop'],
-            ['title' => 'Katalog Skincare Aesthetic', 'category' => 'produk', 'image_path' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop'],
-            ['title' => 'Foto Keluarga Ceria', 'category' => 'keluarga', 'image_path' => 'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=800&auto=format&fit=crop'],
-            ['title' => 'Self Photo Korean Pose', 'category' => 'self-photo', 'image_path' => 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800&auto=format&fit=crop'],
-            ['title' => 'Bestie Vintage Analog Vibe', 'category' => 'self-photo', 'image_path' => 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=800&auto=format&fit=crop'],
+            ['title' => 'Momen Wisuda Bersama Sahabat', 'category' => 'wisuda', 'image_path' => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop', 'room_id' => $room3->id],
+            ['title' => 'Couple Studio Casual Prewedding', 'category' => 'prewedding', 'image_path' => 'https://images.unsplash.com/photo-1647833190352-0e7e579b45b6?q=80&w=800&auto=format&fit=crop', 'room_id' => $room1->id],
+            ['title' => 'Sesi Studio Foto Keluarga Harmonis', 'category' => 'keluarga', 'image_path' => 'https://images.unsplash.com/photo-1647833197770-ecf18b7f0ef7?q=80&w=800&auto=format&fit=crop', 'room_id' => $room3->id],
+            ['title' => 'Self Photo Pose Korean Minimalist', 'category' => 'self-photo', 'image_path' => 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800&auto=format&fit=crop', 'room_id' => $room1->id],
+            ['title' => 'Studio Portrait Pria Gaya Editorial', 'category' => 'self-photo', 'image_path' => 'https://images.unsplash.com/photo-1668852572751-9636b33f1453?q=80&w=800&auto=format&fit=crop', 'room_id' => $room2->id],
+            ['title' => 'Self Photo Expressive Monokrom', 'category' => 'self-photo', 'image_path' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop', 'room_id' => $room2->id],
+            ['title' => 'Studio Beauty & Editorial Portrait', 'category' => 'produk', 'image_path' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop', 'room_id' => $room3->id],
+            ['title' => 'Graduation Joy Studio Session', 'category' => 'wisuda', 'image_path' => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=crop', 'room_id' => $room1->id],
         ];
 
         foreach ($portfolioData as $p) {
@@ -160,7 +164,7 @@ class DatabaseSeeder extends Seeder
                 'title' => $p['title'],
                 'category' => $p['category'],
                 'image_path' => $p['image_path'],
-                'room_id' => $room1->id,
+                'room_id' => $p['room_id'],
                 'is_featured' => true,
             ]);
         }

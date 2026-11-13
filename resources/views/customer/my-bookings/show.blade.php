@@ -7,21 +7,21 @@
 
 @php
     $statusMap = [
-        'pending'     => ['Menunggu Pembayaran', 'warning', 'fa-clock'],
-        'confirmed'   => ['Dikonfirmasi', 'success', 'fa-calendar-check'],
-        'paid'        => ['Dikonfirmasi (Lunas)', 'success', 'fa-calendar-check'],
-        'dp_paid'     => ['Dikonfirmasi (DP 50%)', 'info', 'fa-credit-card'],
-        'in_progress' => ['Sedang Berlangsung', 'gold', 'fa-camera'],
-        'checked_in'  => ['Sedang Berlangsung', 'gold', 'fa-camera'],
-        'completed'   => ['Selesai Sesi', 'teal', 'fa-circle-check'],
-        'delivered'   => ['Foto Siap Diunduh', 'teal', 'fa-images'],
-        'closed'      => ['Ditutup', 'ink-muted', 'fa-box-archive'],
-        'rescheduled' => ['Reschedule', 'gold', 'fa-calendar-days'],
-        'cancelled'   => ['Dibatalkan', 'danger', 'fa-ban'],
-        'expired'     => ['Kedaluwarsa', 'ink-muted', 'fa-clock-rotate-left'],
-        'no_show'     => ['No-Show (Hangus)', 'danger', 'fa-user-xmark'],
+        'pending'     => ['Menunggu Pembayaran', 'warning', 'clock'],
+        'confirmed'   => ['Dikonfirmasi', 'success', 'calendar-check'],
+        'paid'        => ['Dikonfirmasi (Lunas)', 'success', 'calendar-check'],
+        'dp_paid'     => ['Dikonfirmasi (DP 50%)', 'info', 'credit-card'],
+        'in_progress' => ['Sedang Berlangsung', 'gold', 'camera'],
+        'checked_in'  => ['Sedang Berlangsung', 'gold', 'camera'],
+        'completed'   => ['Selesai Sesi', 'teal', 'circle-check'],
+        'delivered'   => ['Foto Siap Diunduh', 'teal', 'images'],
+        'closed'      => ['Ditutup', 'ink-muted', 'box-archive'],
+        'rescheduled' => ['Reschedule', 'gold', 'calendar-days'],
+        'cancelled'   => ['Dibatalkan', 'danger', 'ban'],
+        'expired'     => ['Kedaluwarsa', 'ink-muted', 'clock-rotate-left'],
+        'no_show'     => ['No-Show (Hangus)', 'danger', 'user-xmark'],
     ];
-    [$statusLabel, $statusVariant, $statusIcon] = $statusMap[$booking->status] ?? ['Unknown', 'ink-muted', 'fa-question'];
+    [$statusLabel, $statusVariant, $statusIcon] = $statusMap[$booking->status] ?? ['Unknown', 'ink-muted', 'question'];
     $isPaid = in_array($booking->status, ['confirmed', 'paid', 'dp_paid', 'in_progress', 'checked_in', 'completed', 'delivered', 'closed']);
     $refundCalc = $booking->calculateCancellationRefund();
 @endphp
@@ -94,7 +94,7 @@
                 <div class="flex items-center gap-3 mb-2 flex-wrap">
                     <span class="font-mono font-bold text-lg text-gold">{{ $booking->booking_code }}</span>
                     <span class="px-3 py-1 rounded-full text-xs font-bold bg-{{ $statusVariant }}/15 text-{{ $statusVariant }} border border-{{ $statusVariant }}/20 flex items-center gap-1.5">
-                        <i class="fa-solid fa-{{ $statusIcon }} text-[10px]"></i> {{ $statusLabel }}
+                        <i class="fa-solid fa-{{ ltrim($statusIcon, 'fa-') }} text-[10px]"></i> {{ $statusLabel }}
                     </span>
                     @if($booking->reschedule_count > 0)
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gold/15 text-gold border border-gold/20">
@@ -315,16 +315,16 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         @foreach([
-                            ['fa-door-open', '#C8A27A', 'Ruangan', $booking->room->name],
-                            ['fa-box-open', '#2F4F4F', 'Paket', $booking->package->name],
-                            ['fa-calendar', '#C8A27A', 'Tanggal Sesi', $booking->booking_date->translatedFormat('l, d M Y')],
-                            ['fa-clock', '#2E9E6B', 'Jam Sesi', substr($booking->start_time, 0, 5).' – '.substr($booking->end_time, 0, 5).' WIB'],
-                            ['fa-users', '#2F4F4F', 'Jumlah Orang', $booking->people_count.' orang'],
-                            ['fa-stopwatch', '#C8A27A', 'Durasi', $booking->package->duration_minutes.' menit'],
+                            ['door-open', '#C8A27A', 'Ruangan', $booking->room->name],
+                            ['box-open', '#2F4F4F', 'Paket', $booking->package->name],
+                            ['calendar', '#C8A27A', 'Tanggal Sesi', $booking->booking_date->translatedFormat('l, d M Y')],
+                            ['clock', '#2E9E6B', 'Jam Sesi', substr($booking->start_time, 0, 5).' – '.substr($booking->end_time, 0, 5).' WIB'],
+                            ['users', '#2F4F4F', 'Jumlah Orang', $booking->people_count.' orang'],
+                            ['stopwatch', '#C8A27A', 'Durasi', $booking->package->duration_minutes.' menit'],
                         ] as [$icon, $color, $label, $val])
                             <div class="p-3.5 rounded-xl bg-cream border border-cream-dark">
                                 <div class="flex items-center gap-2 mb-1">
-                                    <i class="fa-solid fa-{{ $icon }} text-xs" style="color: {{ $color }}"></i>
+                                    <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-xs" style="color: {{ $color }}"></i>
                                     <span class="text-[11px] text-ink-muted">{{ $label }}</span>
                                 </div>
                                 <p class="font-semibold text-sm text-ink">{{ $val }}</p>

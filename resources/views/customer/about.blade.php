@@ -61,16 +61,16 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach([
-                ['fa-user-shield', '#C8A27A', 'Privasi Terjamin', 'Setiap sesi berlangsung tanpa gangguan. Ruangan dikunci untuk Anda saja selama sesi berlangsung — tidak ada orang lain yang bisa masuk.'],
-                ['fa-wand-magic-sparkles', '#2F4F4F', 'Kualitas Profesional', 'Kamera DSLR full-frame terkalibrasi + lighting Godox studio-grade + preset editing eksklusif. Hasilnya? Foto siap cetak & unggah.'],
-                ['fa-calendar-check', '#2E9E6B', 'Booking Bebas Ribet', 'Tidak perlu DM, menunggu konfirmasi, atau bayar DP manual. Semua otomatis — pilih slot, bayar, tiket QR langsung di tangan.'],
-                ['fa-paint-roller', '#C8A27A', 'Tema yang Beragam', 'Dari Korean minimalist hingga vintage darkroom, dari aesthetic boho hingga clean white — ada 15+ tema yang bisa dipilih sesuai mood.'],
-                ['fa-clock-rotate-left', '#2F4F4F', 'Hasil Cepat', 'Foto editing selesai dan masuk ke galeri online Anda dalam 24 jam setelah sesi. Tidak perlu menunggu berminggu-minggu.'],
-                ['fa-headset', '#2E9E6B', 'CS Responsif', 'Tim customer service kami siap membantu via WhatsApp setiap hari 08.00–21.00 WIB — dari pertanyaan hingga bantuan teknis.'],
+                ['user-shield', '#C8A27A', 'Privasi Terjamin', 'Setiap sesi berlangsung tanpa gangguan. Ruangan dikunci untuk Anda saja selama sesi berlangsung — tidak ada orang lain yang bisa masuk.'],
+                ['wand-magic-sparkles', '#2F4F4F', 'Kualitas Profesional', 'Kamera DSLR full-frame terkalibrasi + lighting Godox studio-grade + preset editing eksklusif. Hasilnya? Foto siap cetak & unggah.'],
+                ['calendar-check', '#2E9E6B', 'Booking Bebas Ribet', 'Tidak perlu DM, menunggu konfirmasi, atau bayar DP manual. Semua otomatis — pilih slot, bayar, tiket QR langsung di tangan.'],
+                ['paint-roller', '#C8A27A', 'Tema yang Beragam', 'Dari Korean minimalist hingga vintage darkroom, dari aesthetic boho hingga clean white — ada 15+ tema yang bisa dipilih sesuai mood.'],
+                ['clock-rotate-left', '#2F4F4F', 'Hasil Cepat', 'Foto editing selesai dan masuk ke galeri online Anda dalam 24 jam setelah sesi. Tidak perlu menunggu berminggu-minggu.'],
+                ['headset', '#2E9E6B', 'CS Responsif', 'Tim customer service kami siap membantu via WhatsApp setiap hari 08.00–21.00 WIB — dari pertanyaan hingga bantuan teknis.'],
             ] as [$icon, $color, $title, $desc])
                 <div class="bg-cream rounded-2xl p-7 border border-cream-dark card-lift reveal shadow-card">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: {{ $color }}15;">
-                        <i class="fa-solid fa-{{ $icon }} text-lg" style="color: {{ $color }}"></i>
+                        <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-lg" style="color: {{ $color }}"></i>
                     </div>
                     <h3 class="font-serif font-semibold text-lg text-ink mb-2">{{ $title }}</h3>
                     <p class="text-sm text-ink-muted leading-relaxed">{{ $desc }}</p>
@@ -92,8 +92,8 @@
                     <div class="aspect-square rounded-3xl overflow-hidden bg-cream-dark mt-6">
                         <img src="/images/couple.jpg" alt="Sesi foto couple" class="w-full h-full object-cover">
                     </div>
-                    <div class="aspect-square rounded-3xl overflow-hidden bg-cream-dark col-span-2">
-                        <img src="/images/hero-studio.jpg" alt="Interior studio" class="w-full h-full object-cover object-bottom" style="max-height: 200px;">
+                    <div class="col-span-2 h-60 sm:h-72 rounded-3xl overflow-hidden bg-cream-dark shadow-card">
+                        <img src="/images/hero-studio.jpg" alt="Interior studio" class="w-full h-full object-cover object-center">
                     </div>
                 </div>
             </div>

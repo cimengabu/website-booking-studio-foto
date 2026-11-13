@@ -97,14 +97,14 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4 items-center">
             @foreach([
-                ['fa-bolt', '#C8A27A', 'Booking 3 Menit', 'Pilih paket, jadwal, bayar — selesai'],
-                ['fa-lock', '#2F4F4F', 'Slot Realtime Lock', 'Tidak ada dobel booking sama sekali'],
-                ['fa-shield-halved', '#2E9E6B', 'Pembayaran Aman', 'QRIS, GoPay, OVO, Virtual Account'],
-                ['fa-cloud-arrow-down', '#C8A27A', 'Foto Dikirim 24 Jam', 'File digital langsung ke akun Anda'],
+                ['bolt', '#C8A27A', 'Booking 3 Menit', 'Pilih paket, jadwal, bayar — selesai'],
+                ['lock', '#2F4F4F', 'Slot Realtime Lock', 'Tidak ada dobel booking sama sekali'],
+                ['shield-halved', '#2E9E6B', 'Pembayaran Aman', 'QRIS, GoPay, OVO, Virtual Account'],
+                ['cloud-arrow-down', '#C8A27A', 'Foto Dikirim 24 Jam', 'File digital langsung ke akun Anda'],
             ] as [$icon, $color, $title, $desc])
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: {{ $color }}15;">
-                        <i class="fa-solid fa-{{ $icon }} text-sm" style="color: {{ $color }}"></i>
+                        <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-sm" style="color: {{ $color }}"></i>
                     </div>
                     <div>
                         <p class="text-sm font-semibold text-ink leading-tight">{{ $title }}</p>
@@ -189,7 +189,7 @@
 
                     {{-- Image --}}
                     <div class="relative aspect-[4/3] overflow-hidden bg-cream-dark">
-                        <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800&auto=format&fit=crop' }}"
+                        <img src="{{ $room->primaryImage?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=800&auto=format&fit=crop' }}"
                              alt="{{ $room->name }}"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                              loading="lazy">
@@ -358,14 +358,14 @@
             {{-- Stats grid --}}
             <div class="grid grid-cols-2 gap-4 reveal" data-delay="150">
                 @foreach([
-                    ['500+', 'Sesi Foto Selesai', 'fa-camera'],
-                    ['4.9★', 'Rating Pelanggan', 'fa-star'],
-                    ['15+', 'Tema Ruangan Unik', 'fa-palette'],
-                    ['24/7', 'Booking Online', 'fa-calendar'],
+                    ['500+', 'Sesi Foto Selesai', 'camera'],
+                    ['4.9★', 'Rating Pelanggan', 'star'],
+                    ['15+', 'Tema Ruangan Unik', 'palette'],
+                    ['24/7', 'Booking Online', 'calendar'],
                 ] as [$val, $label, $icon])
                     <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
                         <div class="w-10 h-10 rounded-xl bg-gold/20 flex items-center justify-center mx-auto mb-3">
-                            <i class="fa-solid fa-{{ $icon }} text-gold text-sm"></i>
+                            <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-gold text-sm"></i>
                         </div>
                         <p class="font-serif font-bold text-3xl text-white mb-1">{{ $val }}</p>
                         <p class="text-xs text-white/60 font-medium">{{ $label }}</p>
@@ -431,44 +431,80 @@
      TESTIMONIALS
      ════════════════════════════════════════════════════════════ --}}
 @if($reviews->isNotEmpty())
-<section class="py-20 sm:py-24 bg-cream">
+<section class="py-20 sm:py-24 bg-cream" x-data="{ openReviewModal: false, selectedRating: 5, hoveredRating: 0, ratingLabel() {
+    const r = this.hoveredRating || this.selectedRating;
+    const labels = {
+        5: '★★★★★ — Luar Biasa / Sangat Puas!',
+        4: '★★★★☆ — Bagus & Menyenangkan',
+        3: '★★★☆☆ — Cukup Baik',
+        2: '★★☆☆☆ — Kurang Memuaskan',
+        1: '★☆☆☆☆ — Buruk'
+    };
+    return labels[r] || 'Pilih Rating Bintang';
+} }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto mb-16 reveal">
-            <p class="text-xs font-bold text-gold uppercase tracking-widest mb-3">Testimoni</p>
-            <h2 class="font-serif font-bold text-4xl text-ink mb-4">Kata Mereka tentang SnapSpace</h2>
-            <p class="text-ink-muted">Ribuan momen indah telah diabadikan. Inilah cerita nyata dari pelanggan kami.</p>
+
+        {{-- Success Alert if just reviewed --}}
+        @if(session('review_success'))
+            <div class="max-w-2xl mx-auto mb-10 p-4 rounded-2xl bg-success/15 border border-success/30 text-emerald-800 text-sm font-semibold flex items-center gap-3 shadow-sm animate-bounce">
+                <i class="fa-solid fa-circle-check text-xl text-success shrink-0"></i>
+                <p>{{ session('review_success') }}</p>
+            </div>
+        @endif
+
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-16 reveal">
+            <div class="max-w-2xl">
+                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-3">Testimoni & Ulasan</p>
+                <h2 class="font-serif font-bold text-4xl text-ink mb-4">Kata Mereka tentang SnapSpace</h2>
+                <p class="text-ink-muted">Ribuan momen indah telah diabadikan. Inilah cerita nyata dari para pelanggan setia kami.</p>
+            </div>
+            <div>
+                <button type="button"
+                        @click="openReviewModal = true"
+                        class="btn-gold btn-bounce inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-white font-bold text-xs shadow-warm transition-all">
+                    <i class="fa-solid fa-star text-amber-200"></i>
+                    <span>Beri Rating & Testimoni</span>
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($reviews as $rev)
-                <div class="bg-white rounded-3xl p-7 border border-cream-dark shadow-card card-lift reveal" data-delay="{{ $loop->index * 80 }}">
-                    {{-- Stars --}}
-                    <div class="flex gap-1 text-gold text-sm mb-4">
-                        @for($i=1; $i<=$rev->rating; $i++)
-                            <i class="fa-solid fa-star"></i>
-                        @endfor
-                        @for($i=$rev->rating+1; $i<=5; $i++)
-                            <i class="fa-regular fa-star text-cream-dark"></i>
-                        @endfor
-                    </div>
+                @php
+                    $authorName = $rev->user?->name ?? $rev->guest_name ?? 'Pelanggan SnapSpace';
+                    $roomName = $rev->booking?->room?->name ?? $rev->room?->name ?? 'SnapSpace Studio';
+                    $initials = strtoupper(substr($authorName, 0, 2));
+                @endphp
+                <div class="bg-white rounded-3xl p-7 border border-cream-dark shadow-card card-lift reveal flex flex-col justify-between" data-delay="{{ $loop->index * 70 }}">
+                    <div>
+                        {{-- Stars --}}
+                        <div class="flex gap-1 text-gold text-sm mb-4">
+                            @for($i=1; $i<=$rev->rating; $i++)
+                                <i class="fa-solid fa-star"></i>
+                            @endfor
+                            @for($i=$rev->rating+1; $i<=5; $i++)
+                                <i class="fa-regular fa-star text-cream-dark"></i>
+                            @endfor
+                        </div>
 
-                    {{-- Quote --}}
-                    <div class="relative mb-5">
-                        <i class="fa-solid fa-quote-left text-3xl text-gold/15 absolute -top-1 -left-1"></i>
-                        <p class="text-sm text-ink-soft leading-relaxed pl-4">{{ $rev->comment }}</p>
+                        {{-- Quote --}}
+                        <div class="relative mb-5">
+                            <i class="fa-solid fa-quote-left text-3xl text-gold/15 absolute -top-1 -left-1"></i>
+                            <p class="text-sm text-ink-soft leading-relaxed pl-4">{{ $rev->comment }}</p>
+                        </div>
                     </div>
 
                     {{-- Author --}}
-                    <div class="flex items-center gap-3 pt-5 border-t border-cream-dark">
-                        <div class="w-10 h-10 rounded-full bg-teal text-white flex items-center justify-center font-bold text-sm">
-                            {{ strtoupper(substr($rev->user->name, 0, 2)) }}
+                    <div class="flex items-center gap-3 pt-5 border-t border-cream-dark mt-4">
+                        <div class="w-10 h-10 rounded-full bg-teal text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                            {{ $initials }}
                         </div>
-                        <div>
-                            <p class="text-sm font-semibold text-ink">{{ $rev->user->name }}</p>
-                            <p class="text-xs text-ink-muted">{{ $rev->booking->room->name ?? 'SnapSpace Studio' }}</p>
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-ink truncate">{{ $authorName }}</p>
+                            <p class="text-xs text-ink-muted truncate">{{ $roomName }}</p>
                         </div>
-                        <div class="ml-auto">
-                            <span class="w-7 h-7 rounded-full bg-success/10 flex items-center justify-center">
+                        <div class="ml-auto shrink-0">
+                            <span class="w-7 h-7 rounded-full bg-success/10 flex items-center justify-center" title="Ulasan Terverifikasi">
                                 <i class="fa-solid fa-circle-check text-success text-xs"></i>
                             </span>
                         </div>
@@ -476,6 +512,141 @@
                 </div>
             @endforeach
         </div>
+
+        {{-- ── MODAL BERI RATING & TESTIMONI ── --}}
+        <div x-show="openReviewModal"
+             x-cloak
+             style="display: none;"
+             class="fixed inset-0 z-50 overflow-y-auto"
+             role="dialog"
+             aria-modal="true">
+
+            {{-- Backdrop --}}
+            <div x-show="openReviewModal"
+                 x-cloak
+                 style="display: none;"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-ink/60 backdrop-blur-sm"
+                 @click="openReviewModal = false"></div>
+
+            {{-- Modal Box --}}
+            <div class="min-h-full flex items-center justify-center p-4">
+                <div x-show="openReviewModal"
+                     x-cloak
+                     style="display: none;"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:scale-95"
+                     class="relative bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-cream-dark overflow-hidden">
+
+                    {{-- Close Button --}}
+                    <button type="button"
+                            @click="openReviewModal = false"
+                            class="absolute top-5 right-5 w-8 h-8 rounded-full bg-cream hover:bg-cream-dark text-ink-muted flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+
+                    {{-- Header --}}
+                    <div class="mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gold/15 text-gold flex items-center justify-center text-xl mb-3">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <h3 class="font-serif font-bold text-2xl text-ink">Beri Rating & Ulasan</h3>
+                        <p class="text-xs text-ink-muted mt-1 leading-relaxed">
+                            Ceritakan pengalaman Anda berfoto di SnapSpace Studio. Setiap masukan sangat berharga bagi kami!
+                        </p>
+                    </div>
+
+                    {{-- Form --}}
+                    <form action="{{ route('testimonials.store') }}" method="POST" class="space-y-4">
+                        @csrf
+
+                        {{-- Rating Star Selector --}}
+                        <div class="bg-cream rounded-2xl p-4 border border-cream-dark text-center">
+                            <p class="text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">Berapa bintang yang Anda berikan?</p>
+                            <div class="flex items-center justify-center gap-2 my-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <button type="button"
+                                            @click="selectedRating = {{ $i }}"
+                                            @mouseenter="hoveredRating = {{ $i }}"
+                                            @mouseleave="hoveredRating = 0"
+                                            class="text-3xl sm:text-4xl transition-transform hover:scale-110 focus:outline-none"
+                                            :class="((hoveredRating || selectedRating) >= {{ $i }}) ? 'text-gold' : 'text-cream-dark'">
+                                        <i class="fa-solid fa-star"></i>
+                                    </button>
+                                @endfor
+                            </div>
+                            <input type="hidden" name="rating" :value="selectedRating">
+                            <p class="text-xs font-semibold text-gold mt-1" x-text="ratingLabel()"></p>
+                        </div>
+
+                        {{-- Name Input --}}
+                        <div>
+                            <label class="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-1.5">
+                                Nama Anda <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="name"
+                                   value="{{ Auth::user()->name ?? '' }}"
+                                   required
+                                   placeholder="Contoh: Sarah Angelina"
+                                   class="w-full px-4 py-3 rounded-xl border border-cream-dark bg-cream text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all">
+                        </div>
+
+                        {{-- Room Selection --}}
+                        @if(isset($allRooms) && $allRooms->count() > 0)
+                            <div>
+                                <label class="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-1.5">
+                                    Ruangan yang Digunakan (Opsional)
+                                </label>
+                                <select name="room_id"
+                                        class="w-full px-4 py-3 rounded-xl border border-cream-dark bg-cream text-sm text-ink focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all">
+                                    <option value="">-- Pengalaman Umum di SnapSpace --</option>
+                                    @foreach($allRooms as $room)
+                                        <option value="{{ $room->id }}">{{ $room->name }} ({{ $room->theme }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
+                        {{-- Comment --}}
+                        <div>
+                            <label class="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-1.5">
+                                Cerita Pengalaman / Ulasan <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="comment"
+                                      rows="4"
+                                      required
+                                      placeholder="Contoh: Lighting-nya bagus banget, tempatnya nyaman dan staf sangat ramah. Hasil foto langsung siap download..."
+                                      class="w-full px-4 py-3 rounded-xl border border-cream-dark bg-cream text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all resize-none"></textarea>
+                        </div>
+
+                        {{-- Submit Buttons --}}
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <button type="button"
+                                    @click="openReviewModal = false"
+                                    class="w-full py-3 px-4 rounded-xl border border-cream-dark text-ink-soft text-xs font-semibold hover:bg-cream transition-colors">
+                                Batal
+                            </button>
+                            <button type="submit"
+                                    class="w-full py-3 px-4 rounded-xl bg-gold hover:bg-gold-dark text-white text-xs font-bold shadow-warm transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Kirim Testimoni</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
 @endif

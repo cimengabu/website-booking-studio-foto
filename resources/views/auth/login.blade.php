@@ -182,7 +182,7 @@
             @endif
 
             <!-- Login Form -->
-            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+            <form method="POST" action="{{ route('login') }}" class="space-y-5" autocomplete="off">
                 @csrf
 
                 <!-- Email -->
@@ -192,7 +192,10 @@
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-light">
                             <i class="fa-regular fa-envelope text-sm"></i>
                         </div>
-                        <input type="email" id="email" name="email" x-model="email" value="{{ old('email') }}" required autofocus
+                        <input type="email" id="email" name="email" x-model="email"
+                               value="{{ $errors->any() ? old('email') : '' }}"
+                               required autofocus
+                               autocomplete="off"
                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                placeholder="email@kamu.com">
                     </div>
@@ -208,6 +211,7 @@
                             <i class="fa-solid fa-lock text-sm"></i>
                         </div>
                         <input :type="showPassword ? 'text' : 'password'" id="password" name="password" x-model="password" required
+                               autocomplete="new-password"
                                class="w-full pl-10 pr-10 py-3 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                placeholder="••••••••">
                         <button type="button" @click="showPassword = !showPassword"

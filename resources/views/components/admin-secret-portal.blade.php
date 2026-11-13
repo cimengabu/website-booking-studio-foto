@@ -1,5 +1,7 @@
 <div x-data="adminSecretPortal()"
+     x-show="isOpen"
      x-cloak
+     style="display: none;"
      @open-admin-portal.window="openPortal()"
      @keydown.escape.window="closePortal()"
      class="relative z-[9999]"
@@ -9,6 +11,8 @@
 
     {{-- Backdrop --}}
     <div x-show="isOpen"
+         x-cloak
+         style="display: none;"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
@@ -20,6 +24,8 @@
 
     {{-- Modal Dialog --}}
     <div x-show="isOpen"
+         x-cloak
+         style="display: none;"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95 translate-y-4"
          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -107,9 +113,9 @@
                         </div>
 
                         <div class="flex gap-3">
-                            <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                            <form method="POST" action="{{ route('logout') }}" class="flex-1" id="portal-logout-form">
                                 @csrf
-                                <button type="submit" class="w-full py-3 rounded-xl border border-danger/30 text-danger hover:bg-red-50 text-xs font-semibold transition-colors">
+                                <button type="button" onclick="return confirmLogout2X(event, this)" class="w-full py-3 rounded-xl border border-danger/30 text-danger hover:bg-red-50 text-xs font-semibold transition-colors">
                                     Keluar dari Akun Ini
                                 </button>
                             </form>

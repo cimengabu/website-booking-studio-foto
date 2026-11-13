@@ -23,6 +23,13 @@
                 theme: {
                     extend: {
                         colors: {
+                            gold: { DEFAULT: '#C8A27A', light: '#DEC4A0', dark: '#A07C52', 50: '#FAF5EE' },
+                            cream: { DEFAULT: '#F8F6F3', dark: '#EDE9E3', warm: '#F2EDE6' },
+                            ink: { DEFAULT: '#1A1A1A', soft: '#2D2D2D', muted: '#6B6560', light: '#9C9490' },
+                            teal: { DEFAULT: '#2F4F4F', light: '#3D6464' },
+                            success: '#2E9E6B',
+                            warning: '#E5A53B',
+                            danger: '#D9534F',
                             brand: {
                                 paper: '#F3EFE6',
                                 ink: '#1B1A17',
@@ -45,6 +52,7 @@
         }
     </script>
     <style>
+        [x-cloak] { display: none !important; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #141311; }
         ::-webkit-scrollbar-thumb { background: #2D2B26; border-radius: 99px; }
@@ -542,7 +550,7 @@
                         <div class="border-t border-[#2D2B26] pt-1">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors font-medium">
+                                <button type="submit" onclick="return confirmLogout2X(event, this)" class="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors font-medium">
                                     <i class="fa-solid fa-right-from-bracket text-xs w-4"></i> Keluar
                                 </button>
                             </form>
@@ -639,6 +647,8 @@
             </div>
         </div>
     </div>
+
+    <x-logout-confirm-modal />
 
     @stack('scripts')
 </body>

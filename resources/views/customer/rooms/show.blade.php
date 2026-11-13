@@ -7,7 +7,7 @@
 
 {{-- ── IMAGE GALLERY HERO ── --}}
 <section class="bg-cream-dark"
-         x-data="{ activeImg: 0, images: {{ json_encode($room->images->pluck('path')->toArray() ?: ['https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200']) }} }">
+         x-data="{ activeImg: 0, images: {{ json_encode($room->images->pluck('path')->toArray() ?: ['https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=1200']) }} }">
 
     {{-- Main image --}}
     <div class="relative aspect-[21/9] overflow-hidden bg-cream-dark max-h-[520px]">
@@ -104,16 +104,16 @@
                     <h2 class="font-serif font-semibold text-lg text-ink mb-5">Spesifikasi Ruangan</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         @foreach([
-                            ['fa-users', '#C8A27A', 'Kapasitas', $room->capacity.' Orang'],
-                            ['fa-expand', '#2F4F4F', 'Luas', $room->area_m2.' m²'],
-                            ['fa-camera', '#C8A27A', 'Kamera', 'Full-Frame DSLR'],
-                            ['fa-bolt', '#2E9E6B', 'Remote', 'Wireless Shutter'],
-                            ['fa-lightbulb', '#C8A27A', 'Lighting', 'Softbox Godox'],
-                            ['fa-shield-halved', '#2F4F4F', 'Privasi', '100% Tertutup'],
+                            ['users', '#C8A27A', 'Kapasitas', $room->capacity.' Orang'],
+                            ['expand', '#2F4F4F', 'Luas', $room->area_m2.' m²'],
+                            ['camera', '#C8A27A', 'Kamera', 'Full-Frame DSLR'],
+                            ['bolt', '#2E9E6B', 'Remote', 'Wireless Shutter'],
+                            ['lightbulb', '#C8A27A', 'Lighting', 'Softbox Godox'],
+                            ['shield-halved', '#2F4F4F', 'Privasi', '100% Tertutup'],
                         ] as [$icon, $color, $label, $val])
                             <div class="flex items-start gap-3 p-4 rounded-xl bg-cream border border-cream-dark">
                                 <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: {{ $color }}15;">
-                                    <i class="fa-solid fa-{{ $icon }} text-sm" style="color: {{ $color }}"></i>
+                                    <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-sm" style="color: {{ $color }}"></i>
                                 </div>
                                 <div>
                                     <p class="text-xs text-ink-muted">{{ $label }}</p>
@@ -124,27 +124,30 @@
                     </div>
                 </div>
 
-                {{-- What's Included --}}
+                {{-- What's Included / Kelengkapan Ruangan --}}
                 <div class="bg-white rounded-2xl p-6 border border-cream-dark shadow-card">
-                    <h2 class="font-serif font-semibold text-lg text-ink mb-5">Yang Tersedia di Ruangan Ini</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="font-serif font-semibold text-lg text-ink">Yang Tersedia di Ruangan Ini (Kelengkapan Ruangan)</h2>
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-gold/10 text-gold-dark border border-gold/20">Lengkap & Siap Pakai</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         @foreach([
-                            'Kamera DSLR/Mirrorless Full-Frame terkalibrasi',
-                            'Tripod sturdy + remote shutter wireless',
-                            'Lighting softbox profesional (Godox)',
-                            'Hair light & fill light',
-                            'Pilihan background warna (3–6 opsi)',
-                            'Properti foto: kursi, frame, bunga, dll.',
-                            'Cermin full-length untuk cek penampilan',
-                            'Ruang ganti privat',
-                            'AC + WiFi kencang',
-                            'Tissue & cermin kecil makeup',
-                        ] as $item)
-                            <div class="flex items-center gap-3 text-sm text-ink-soft">
-                                <div class="w-5 h-5 rounded-full bg-success/15 flex items-center justify-center flex-shrink-0">
-                                    <i class="fa-solid fa-check text-success text-[10px]"></i>
+                            ['camera', 'Kamera DSLR/Mirrorless Full-Frame terkalibrasi', '#C8A27A'],
+                            ['sliders', 'Tripod sturdy + remote shutter wireless', '#2F4F4F'],
+                            ['lightbulb', 'Lighting softbox profesional (Godox)', '#E5A53B'],
+                            ['sun', 'Hair light & fill light studio', '#C8A27A'],
+                            ['palette', 'Pilihan background warna (3–6 opsi estetik)', '#2E9E6B'],
+                            ['couch', 'Properti foto: kursi vintage, frame, bunga kering', '#2F4F4F'],
+                            ['wand-magic-sparkles', 'Cermin full-length untuk cek penampilan', '#C8A27A'],
+                            ['door-closed', 'Ruang ganti privat & aman', '#2E9E6B'],
+                            ['wifi', 'AC dingin + WiFi kencang untuk stories', '#3B82F6'],
+                            ['spa', 'Tissue, sisir & cermin kecil makeup', '#E5A53B'],
+                        ] as [$amenityIcon, $item, $itemColor])
+                            <div class="flex items-center gap-3 p-2.5 rounded-xl bg-cream/60 border border-cream-dark text-sm text-ink-soft">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: {{ $itemColor }}18;">
+                                    <i class="fa-solid fa-{{ ltrim($amenityIcon, 'fa-') }} text-xs" style="color: {{ $itemColor }};"></i>
                                 </div>
-                                {{ $item }}
+                                <span class="font-medium text-xs sm:text-sm text-ink">{{ $item }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -286,7 +289,7 @@
                 <a href="{{ route('rooms.show', $other->slug) }}"
                    class="group flex items-center gap-4 p-4 bg-cream rounded-2xl border border-cream-dark hover:border-gold card-lift transition-all">
                     <div class="w-16 h-16 rounded-xl overflow-hidden bg-cream-dark flex-shrink-0">
-                        <img src="{{ $other->primaryImage?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=200' }}"
+                        <img src="{{ $other->primaryImage?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=200' }}"
                              alt="{{ $other->name }}"
                              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     </div>

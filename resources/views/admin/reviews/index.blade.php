@@ -51,12 +51,18 @@
                     @forelse($reviews as $review)
                         <tr class="hover:bg-[#141311]/50 transition-colors">
                             <td class="px-5 py-4 align-top w-64">
-                                <p class="font-bold text-white font-sans text-sm">{{ $review->user->name ?? 'Pelanggan' }}</p>
-                                <a href="{{ route('admin.bookings.show', $review->booking_id) }}" class="text-[#F2C94C] hover:underline text-[11px] block mt-0.5">
-                                    {{ $review->booking->booking_code ?? 'Booking #' . $review->booking_id }}
-                                </a>
+                                <p class="font-bold text-white font-sans text-sm">{{ $review->author_name }}</p>
+                                @if($review->booking_id)
+                                    <a href="{{ route('admin.bookings.show', $review->booking_id) }}" class="text-[#F2C94C] hover:underline text-[11px] block mt-0.5">
+                                        {{ $review->booking->booking_code ?? 'Booking #' . $review->booking_id }}
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 text-[11px] block mt-0.5 italic">Ulasan Website / Langsung</span>
+                                @endif
                                 @if($review->booking && $review->booking->room)
                                     <span class="text-[10px] text-gray-500 font-sans block mt-0.5">{{ $review->booking->room->name }}</span>
+                                @elseif($review->room)
+                                    <span class="text-[10px] text-gray-500 font-sans block mt-0.5">{{ $review->room->name }}</span>
                                 @endif
                                 <span class="text-[9px] text-gray-600 block mt-1">{{ $review->created_at->format('d M Y H:i') }}</span>
                             </td>

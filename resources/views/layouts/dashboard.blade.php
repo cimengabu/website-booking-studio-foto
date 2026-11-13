@@ -24,8 +24,14 @@
                 theme: {
                     extend: {
                         colors: {
+                            gold: { DEFAULT: '#C8A27A', light: '#DEC4A0', dark: '#A07C52', 50: '#FAF5EE' },
+                            cream: { DEFAULT: '#F8F6F3', dark: '#EDE9E3', warm: '#F2EDE6' },
+                            ink: { DEFAULT: '#1A1A1A', soft: '#2D2D2D', muted: '#6B6560', light: '#9C9490' },
+                            teal: { DEFAULT: '#2F4F4F', light: '#3D6464' },
+                            success: '#2E9E6B',
+                            warning: '#E5A53B',
+                            danger: '#D9534F',
                             brand: {
-                                paper: '#F3EFE6',
                                 ink: '#1B1A17',
                                 safelight: '#E8451E',
                                 forest: '#1F3A2E',
@@ -46,6 +52,7 @@
         }
     </script>
     <style>
+        [x-cloak] { display: none !important; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #141311; }
         ::-webkit-scrollbar-thumb { background: #2D2B26; border-radius: 99px; }
@@ -216,7 +223,7 @@
         </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-rose-500 hover:text-rose-400 hover:bg-rose-500/10">
+            <button type="submit" onclick="return confirmLogout2X(event, this)" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-rose-500 hover:text-rose-400 hover:bg-rose-500/10">
                 <i class="fa-solid fa-right-from-bracket w-4 text-center text-sm"></i>
                 <span>Keluar</span>
             </button>
@@ -373,6 +380,8 @@
 
     {{-- ── ADMIN SECRET PORTAL (Ketik "admin" di keyboard) ─────────────── --}}
     @include('components.admin-secret-portal')
+
+    <x-logout-confirm-modal />
 
     @stack('scripts')
 </body>

@@ -32,7 +32,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 border-b border-[#2D2B26]">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                    <img src="{{ $booking->room->images->first()?->path ?? 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=100' }}"
+                    <img src="{{ $booking->room->images->first()?->path ?? 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=100' }}"
                          alt="{{ $booking->room->name }}" class="w-full h-full object-cover">
                 </div>
                 <div>

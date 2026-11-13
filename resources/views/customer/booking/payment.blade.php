@@ -83,15 +83,15 @@
 
                         <div class="space-y-3 text-sm">
                             @foreach([
-                                ['fa-door-open', 'Ruangan', $booking->room->name],
-                                ['fa-box-open', 'Paket', $booking->package->name],
-                                ['fa-calendar', 'Tanggal', $booking->booking_date->translatedFormat('l, d M Y')],
-                                ['fa-clock', 'Jam Sesi', substr($booking->start_time, 0, 5).' - '.substr($booking->end_time, 0, 5).' WIB'],
-                                ['fa-users', 'Jumlah Orang', $booking->people_count.' orang'],
+                                ['door-open', 'Ruangan', $booking->room->name],
+                                ['box-open', 'Paket', $booking->package->name],
+                                ['calendar', 'Tanggal', $booking->booking_date->translatedFormat('l, d M Y')],
+                                ['clock', 'Jam Sesi', substr($booking->start_time, 0, 5).' - '.substr($booking->end_time, 0, 5).' WIB'],
+                                ['users', 'Jumlah Orang', $booking->people_count.' orang'],
                             ] as [$icon, $label, $val])
                                 <div class="flex items-center justify-between py-2 border-b border-cream-dark last:border-0">
                                     <span class="flex items-center gap-2 text-ink-muted">
-                                        <i class="fa-solid fa-{{ $icon }} text-xs text-gold w-4 text-center"></i>
+                                        <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-xs text-gold w-4 text-center"></i>
                                         {{ $label }}
                                     </span>
                                     <span class="font-semibold text-ink">{{ $val }}</span>
@@ -318,12 +318,12 @@
                         {{-- Trust badges --}}
                         <div class="flex items-center justify-center gap-4 mt-5 pt-5 border-t border-cream-dark">
                             @foreach([
-                                ['fa-shield-halved', 'Terenkripsi SSL/TLS'],
-                                ['fa-lock', 'Pembayaran Aman'],
-                                ['fa-building-columns', 'Berlisensi Bank Indonesia'],
+                                ['shield-halved', 'Terenkripsi SSL/TLS'],
+                                ['lock', 'Pembayaran Aman'],
+                                ['building-columns', 'Berlisensi Bank Indonesia'],
                             ] as [$icon, $label])
                                 <div class="flex items-center gap-1.5 text-xs text-ink-muted">
-                                    <i class="fa-solid fa-{{ $icon }} text-success text-[10px]"></i>
+                                    <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-success text-[10px]"></i>
                                     {{ $label }}
                                 </div>
                             @endforeach

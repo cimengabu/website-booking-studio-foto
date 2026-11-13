@@ -33,12 +33,12 @@
         <div class="flex items-center gap-2 min-w-max">
             @php
                 $allCats = [
-                    'all'       => ['Semua', 'fa-grid-2'],
-                    'self-photo'=> ['Self Photo', 'fa-person'],
-                    'prewedding'=> ['Prewedding', 'fa-heart'],
-                    'wisuda'    => ['Wisuda', 'fa-graduation-cap'],
-                    'keluarga'  => ['Keluarga', 'fa-house-chimney-user'],
-                    'produk'    => ['Produk', 'fa-box'],
+                    'all'       => ['Semua', 'border-all'],
+                    'self-photo'=> ['Self Photo', 'person'],
+                    'prewedding'=> ['Prewedding', 'heart'],
+                    'wisuda'    => ['Wisuda', 'graduation-cap'],
+                    'keluarga'  => ['Keluarga', 'house-chimney-user'],
+                    'produk'    => ['Produk', 'box'],
                 ];
                 $activeFilter = $category ?? 'all';
             @endphp
@@ -49,7 +49,7 @@
                           {{ $activeFilter === $slug || ($slug === 'all' && !$activeFilter)
                              ? 'bg-gold text-white shadow-warm'
                              : 'text-ink-muted hover:text-ink hover:bg-cream' }}">
-                    <i class="fa-solid fa-{{ $icon }} text-xs"></i>
+                    <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-xs"></i>
                     {{ $label }}
                 </a>
             @endforeach

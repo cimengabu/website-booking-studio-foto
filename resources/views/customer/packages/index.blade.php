@@ -128,13 +128,13 @@
         <div class="mt-12 bg-cream rounded-3xl p-8 border border-cream-dark reveal">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
                 @foreach([
-                    ['fa-shield-halved', 'text-success', 'Pembayaran 100% Aman', 'Diproses melalui Midtrans — gateway resmi & terpercaya'],
-                    ['fa-rotate-left', 'text-gold', 'Reschedule Mudah', 'Ubah jadwal kapan saja (H-24 jam tanpa biaya tambahan)'],
-                    ['fa-headset', 'text-teal', 'CS Siap Membantu', 'Tim kami siap menjawab pertanyaan Anda via WhatsApp'],
+                    ['shield-halved', 'text-success', 'Pembayaran 100% Aman', 'Diproses melalui Midtrans — gateway resmi & terpercaya'],
+                    ['rotate-left', 'text-gold', 'Reschedule Mudah', 'Ubah jadwal kapan saja (H-24 jam tanpa biaya tambahan)'],
+                    ['headset', 'text-teal', 'CS Siap Membantu', 'Tim kami siap menjawab pertanyaan Anda via WhatsApp'],
                 ] as [$icon, $color, $title, $desc])
                     <div class="flex flex-col items-center gap-3">
                         <div class="w-12 h-12 rounded-2xl bg-white border border-cream-dark flex items-center justify-center shadow-card">
-                            <i class="fa-solid fa-{{ $icon }} text-lg {{ $color }}"></i>
+                            <i class="fa-solid fa-{{ ltrim($icon, 'fa-') }} text-lg {{ $color }}"></i>
                         </div>
                         <div>
                             <p class="font-semibold text-sm text-ink">{{ $title }}</p>

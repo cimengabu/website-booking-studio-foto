@@ -12,6 +12,8 @@ class Review extends Model
     protected $fillable = [
         'booking_id',
         'user_id',
+        'guest_name',
+        'room_id',
         'rating',
         'comment',
         'admin_reply',
@@ -34,5 +36,20 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
+
+    public function getAuthorNameAttribute(): string
+    {
+        return $this->user?->name ?? $this->guest_name ?? 'Pelanggan SnapSpace';
+    }
+
+    public function getRoomNameAttribute(): string
+    {
+        return $this->booking?->room?->name ?? $this->room?->name ?? 'SnapSpace Studio';
     }
 }

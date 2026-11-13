@@ -78,9 +78,9 @@
                 <i class="fa-solid fa-calendar-day text-gold"></i>
                 <span class="hidden sm:inline">Jadwal Sesi Hari Ini</span>
             </a>
-            <form method="POST" action="{{ route('logout') }}" class="inline">
+            <form method="POST" action="{{ route('logout') }}" class="inline" id="staff-scan-logout-form">
                 @csrf
-                <button type="submit" title="Keluar" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-danger/20 hover:text-danger text-white/60 flex items-center justify-center transition-colors">
+                <button type="button" title="Keluar" onclick="return confirmLogout2X(event, this)" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-danger/20 hover:text-danger text-white/60 flex items-center justify-center transition-colors">
                     <i class="fa-solid fa-power-off text-sm"></i>
                 </button>
             </form>
@@ -204,6 +204,12 @@
     <footer class="py-4 text-center text-[11px] text-white/40 border-t border-white/5">
         SnapSpace Studio Staff Portal &copy; {{ date('Y') }} — Surabaya
     </footer>
+
+    <!-- Alpine.js -->
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
+
+    <!-- Logout 2x Confirmation Modal -->
+    <x-logout-confirm-modal />
 
     <!-- Audio Beep for successful scan -->
     <script>
