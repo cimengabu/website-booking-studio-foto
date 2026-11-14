@@ -32,4 +32,9 @@ class BookingAddon extends Model
     {
         return $this->belongsTo(Addon::class);
     }
+
+    public function getQuantityAttribute(): int
+    {
+        return (int) $this->qty;
+    }
 }

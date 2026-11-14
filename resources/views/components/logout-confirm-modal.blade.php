@@ -3,7 +3,7 @@
      x-show="isOpen"
      x-cloak
      style="display: none;"
-     class="fixed inset-0 z-[999] overflow-y-auto"
+     class="fixed inset-0 z-[100001] overflow-y-auto"
      role="dialog"
      aria-modal="true">
 

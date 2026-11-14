@@ -96,6 +96,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/booking', [BookingWizardController::class, 'showWizard'])->name('booking.wizard');
     Route::post('/booking', [BookingWizardController::class, 'storeBooking'])->name('booking.store');
     Route::get('/booking/{code}/pay', [BookingWizardController::class, 'showPaymentPage'])->name('booking.pay');
+    Route::get('/booking/{code}/invoice', [BookingWizardController::class, 'showInvoice'])->name('booking.invoice');
     Route::post('/booking/{code}/pay-simulated', [BookingWizardController::class, 'processSimulatedPayment'])->name('booking.pay-simulated');
     Route::post('/booking/{code}/check-payment-status', [BookingWizardController::class, 'checkPaymentStatus'])->name('booking.check-payment-status');
 

@@ -286,6 +286,92 @@
                 @endif
             @endif
         </div>
+
+        <!-- Right Column: Financial Breakdown & Official Invoice -->
+        <div class="lg:col-span-4 space-y-6">
+            <!-- Payment Summary Card -->
+            <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-[#2D2B26] pb-3">
+                    <h3 class="font-heading font-bold text-sm text-white flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-[#F2C94C]"></i>
+                        Status Keuangan & Nota
+                    </h3>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full {{ $booking->paid_amount >= $booking->total_price ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : ($booking->paid_amount > 0 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20') }}">
+                        {{ $booking->paid_amount >= $booking->total_price ? 'LUNAS' : ($booking->paid_amount > 0 ? 'DP 50%' : 'BELUM BAYAR') }}
+                    </span>
+                </div>
+
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="flex justify-between text-gray-400">
+                        <span>Subtotal Layanan:</span>
+                        <span class="text-white">Rp {{ number_format($booking->subtotal + $booking->addons_total, 0, ',', '.') }}</span>
+                    </div>
+
+                    @if($booking->markup_amount > 0)
+                        <div class="flex justify-between text-gray-400">
+                            <span>Surcharge / Weekend:</span>
+                            <span class="text-amber-400">+Rp {{ number_format($booking->markup_amount, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
+
+                    @if($booking->discount > 0)
+                        <div class="flex justify-between text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 rounded-lg border border-emerald-500/20">
+                            <span>Diskon ({{ $booking->promo_code ?? 'Promo' }}):</span>
+                            <span>-Rp {{ number_format($booking->discount, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
+
+                    <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-[#2D2B26]">
+                        <span>Total Tagihan:</span>
+                        <span class="text-[#F2C94C]">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                    </div>
+
+                    <div class="flex justify-between text-emerald-400 pt-1">
+                        <span>Sudah Dibayar:</span>
+                        <span>Rp {{ number_format($booking->paid_amount, 0, ',', '.') }}</span>
+                    </div>
+
+                    @if($booking->remaining_balance > 0)
+                        <div class="flex justify-between text-rose-400 pt-1 font-bold">
+                            <span>Sisa Tagihan:</span>
+                            <span>Rp {{ number_format($booking->remaining_balance, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Print Invoice Button -->
+                <div class="pt-3 border-t border-[#2D2B26]">
+                    <a href="{{ route('booking.invoice', $booking->booking_code) }}" target="_blank"
+                       class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#F2C94C] text-black font-bold text-xs hover:bg-[#e0b73c] transition-all shadow-md">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Cetak / Unduh Nota Resmi (PDF)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Payment Logs -->
+            @if($booking->payments->isNotEmpty())
+                <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-6 space-y-3">
+                    <h4 class="font-heading font-bold text-xs text-gray-300 uppercase tracking-wider border-b border-[#2D2B26] pb-2">
+                        Riwayat Pembayaran Gateway
+                    </h4>
+                    <div class="space-y-2">
+                        @foreach($booking->payments as $p)
+                            <div class="p-3 rounded-xl bg-[#141311] border border-[#2D2B26] text-xs font-mono space-y-1">
+                                <div class="flex justify-between text-[11px]">
+                                    <span class="text-white font-bold">{{ $p->order_id }}</span>
+                                    <span class="text-emerald-400 font-bold uppercase">{{ $p->status }}</span>
+                                </div>
+                                <div class="flex justify-between text-gray-400 text-[10px]">
+                                    <span>Metode: {{ strtoupper($p->payment_type ?? 'QRIS') }}</span>
+                                    <span>Rp {{ number_format($p->gross_amount, 0, ',', '.') }}</span>
+                                </div>
+                                <p class="text-[9px] text-gray-500">{{ $p->paid_at ? $p->paid_at->format('d/m/Y H:i') : $p->created_at->format('d/m/Y H:i') }} WIB</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 @endsection

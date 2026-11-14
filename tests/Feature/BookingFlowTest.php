@@ -90,4 +90,15 @@ class BookingFlowTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee($booking->booking_code);
     }
+
+    public function test_can_view_official_invoice(): void
+    {
+        $booking = Booking::first();
+
+        $response = $this->actingAs($booking->user)->get(route('booking.invoice', $booking->booking_code));
+
+        $response->assertStatus(200);
+        $response->assertSee($booking->booking_code);
+        $response->assertSee('BUKTI PEMBAYARAN RESMI');
+    }
 }

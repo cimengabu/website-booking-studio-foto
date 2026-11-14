@@ -122,6 +122,14 @@
                     </a>
                 @endif
 
+                {{-- Lihat & Cetak Nota Resmi --}}
+                @if($booking->paid_amount > 0)
+                    <a href="{{ route('booking.invoice', $booking->booking_code) }}" target="_blank"
+                       class="px-4 py-2.5 rounded-xl bg-white hover:bg-cream border border-cream-dark text-ink text-sm font-semibold transition-colors flex items-center gap-2 shadow-xs">
+                        <i class="fa-solid fa-file-invoice-dollar text-gold"></i> Nota Resmi
+                    </a>
+                @endif
+
                 {{-- Tombol Ajukan Reschedule --}}
                 @if($booking->isReschedulable())
                     <button type="button" @click="showRescheduleModal = true"
@@ -518,6 +526,15 @@
                             <span class="text-ink-muted">Sudah Dibayar</span>
                             <span class="text-success font-semibold">Rp {{ number_format($booking->paid_amount, 0, ',', '.') }}</span>
                         </div>
+
+                        @if($booking->paid_amount > 0)
+                            <div class="pt-3 border-t border-cream-dark">
+                                <a href="{{ route('booking.invoice', $booking->booking_code) }}" target="_blank"
+                                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-ink text-white text-xs font-bold hover:bg-ink-soft transition-colors shadow-xs">
+                                    <i class="fa-solid fa-file-invoice-dollar text-gold"></i> Lihat & Cetak Nota Resmi (Invoice)
+                                </a>
+                            </div>
+                        @endif
 
                         @if($booking->remaining_balance > 0)
                             <div class="flex justify-between py-2 border-t border-dashed border-rose-200 bg-rose-50/50 p-2.5 rounded-xl">

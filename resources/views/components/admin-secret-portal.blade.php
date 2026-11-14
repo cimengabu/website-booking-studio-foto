@@ -32,9 +32,10 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-         class="fixed inset-0 z-[10000] overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center">
+         class="fixed inset-0 z-[10000] overflow-y-auto p-4 sm:p-6 md:p-20 flex items-center justify-center cursor-pointer"
+         @click.self="closePortal()">
 
-        <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-cream-dark overflow-hidden transform transition-all text-ink"
+        <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-cream-dark overflow-hidden transform transition-all text-ink cursor-default"
              @click.stop>
             {{-- Header golden accent line --}}
             <div class="h-1.5 w-full bg-gradient-to-r from-gold via-gold-light to-gold"></div>
@@ -115,13 +116,21 @@
                         <div class="flex gap-3">
                             <form method="POST" action="{{ route('logout') }}" class="flex-1" id="portal-logout-form">
                                 @csrf
-                                <button type="button" onclick="return confirmLogout2X(event, this)" class="w-full py-3 rounded-xl border border-danger/30 text-danger hover:bg-red-50 text-xs font-semibold transition-colors">
+                                <button type="button"
+                                        @click="closePortal()"
+                                        onclick="return confirmLogout2X(event, this)"
+                                        class="w-full py-3 rounded-xl border border-danger/30 text-danger hover:bg-red-50 text-xs font-semibold transition-colors">
                                     Keluar dari Akun Ini
                                 </button>
                             </form>
-                            <a href="{{ route('login') }}" class="flex-1 py-3 text-center rounded-xl bg-ink text-white text-xs font-semibold hover:bg-ink-soft transition-colors">
-                                Login Akun Lain
-                            </a>
+                            <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                                @csrf
+                                <input type="hidden" name="redirect_to" value="{{ route('login') }}">
+                                <button type="submit"
+                                        class="w-full py-3 text-center rounded-xl bg-ink text-white text-xs font-semibold hover:bg-ink-soft transition-colors shadow-xs">
+                                    Login Akun Lain
+                                </button>
+                            </form>
                         </div>
                     @endif
                 @else
@@ -201,6 +210,7 @@
             isOpen: false,
             buffer: '',
             secret: 'admin',
+            bufferTimer: null,
 
             init() {
                 window.addEventListener('keydown', (e) => {
@@ -226,13 +236,18 @@
 
                     // Process single character keystroke
                     if (e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                        clearTimeout(this.bufferTimer);
                         this.buffer += e.key.toLowerCase();
-                        if (this.buffer.length > 20) {
-                            this.buffer = this.buffer.slice(-10);
+                        if (this.buffer.length > 10) {
+                            this.buffer = this.buffer.slice(-5);
                         }
                         if (this.buffer.endsWith(this.secret)) {
                             this.buffer = '';
                             this.openPortal();
+                        } else {
+                            this.bufferTimer = setTimeout(() => {
+                                this.buffer = '';
+                            }, 1500);
                         }
                     }
                 });

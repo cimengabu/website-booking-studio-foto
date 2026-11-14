@@ -148,6 +148,20 @@ class BookingWizardController extends Controller
         return view('customer.booking.payment', compact('booking'));
     }
 
+    public function showInvoice(string $code)
+    {
+        $booking = Booking::with(['room.primaryImage', 'package', 'bookingAddons.addon', 'payments', 'user', 'photographer'])
+            ->where('booking_code', $code)
+            ->firstOrFail();
+
+        // Ensure user is authorized to view invoice
+        if ($booking->user_id !== Auth::id() && ! Auth::user()?->isAdmin() && ! Auth::user()?->isStaff()) {
+            abort(403, 'Anda tidak memiliki hak akses untuk melihat nota ini.');
+        }
+
+        return view('customer.booking.invoice', compact('booking'));
+    }
+
     public function processSimulatedPayment(Request $request, string $code)
     {
         $booking = Booking::where('booking_code', $code)->firstOrFail();

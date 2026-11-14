@@ -138,6 +138,21 @@ class Booking extends Model
         return max(0, (float) $this->total_price - (float) $this->paid_amount);
     }
 
+    public function getPackagePriceAttribute(): float
+    {
+        return (float) ($this->subtotal ?? $this->package?->price ?? 0);
+    }
+
+    public function getAddonTotalAttribute(): float
+    {
+        return (float) ($this->addons_total ?? 0);
+    }
+
+    public function getDiscountAmountAttribute(): float
+    {
+        return (float) ($this->discount ?? 0);
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
