@@ -2,6 +2,21 @@
 
 @section('page-title', 'Laporan Keuangan')
 
+@push('styles')
+<style>
+@media print {
+    aside, header, nav, form, .no-print, button, a { display: none !important; }
+    body, main, .space-y-8 { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
+    .bg-\[\#1E1D1A\], .bg-\[\#141311\] { background: white !important; color: black !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+    .text-white { color: black !important; }
+    .text-gray-400, .text-gray-300, .text-gray-500 { color: #555 !important; }
+    table { width: 100% !important; border-collapse: collapse !important; }
+    th, td { border: 1px solid #ddd !important; padding: 8px !important; color: black !important; }
+    .shadow-xl { box-shadow: none !important; }
+}
+</style>
+@endpush
+
 @section('content')
 <div class="space-y-8">
     <!-- Filter Period -->
@@ -19,11 +34,11 @@
                 <i class="fa-solid fa-search mr-1.5"></i> Tampilkan
             </button>
             <a href="{{ route('admin.reports.export', array_merge(request()->all(), ['format' => 'excel'])) }}" class="px-5 py-2.5 rounded-xl bg-[#1F3A2E] text-[#F2C94C] font-bold text-xs hover:bg-[#152820] flex items-center gap-2">
-                <i class="fa-solid fa-table"></i> Export Excel
+                <i class="fa-solid fa-table"></i> Export CSV / Excel
             </a>
-            <a href="{{ route('admin.reports.export', array_merge(request()->all(), ['format' => 'pdf'])) }}" class="px-5 py-2.5 rounded-xl bg-rose-900/60 text-rose-200 font-bold text-xs hover:bg-rose-900 flex items-center gap-2">
-                <i class="fa-solid fa-file-pdf"></i> Export PDF
-            </a>
+            <button type="button" onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-sky-900/60 text-sky-200 font-bold text-xs hover:bg-sky-900 flex items-center gap-2">
+                <i class="fa-solid fa-print"></i> Cetak / Print
+            </button>
         </div>
     </form>
 
