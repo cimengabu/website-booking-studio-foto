@@ -127,7 +127,7 @@
                     <div class="text-xs text-ink-muted space-y-0.5 leading-relaxed mt-2">
                         <p class="font-medium text-ink">PT SnapSpace Kreatif Indonesia</p>
                         <p>Jl. Tunjungan No. 88, Genteng, Kota Surabaya, Jawa Timur 60275</p>
-                        <p>WhatsApp: +62 812-3456-7890 · Email: billing@snapspace.id</p>
+                        <p>WhatsApp: +62 878-2568-8608 · Email: billing@snapspace.id</p>
                         <p class="font-mono text-[11px] text-stone-500">NMID: ID1020240988771 · NPWP: 98.765.432.1-604.000</p>
                     </div>
                 </div>

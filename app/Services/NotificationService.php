@@ -163,7 +163,7 @@ class NotificationService
             ."2. Siapkan konsep pose atau properti favorit kamu.\n"
             ."3. Tunjukkan tiket booking digital: {$checkUrl}\n\n"
             ."📍 Lokasi: Jl. Tunjungan No. 88, Surabaya\n"
-            .'Hubungi kami jika ada kendala perjalanan: wa.me/6281234567890';
+            .'Hubungi kami jika ada kendala perjalanan: wa.me/628782 5688608';
 
         $waUrl = $this->buildWhatsAppUrl($phone, $message);
 
@@ -276,7 +276,7 @@ class NotificationService
             ."Pemesanan sesi foto dengan kode *{$booking->booking_code}* telah dibatalkan.\n\n"
             .($reason ? "• *Alasan:* {$reason}\n" : '')
             ."Jika Anda tidak merasa mengajukan pembatalan atau membutuhkan bantuan refund/pertanyaan, silakan hubungi tim kami:\n"
-            ."wa.me/6281234567890\n\n"
+            ."wa.me/628782 5688608\n\n"
             .'Terima kasih.';
 
         $waUrl = $this->buildWhatsAppUrl($phone, $message);

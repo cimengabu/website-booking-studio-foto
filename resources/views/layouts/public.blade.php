@@ -594,7 +594,7 @@
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-white/80 uppercase tracking-wide">WhatsApp CS</p>
-                                <a href="https://wa.me/6281234567890" class="text-sm text-success hover:text-success/80 transition-colors mt-0.5 block">+62 812-3456-7890</a>
+                                <a href="https://wa.me/628782 5688608" class="text-sm text-success hover:text-success/80 transition-colors mt-0.5 block">+62 878-2568-8608</a>
                             </div>
                         </li>
                     </ul>

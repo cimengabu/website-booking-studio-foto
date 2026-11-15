@@ -257,7 +257,7 @@
                     <i class="fa-solid fa-clock text-[#F2C94C] mr-1.5"></i> Buka Setiap Hari: 09:00 - 21:00 WIB
                 </p>
                 <p class="text-xs text-gray-400">
-                    <i class="fa-solid fa-headset text-emerald-400 mr-1.5"></i> WA CS: +62 812-3456-7890
+                    <i class="fa-solid fa-headset text-emerald-400 mr-1.5"></i> WA CS: +62 878-2568-8608
                 </p>
             </div>
 

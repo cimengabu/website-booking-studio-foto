@@ -224,7 +224,7 @@
                 <div>
                     <label class="block text-xs font-mono uppercase tracking-wider text-gray-300 mb-2" for="studio_phone">Nomor WhatsApp CS</label>
                     <input type="text" id="studio_phone" name="studio_phone" required
-                           value="{{ $settings['studio_phone'] ?? '+62 812-3456-7890' }}"
+                           value="{{ $settings['studio_phone'] ?? '+62 878-2568-8608' }}"
                            class="w-full bg-[#141311] border border-[#2D2B26] rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#E8451E]">
                 </div>
             </div>

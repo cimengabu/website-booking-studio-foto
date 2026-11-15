@@ -72,7 +72,7 @@
                         </div>
 
                         {{-- WhatsApp --}}
-                        <a href="https://wa.me/6281234567890?text=Halo%20SnapSpace%2C%20saya%20ingin%20bertanya%20tentang%20studio%20foto." 
+                        <a href="https://wa.me/628782 5688608?text=Halo%20SnapSpace%2C%20saya%20ingin%20bertanya%20tentang%20studio%20foto." 
                            target="_blank" rel="noopener"
                            class="flex items-center gap-4 p-5 bg-success/5 rounded-2xl border border-success/20 hover:bg-success/10 transition-colors card-lift">
                             <div class="w-11 h-11 rounded-xl bg-success/15 flex items-center justify-center flex-shrink-0">
@@ -80,7 +80,7 @@
                             </div>
                             <div class="flex-1">
                                 <p class="font-semibold text-sm text-ink">Chat via WhatsApp</p>
-                                <p class="text-sm text-ink-muted">+62 812-3456-7890 (respon cepat)</p>
+                                <p class="text-sm text-ink-muted">+62 878-2568-8608 (respon cepat)</p>
                             </div>
                             <i class="fa-solid fa-arrow-right text-success text-sm"></i>
                         </a>

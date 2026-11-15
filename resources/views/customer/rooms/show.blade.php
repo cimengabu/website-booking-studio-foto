@@ -266,7 +266,7 @@
                     </div>
 
                     {{-- WhatsApp --}}
-                    <a href="https://wa.me/6281234567890?text=Halo%20SnapSpace%2C%20saya%20mau%20tanya%20tentang%20ruangan%20{{ urlencode($room->name) }}"
+                    <a href="https://wa.me/628782 5688608?text=Halo%20SnapSpace%2C%20saya%20mau%20tanya%20tentang%20ruangan%20{{ urlencode($room->name) }}"
                        target="_blank" rel="noopener"
                        class="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-success/10 border border-success/30 text-success text-sm font-semibold hover:bg-success/20 transition-colors">
                         <i class="fa-brands fa-whatsapp text-base"></i> Tanya via WhatsApp

@@ -61,7 +61,7 @@ class DatabaseSeeder extends Seeder
         Setting::setKey('dp_percent', 50);
         Setting::setKey('extra_person_fee', 25000);
         Setting::setKey('studio_address', 'Jl. Tunjungan No. 88, Surabaya');
-        Setting::setKey('studio_phone', '+62 812-3456-7890');
+        Setting::setKey('studio_phone', '+62 878-2568-8608');
 
         // 3. Rooms
         $room1 = Room::create([

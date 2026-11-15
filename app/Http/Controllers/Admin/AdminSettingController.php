@@ -19,7 +19,7 @@ class AdminSettingController extends Controller
             'dp_percent' => Setting::getByKey('dp_percent', 50),
             'extra_person_fee' => Setting::getByKey('extra_person_fee', 25000),
             'studio_address' => Setting::getByKey('studio_address', 'Jl. Tunjungan No. 88, Surabaya'),
-            'studio_phone' => Setting::getByKey('studio_phone', '+62 812-3456-7890'),
+            'studio_phone' => Setting::getByKey('studio_phone', '+62 878-2568-8608'),
 
             // Aturan Bisnis Reschedule
             'reschedule_max_times' => Setting::getByKey('reschedule_max_times', 1),
