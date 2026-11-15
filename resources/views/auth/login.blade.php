@@ -133,33 +133,9 @@
 
             <!-- Header -->
             <div class="space-y-2">
-                <span class="inline-block text-xs font-bold text-gold uppercase tracking-widest">Portal Pelanggan & Mitra</span>
+                <span class="inline-block text-xs font-bold text-gold uppercase tracking-widest">Portal SnapSpace Studio</span>
                 <h1 class="font-serif font-bold text-3xl text-ink">Selamat Datang Kembali</h1>
                 <p class="text-sm text-ink-muted">Masuk ke akun Anda untuk melihat jadwal, unduh hasil foto, atau pesan sesi baru.</p>
-            </div>
-
-            <!-- Quick Demo Login Switcher (Ideal for rapid testing & evaluation) -->
-            <div class="bg-gold-50/70 border border-gold/30 rounded-2xl p-3.5 space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-bold text-gold-dark uppercase tracking-wider">
-                        <i class="fa-solid fa-bolt mr-1"></i> Quick Demo Autofill:
-                    </span>
-                    <span class="text-[10px] text-ink-muted">Klik untuk isi otomatis</span>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" @click="fill('customer@snapspace.id', 'password')"
-                            class="px-2.5 py-1.5 rounded-xl bg-white text-ink text-xs font-medium border border-cream-dark hover:border-gold hover:text-gold shadow-xs transition-all text-center">
-                        Pelanggan
-                    </button>
-                    <button type="button" @click="fill('staff@snapspace.id', 'password')"
-                            class="px-2.5 py-1.5 rounded-xl bg-white text-ink text-xs font-medium border border-cream-dark hover:border-gold hover:text-gold shadow-xs transition-all text-center">
-                        Staff QR
-                    </button>
-                    <button type="button" @click="fill('admin@snapspace.id', 'password')"
-                            class="px-2.5 py-1.5 rounded-xl bg-white text-ink text-xs font-medium border border-cream-dark hover:border-gold hover:text-gold shadow-xs transition-all text-center">
-                        Admin Studio
-                    </button>
-                </div>
             </div>
 
             <!-- Flash Error Message -->
@@ -268,11 +244,7 @@
         return {
             email: '{{ old('email') }}',
             password: '',
-            showPassword: false,
-            fill(e, p) {
-                this.email = e;
-                this.password = p;
-            }
+            showPassword: false
         }
     }
 </script>

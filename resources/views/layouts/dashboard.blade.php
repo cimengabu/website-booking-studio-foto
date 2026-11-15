@@ -378,9 +378,6 @@
     });
 </script>
 
-    {{-- ── ADMIN SECRET PORTAL (Ketik "admin" di keyboard) ─────────────── --}}
-    @include('components.admin-secret-portal')
-
     <x-logout-confirm-modal />
 
     @stack('scripts')
