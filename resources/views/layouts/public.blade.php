@@ -8,7 +8,7 @@
     <title>@yield('title', 'SnapSpace Studio — Foto Profesional, Booking Real-Time')</title>
 
     <!-- Canonical -->
-    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="canonical" href="{{ url()->current() }}"> 
 
     <!-- Google Fonts: Playfair Display (serif) + Plus Jakarta Sans (sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
