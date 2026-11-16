@@ -667,7 +667,7 @@
                             <i class="fa-brands fa-whatsapp text-success text-xl"></i>
                             <div>
                                 <p class="text-xs font-semibold text-ink">Butuh bantuan?</p>
-                                <a href="https://wa.me/628782 5688608" target="_blank" rel="noopener" class="text-xs text-success hover:underline">+62 878-2568-8608</a>
+                                <a href="https://wa.me/6287825688608" target="_blank" rel="noopener" class="text-xs text-success hover:underline">+62 878-2568-8608</a>
                             </div>
                         </div>
                     </div>

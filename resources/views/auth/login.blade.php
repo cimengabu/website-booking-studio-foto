@@ -203,7 +203,7 @@
                         <input type="checkbox" name="remember" class="w-4 h-4 rounded border-cream-dark text-gold focus:ring-gold/30">
                         <span class="text-xs text-ink-muted">Ingat saya</span>
                     </label>
-                    <a href="https://wa.me/628782 5688608?text=Halo%20SnapSpace,%20saya%20butuh%20bantuan%20reset%20password%20akun." target="_blank" class="text-xs text-gold hover:underline font-medium">
+                    <a href="https://wa.me/6287825688608?text=Halo%20SnapSpace,%20saya%20butuh%20bantuan%20reset%20password%20akun." target="_blank" class="text-xs text-gold hover:underline font-medium">
                         Lupa password?
                     </a>
                 </div>

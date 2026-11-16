@@ -72,7 +72,7 @@
                         </div>
 
                         {{-- WhatsApp --}}
-                        <a href="https://wa.me/628782 5688608?text=Halo%20SnapSpace%2C%20saya%20ingin%20bertanya%20tentang%20studio%20foto." 
+                        <a href="https://wa.me/6287825688608?text=Halo%20SnapSpace%2C%20saya%20ingin%20bertanya%20tentang%20studio%20foto." 
                            target="_blank" rel="noopener"
                            class="flex items-center gap-4 p-5 bg-success/5 rounded-2xl border border-success/20 hover:bg-success/10 transition-colors card-lift">
                             <div class="w-11 h-11 rounded-xl bg-success/15 flex items-center justify-center flex-shrink-0">

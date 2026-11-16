@@ -32,7 +32,7 @@
 
     {{-- Search Filter Bar --}}
     <div class="bg-[#1E1D1A] border border-[#2D2B26] rounded-2xl p-4 shadow-xl">
-        <form method="GET" class="flex gap-3">
+        <form method="GET" action="{{ route('admin.users.index') }}" class="flex gap-3">
             <input type="hidden" name="role" value="{{ request('role', 'all') }}">
             <div class="relative flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>

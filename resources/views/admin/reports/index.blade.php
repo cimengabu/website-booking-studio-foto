@@ -20,7 +20,7 @@
 @section('content')
 <div class="space-y-8">
     <!-- Filter Period -->
-    <form method="GET" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
+    <form method="GET" action="{{ route('admin.reports.index') }}" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
         <div class="flex flex-wrap gap-4 items-end">
             <div>
                 <label class="block text-[10px] font-mono font-bold text-gray-400 uppercase mb-1.5">Dari Tanggal</label>

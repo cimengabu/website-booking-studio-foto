@@ -29,7 +29,7 @@
     </div>
 
     <!-- Search & Filter Filter Bar -->
-    <form method="GET" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
+    <form method="GET" action="{{ route('admin.customers.index') }}" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
         <div class="flex flex-col sm:flex-row gap-3">
             <div class="flex-grow relative">
                 <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-500 text-xs"></i>

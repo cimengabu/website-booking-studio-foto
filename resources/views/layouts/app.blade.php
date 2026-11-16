@@ -232,9 +232,9 @@
                     Platform booking self-photo studio online terdepan di Indonesia. Abadikan momen terbaik Anda bersama sahabat & pasangan tanpa rasa canggung.
                 </p>
                 <div class="flex gap-3 text-gray-400 pt-2">
-                    <a href="#" class="w-8 h-8 rounded-full bg-[#1E1D1A] flex items-center justify-center hover:bg-[#E8451E] hover:text-white transition-colors"><i class="fa-brands fa-instagram text-xs"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-[#1E1D1A] flex items-center justify-center hover:bg-[#E8451E] hover:text-white transition-colors"><i class="fa-brands fa-tiktok text-xs"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-[#1E1D1A] flex items-center justify-center hover:bg-[#E8451E] hover:text-white transition-colors"><i class="fa-brands fa-whatsapp text-xs"></i></a>
+                    <a href="https://instagram.com" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#1E1D1A] flex items-center justify-center hover:bg-[#E8451E] hover:text-white transition-colors" title="Instagram"><i class="fa-brands fa-instagram text-xs"></i></a>
+                    <a href="https://tiktok.com" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#1E1D1A] flex items-center justify-center hover:bg-[#E8451E] hover:text-white transition-colors" title="TikTok"><i class="fa-brands fa-tiktok text-xs"></i></a>
+                    <a href="https://wa.me/6287825688608" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#1E1D1A] flex items-center justify-center hover:bg-[#E8451E] hover:text-white transition-colors" title="WhatsApp"><i class="fa-brands fa-whatsapp text-xs"></i></a>
                 </div>
             </div>
 

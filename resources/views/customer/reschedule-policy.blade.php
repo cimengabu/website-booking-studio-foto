@@ -132,7 +132,7 @@
                 <p class="text-xs font-semibold text-ink">Ada pertanyaan seputar jadwal atau kendala darurat?</p>
                 <p class="text-xs text-ink-muted">Customer Service kami siap membantu Anda setiap hari pukul 09.00 – 21.00 WIB.</p>
             </div>
-            <a href="https://wa.me/628782 5688608" target="_blank" rel="noopener"
+            <a href="https://wa.me/6287825688608" target="_blank" rel="noopener"
                class="px-5 py-3 rounded-xl bg-success text-white font-semibold text-xs flex items-center gap-2 hover:bg-success/90 transition-colors shrink-0">
                 <i class="fa-brands fa-whatsapp text-sm"></i>
                 <span>Hubungi WhatsApp CS</span>

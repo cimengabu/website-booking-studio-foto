@@ -109,7 +109,7 @@
                        class="px-4 py-2 bg-[#E8451E] text-white rounded-xl text-sm font-semibold hover:bg-[#d03a16] transition-colors shadow-lg shadow-[#E8451E]/20">
                         <i class="fa-solid fa-eye text-xs mr-1.5"></i>Lihat Detail
                     </a>
-                    <a href="https://wa.me/628782 5688608?text=Halo+SnapSpace,+saya+ingin+konfirmasi+booking+{{ $nextBooking->booking_code }}"
+                    <a href="https://wa.me/6287825688608?text=Halo+SnapSpace,+saya+ingin+konfirmasi+booking+{{ $nextBooking->booking_code }}"
                        target="_blank"
                        class="px-4 py-2 bg-[#25D366]/15 text-[#25D366] border border-[#25D366]/30 rounded-xl text-sm font-semibold hover:bg-[#25D366]/25 transition-colors">
                         <i class="fa-brands fa-whatsapp text-sm mr-1.5"></i>Chat Admin

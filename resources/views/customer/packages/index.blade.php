@@ -201,7 +201,7 @@
                     Baca FAQ Lengkap
                 </a>
             @endif
-            <a href="https://wa.me/628782 5688608" target="_blank" rel="noopener"
+            <a href="https://wa.me/6287825688608" target="_blank" rel="noopener"
                class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl text-white font-semibold text-sm bg-success hover:bg-success/90 transition-colors shadow-card">
                 <i class="fa-brands fa-whatsapp"></i>
                 Tanya via WhatsApp

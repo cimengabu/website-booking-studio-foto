@@ -31,7 +31,7 @@
     </div>
 
     <!-- Filters -->
-    <form method="GET" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
+    <form method="GET" action="{{ route('admin.bookings.index') }}" class="bg-[#1E1D1A] border border-[#2D2B26] rounded-3xl p-5 shadow-xl">
         <div class="grid grid-cols-2 {{ auth()->user()->isPhotographer() ? 'md:grid-cols-5' : 'md:grid-cols-6' }} gap-4 items-end">
             <div>
                 <label class="block text-[10px] font-mono font-bold text-gray-400 uppercase mb-1.5">Cari</label>
