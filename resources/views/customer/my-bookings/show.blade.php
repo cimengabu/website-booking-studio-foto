@@ -267,6 +267,47 @@
                         @endforeach
                     </div>
 
+                    {{-- Panduan Tahapan Selanjutnya (Alur Siklus Hidup Pesanan) --}}
+                    @if(!$isBranchStatus)
+                        <div class="mt-6 p-4 rounded-2xl bg-gold/10 border border-gold/30 flex items-start gap-3 text-xs">
+                            <i class="fa-solid fa-circle-question text-gold text-base mt-0.5 shrink-0"></i>
+                            <div class="space-y-1.5 flex-1">
+                                @if(in_array($booking->status, ['confirmed', 'paid', 'dp_paid']))
+                                    <p class="font-bold text-ink">Kenapa status berada di "2. Dikonfirmasi"?</p>
+                                    <p class="text-ink-muted leading-relaxed">
+                                        Slot jadwal & ruangan Anda sudah aman dipesan. Sistem menunggu kedatangan Anda di studio pada tanggal <strong>{{ $booking->booking_date->translatedFormat('l, d M Y') }}</strong> jam <strong>{{ substr($booking->start_time, 0, 5) }} WIB</strong>.
+                                    </p>
+                                    <div class="pt-2 text-[11px] text-ink-muted space-y-1 border-t border-gold/20 mt-2">
+                                        <p>• <strong>Kapan ke Tahap 3 (Sedang Berlangsung)?</strong> Otomatis saat Anda tiba di studio dan resepsionis memindai QR Tiket Anda.</p>
+                                        <p>• <strong>Kapan ke Tahap 4 (Selesai Sesi)?</strong> Saat sesi pemotretan di studio telah selesai.</p>
+                                        <p>• <strong>Kapan ke Tahap 5 (Foto Siap)?</strong> Saat foto selesai diedit & diunggah tim studio (bisa diunduh via web).</p>
+                                        <p>• <strong>Kapan Tahap 6 (Ditutup)?</strong> Pesanan resmi ditutup setelah Anda memberikan rating/ulasan atau setelah masa simpan foto 30 hari.</p>
+                                    </div>
+                                @elseif(in_array($booking->status, ['in_progress', 'checked_in']))
+                                    <p class="font-bold text-ink">Status: 3. Sedang Berlangsung di Studio</p>
+                                    <p class="text-ink-muted leading-relaxed">
+                                        Anda telah berhasil check-in pada {{ $booking->checked_in_at?->format('H:i WIB') ?? 'hari ini' }}. Sesi foto sedang berlangsung. Setelah pemotretan selesai, staf studio akan menandai sesi rampung untuk beralih ke <strong>Tahap 4 (Selesai Sesi)</strong>.
+                                    </p>
+                                @elseif($booking->status === 'completed')
+                                    <p class="font-bold text-ink">Status: 4. Selesai Sesi (Proses Editing Foto)</p>
+                                    <p class="text-ink-muted leading-relaxed">
+                                        Pemotretan telah selesai. Tim studio sedang mengkurasi file dan melakukan proses editing. Tautan unduhan galeri foto akan otomatis aktif begitu diunggah ke <strong>Tahap 5 (Foto Siap)</strong>.
+                                    </p>
+                                @elseif($booking->status === 'delivered')
+                                    <p class="font-bold text-ink">Status: 5. Foto Siap Diunduh</p>
+                                    <p class="text-ink-muted leading-relaxed">
+                                        Seluruh file foto hasil sesi sudah siap diunduh pada galeri di bawah! Silakan berikan ulasan & rating bintang untuk menyelesaikan dan menutup pesanan ke <strong>Tahap 6 (Ditutup)</strong>.
+                                    </p>
+                                @elseif($booking->status === 'closed')
+                                    <p class="font-bold text-ink">Status: 6. Pesanan Resmi Ditutup</p>
+                                    <p class="text-ink-muted leading-relaxed">
+                                        Seluruh alur booking telah selesai dan ditutup. Terima kasih telah mengabadikan momen berharga Anda di SnapSpace Studio Klaten!
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- Cabang Alerts (Dibatalkan, Expired, No-Show, Reschedule Info) --}}
                     @if($booking->status === 'cancelled')
                         <div class="mt-6 p-4 rounded-2xl bg-danger/10 border border-danger/20 space-y-2">

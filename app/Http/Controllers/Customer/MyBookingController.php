@@ -80,7 +80,12 @@ class MyBookingController extends Controller
             Auth::user()->increment('loyalty_points', 50);
         }
 
-        return back()->with('success', 'Terima kasih! Ulasan dan rating Anda telah berhasil dikirim. (+50 Poin Loyalti didapatkan!)');
+        // Otomatis tutup pesanan (status: closed) setelah sesi selesai dan pelanggan memberikan ulasan
+        if (in_array($booking->status, ['completed', 'delivered'])) {
+            $booking->update(['status' => 'closed']);
+        }
+
+        return back()->with('success', 'Terima kasih! Ulasan dan rating Anda telah berhasil dikirim. (+50 Poin Loyalti didapatkan!) Pesanan resmi diselesaikan.');
     }
 
     public function downloadPhoto(int $photoId)
