@@ -33,8 +33,11 @@
             <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#E8451E] text-white font-bold text-xs hover:bg-[#d03a16]">
                 <i class="fa-solid fa-search mr-1.5"></i> Tampilkan
             </button>
-            <a href="{{ route('admin.reports.export', array_merge(request()->all(), ['format' => 'excel'])) }}" class="px-5 py-2.5 rounded-xl bg-[#1F3A2E] text-[#F2C94C] font-bold text-xs hover:bg-[#152820] flex items-center gap-2">
-                <i class="fa-solid fa-table"></i> Export CSV / Excel
+            <a href="{{ route('admin.reports.export', array_merge(request()->all(), ['format' => 'excel'])) }}" class="px-5 py-2.5 rounded-xl bg-[#1F3A2E] text-[#F2C94C] font-bold text-xs hover:bg-[#152820] flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-file-excel text-emerald-400"></i> Export Excel (.xls)
+            </a>
+            <a href="{{ route('admin.reports.export', array_merge(request()->all(), ['format' => 'csv'])) }}" class="px-5 py-2.5 rounded-xl bg-[#2D2B26] text-gray-300 font-bold text-xs hover:bg-[#3D3A34] flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-file-csv text-sky-400"></i> Export CSV (.csv)
             </a>
             <button type="button" onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-sky-900/60 text-sky-200 font-bold text-xs hover:bg-sky-900 flex items-center gap-2">
                 <i class="fa-solid fa-print"></i> Cetak / Print

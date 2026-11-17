@@ -49,7 +49,7 @@ class AdminReportController extends Controller
     {
         $from = $request->query('from', now()->startOfMonth()->format('Y-m-d'));
         $to = $request->query('to', now()->format('Y-m-d'));
-        $format = $request->query('format', 'csv');
+        $format = $request->query('format', 'excel');
 
         $payments = Payment::with(['booking.user', 'booking.room', 'booking.package'])
             ->where('transaction_status', 'settlement')
@@ -57,25 +57,50 @@ class AdminReportController extends Controller
             ->latest('paid_at')
             ->get();
 
+        if ($format === 'excel') {
+            $fileName = "Laporan-Keuangan-SnapSpace-{$from}-sd-{$to}.xls";
+            $headers = [
+                'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+                'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ];
+
+            $totalRevenue = $payments->sum('gross_amount');
+
+            $content = view('admin.reports.excel', [
+                'payments' => $payments,
+                'from' => $from,
+                'to' => $to,
+                'totalRevenue' => $totalRevenue,
+            ])->render();
+
+            return response($content, 200, $headers);
+        }
+
+        // CSV fallback
         $fileName = "Laporan-Keuangan-SnapSpace-{$from}-sd-{$to}.csv";
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => "attachment; filename={$fileName}",
+            'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
         ];
 
         $callback = function () use ($payments) {
             $file = fopen('php://output', 'w');
-            fwrite($file, "\xEF\xBB\xBF");
-            fputcsv($file, ['ID Transaksi', 'Kode Booking', 'Pelanggan', 'Ruangan', 'Paket', 'Tipe', 'Metode', 'Jumlah', 'Tanggal Lunas']);
+            fwrite($file, "\xEF\xBB\xBF"); // UTF-8 BOM
+            fwrite($file, "sep=,\r\n");   // Excel delimiter declaration
+            fputcsv($file, ['No', 'ID Transaksi', 'Kode Booking', 'Pelanggan', 'Ruangan', 'Paket', 'Tipe', 'Metode', 'Jumlah', 'Tanggal Lunas']);
+            $no = 1;
             foreach ($payments as $p) {
                 fputcsv($file, [
+                    $no++,
                     $p->order_id,
                     $p->booking->booking_code ?? '-',
                     $p->booking->user->name ?? '-',
                     $p->booking->room->name ?? '-',
                     $p->booking->package->name ?? '-',
                     strtoupper($p->payment_kind),
-                    $p->payment_type,
+                    strtoupper($p->payment_type ?? 'QRIS'),
                     $p->gross_amount,
                     $p->paid_at?->format('Y-m-d H:i:s'),
                 ]);

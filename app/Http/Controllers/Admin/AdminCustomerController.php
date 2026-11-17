@@ -55,6 +55,7 @@ class AdminCustomerController extends Controller
         $callback = function () use ($customers) {
             $output = fopen('php://output', 'w');
             fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+            fwrite($output, "sep=,\r\n"); // Excel delimiter declaration
             fputcsv($output, ['ID', 'Nama', 'Email', 'No Telepon', 'Jumlah Booking', 'Total Belanja (Rp)', 'Status VIP', 'Terdaftar Pada']);
 
             foreach ($customers as $c) {
