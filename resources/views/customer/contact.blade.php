@@ -76,9 +76,8 @@
                                 <p class="font-semibold text-sm text-ink mb-2">Jam Operasional</p>
                                 <div class="space-y-1">
                                     @foreach([
-                                        ['Senin – Jumat', '09:00 – 21:00 WIB'],
-                                        ['Sabtu – Minggu', '08:00 – 22:00 WIB'],
-                                        ['Hari Libur Nasional', '09:00 – 20:00 WIB'],
+                                        ['Setiap Hari (Senin – Minggu)', '09:00 – 21:00 WIB'],
+                                        ['Hari Libur Nasional', '09:00 – 21:00 WIB (Tetap Buka)'],
                                     ] as [$day, $time])
                                         <div class="flex items-center justify-between text-sm">
                                             <span class="text-ink-muted">{{ $day }}</span>
@@ -229,7 +228,7 @@
                             <span x-show="!submitting">
                                 <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Pesan
                             </span>
-                            <span x-show="submitting">
+                            <span x-show="submitting" x-cloak style="display: none;">
                                 <i class="fa-solid fa-spinner animate-spin mr-2"></i> Mengirim...
                             </span>
                         </button>

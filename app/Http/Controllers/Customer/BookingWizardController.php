@@ -68,6 +68,7 @@ class BookingWizardController extends Controller
     {
         $request->validate([
             'package_id' => 'required|exists:packages,id',
+            'room_id' => 'nullable|exists:rooms,id',
             'date' => 'required|date',
             'start_time' => 'required',
             'people_count' => 'nullable|integer|min:1',
@@ -76,6 +77,16 @@ class BookingWizardController extends Controller
             'redeem_points' => 'nullable|integer|min:0',
         ]);
 
+        $peopleCount = (int) ($request->people_count ?? 1);
+        if ($request->filled('room_id')) {
+            $room = Room::find($request->room_id);
+            $package = Package::find($request->package_id);
+            if ($room && $package) {
+                $maxAllowed = min((int) $room->capacity, (int) $package->max_people);
+                $peopleCount = min($peopleCount, $maxAllowed);
+            }
+        }
+
         $maxUserPoints = Auth::user()?->loyalty_points ?? 0;
         $redeemPoints = min((int) ($request->redeem_points ?? 0), $maxUserPoints);
 
@@ -83,7 +94,7 @@ class BookingWizardController extends Controller
             (int) $request->package_id,
             $request->date,
             $request->start_time,
-            (int) ($request->people_count ?? 1),
+            $peopleCount,
             $request->addons ?? [],
             $request->promo_code,
             $redeemPoints
@@ -112,7 +123,18 @@ class BookingWizardController extends Controller
             'booking_date.required' => 'Tanggal booking wajib dipilih.',
             'booking_date.after_or_equal' => 'Tanggal booking tidak boleh di masa lampau.',
             'start_time.required' => 'Jam sesi foto wajib dipilih.',
+            'people_count.required' => 'Jumlah orang wajib diisi.',
         ]);
+
+        $room = Room::findOrFail($request->room_id);
+        $package = Package::findOrFail($request->package_id);
+        $maxAllowed = min((int) $room->capacity, (int) $package->max_people);
+
+        if ((int) $request->people_count > $maxAllowed) {
+            return back()->withInput()->withErrors([
+                'people_count' => "Jumlah orang ({$request->people_count}) melebihi kapasitas maksimal {$maxAllowed} orang untuk ruangan {$room->name} dan paket {$package->name}.",
+            ]);
+        }
 
         try {
             $data = $request->all();

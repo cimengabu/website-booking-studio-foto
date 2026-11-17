@@ -106,9 +106,9 @@
                         @foreach([
                             ['users', '#C8A27A', 'Kapasitas', $room->capacity.' Orang'],
                             ['expand', '#2F4F4F', 'Luas', $room->area_m2.' m²'],
-                            ['camera', '#C8A27A', 'Kamera', 'Full-Frame DSLR'],
+                            ['camera', '#C8A27A', 'Kamera', 'Sony / Canon Full-Frame'],
                             ['bolt', '#2E9E6B', 'Remote', 'Wireless Shutter'],
-                            ['lightbulb', '#C8A27A', 'Lighting', 'Softbox Godox'],
+                            ['lightbulb', '#C8A27A', 'Lighting', 'Studio Godox'],
                             ['shield-halved', '#2F4F4F', 'Privasi', '100% Tertutup'],
                         ] as [$icon, $color, $label, $val])
                             <div class="flex items-start gap-3 p-4 rounded-xl bg-cream border border-cream-dark">
@@ -223,7 +223,7 @@
                                    class="flex items-center justify-between p-4 rounded-xl border border-cream-dark hover:border-gold bg-cream hover:bg-gold/5 transition-all group">
                                     <div>
                                         <p class="font-semibold text-sm text-ink group-hover:text-gold transition-colors">{{ $pkg->name }}</p>
-                                        <p class="text-xs text-ink-muted">{{ $pkg->duration_minutes }} menit · Maks. {{ $pkg->max_people }} orang</p>
+                                        <p class="text-xs text-ink-muted">{{ $pkg->duration_minutes }} menit · Maks. {{ min($room->capacity, $pkg->max_people) }} orang (sesuai kapasitas ruangan)</p>
                                     </div>
                                     <div class="text-right">
                                         <p class="font-serif font-bold text-base text-gold">Rp {{ number_format($pkg->price, 0, ',', '.') }}</p>

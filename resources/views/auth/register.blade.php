@@ -341,7 +341,7 @@
             <div class="text-center pt-2">
                 <p class="text-xs text-ink-muted">
                     Sudah memiliki akun?
-                    <a href="{{ route('login') }}" class="text-gold font-bold hover:underline ml-1">
+                    <a href="{{ route('login', request()->query()) }}" class="text-gold font-bold hover:underline ml-1">
                         Masuk di sini
                     </a>
                 </p>

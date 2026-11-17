@@ -100,7 +100,7 @@
                 <i class="fa-brands fa-whatsapp text-gold text-2xl"></i>
             </div>
             <h3 class="font-serif font-semibold text-xl text-ink mb-2">Masih Ada Pertanyaan?</h3>
-            <p class="text-sm text-ink-muted mb-6 max-w-sm mx-auto">Tim kami siap membantu Anda melalui WhatsApp, setiap hari pukul 08.00–21.00 WIB.</p>
+            <p class="text-sm text-ink-muted mb-6 max-w-sm mx-auto">Tim kami siap membantu Anda melalui WhatsApp, setiap hari pukul 09.00–21.00 WIB.</p>
             <a href="https://wa.me/6287825688608?text=Halo%20SnapSpace%2C%20saya%20punya%20pertanyaan%20tentang..."
                target="_blank" rel="noopener"
                class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-success text-white font-semibold text-sm hover:bg-success/90 transition-colors shadow-card btn-bounce">

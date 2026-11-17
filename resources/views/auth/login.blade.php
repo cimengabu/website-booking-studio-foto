@@ -107,7 +107,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-wand-magic-sparkles text-gold"></i>
-                    <span>Lighting Profoto Premium</span>
+                    <span>Lighting Studio Godox Profesional</span>
                 </div>
             </div>
         </div>
@@ -204,7 +204,7 @@
                         <span class="text-xs text-ink-muted">Ingat saya</span>
                     </label>
                     <a href="https://wa.me/6287825688608?text=Halo%20SnapSpace,%20saya%20butuh%20bantuan%20reset%20password%20akun." target="_blank" class="text-xs text-gold hover:underline font-medium">
-                        Lupa password?
+                        Lupa password? (Bantuan CS WhatsApp)
                     </a>
                 </div>
 
@@ -220,7 +220,7 @@
             <div class="text-center pt-2">
                 <p class="text-xs text-ink-muted">
                     Belum memiliki akun SnapSpace?
-                    <a href="{{ route('register') }}" class="text-gold font-bold hover:underline ml-1">
+                    <a href="{{ route('register', request()->query()) }}" class="text-gold font-bold hover:underline ml-1">
                         Daftar sekarang gratis
                     </a>
                 </p>

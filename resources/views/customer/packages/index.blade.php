@@ -37,7 +37,7 @@
 
         {{-- Comparison header --}}
         <div class="text-center mb-12 reveal">
-            <p class="text-sm text-ink-muted">Semua paket bisa dipilih di ruangan mana saja · Add-on tersedia saat booking</p>
+            <p class="text-sm text-ink-muted">Semua paket dapat dipilih di setiap studio kami · Kapasitas peserta menyesuaikan batas maksimal studio pilihan (hingga 8 orang)</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start">

@@ -189,7 +189,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 @foreach($rooms as $room)
                                     <label class="relative cursor-pointer group block"
-                                           @click="selectRoom({{ $room->id }}, '{{ addslashes($room->name) }}')">
+                                           @click="selectRoom({{ $room->id }}, '{{ addslashes($room->name) }}', {{ $room->capacity }})">
                                         <div class="rounded-2xl overflow-hidden border-2 transition-all duration-200"
                                              :class="selectedRoomId === {{ $room->id }} ? 'border-gold shadow-warm' : 'border-cream-dark hover:border-gold/50'">
                                             <div class="relative aspect-[16/9] bg-cream-dark">
@@ -350,9 +350,15 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-ink-muted uppercase tracking-wide mb-1.5" for="w_people">Jumlah Orang *</label>
-                                <input id="w_people" type="number" x-model.number="form.people_count" min="1" :max="selectedPackage ? selectedPackage.max_people : 6"
+                                <label class="block text-xs font-bold text-ink-muted uppercase tracking-wide mb-1.5" for="w_people">
+                                    Jumlah Orang *
+                                    <span class="text-gold font-normal capitalize" x-text="'(Maks. ' + effectiveMaxCapacity() + ' orang)'"></span>
+                                </label>
+                                <input id="w_people" type="number" x-model.number="form.people_count" min="1" :max="effectiveMaxCapacity()"
+                                       @input="validateCapacity()"
                                        class="w-full px-4 py-3.5 rounded-xl border border-cream-dark bg-cream text-sm text-ink focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all">
+                                <p class="text-[11px] text-ink-muted mt-1.5"
+                                   x-text="'Kapasitas efektif: maksimal ' + effectiveMaxCapacity() + ' orang (menyesuaikan kapasitas ' + (selectedRoom ? selectedRoom.name : 'ruangan') + ' ' + (selectedRoom ? selectedRoom.capacity : 8) + ' orang & ' + (selectedPackage ? selectedPackage.name : 'paket') + ' ' + (selectedPackage ? selectedPackage.max_people : 8) + ' orang).'"></p>
                             </div>
 
                             {{-- Payment option --}}
@@ -761,6 +767,8 @@ function bookingWizard(initRoomId, initPackageId) {
             @foreach($rooms as $room)
             if (this.selectedRoomId === {{ $room->id }}) {
                 this.selectedRoomName = '{{ addslashes($room->name) }}';
+                this.selectedRoomCapacity = {{ $room->capacity }};
+                this.selectedRoom = { id: {{ $room->id }}, name: '{{ addslashes($room->name) }}', capacity: {{ $room->capacity }} };
             }
             @endforeach
 
@@ -775,6 +783,8 @@ function bookingWizard(initRoomId, initPackageId) {
             if (!this.selectedRoomId && {{ $rooms->count() }} > 0) {
                 this.selectedRoomId = {{ $rooms->first()->id }};
                 this.selectedRoomName = '{{ addslashes($rooms->first()->name) }}';
+                this.selectedRoomCapacity = {{ $rooms->first()->capacity }};
+                this.selectedRoom = { id: {{ $rooms->first()->id }}, name: '{{ addslashes($rooms->first()->name) }}', capacity: {{ $rooms->first()->capacity }} };
             }
 
             // Auto-watchers for reactivity
@@ -786,6 +796,19 @@ function bookingWizard(initRoomId, initPackageId) {
             this.fetchSlots();
         },
 
+        effectiveMaxCapacity() {
+            const roomCap = this.selectedRoom ? (this.selectedRoom.capacity || 8) : (this.selectedRoomCapacity || 8);
+            const pkgCap = this.selectedPackage ? (this.selectedPackage.max_people || 8) : (this.selectedPackageMaxPeople || 8);
+            return Math.min(roomCap, pkgCap);
+        },
+
+        validateCapacity() {
+            const max = this.effectiveMaxCapacity();
+            if (this.form.people_count > max) {
+                this.form.people_count = max;
+            }
+        },
+
         goToSchedule() {
             this.step = 2;
             if (this.slots.length === 0) {
@@ -793,23 +816,27 @@ function bookingWizard(initRoomId, initPackageId) {
             }
         },
 
-        selectPackage(id, price, name, maxPeople = 6) {
+        selectPackage(id, price, name, maxPeople = 8) {
             this.selectedPackageId = id;
             this.packagePrice = price;
             this.selectedPackageName = name;
             this.selectedPackageMaxPeople = maxPeople;
             this.selectedPackage = { id, name, price, max_people: maxPeople };
+            this.validateCapacity();
             this.recalculate();
             if (this.selectedRoomId && this.selectedDate) {
                 this.fetchSlots();
             }
         },
 
-        selectRoom(id, name) {
+        selectRoom(id, name, capacity = 8) {
             this.selectedRoomId = id;
             this.selectedRoomName = name;
+            this.selectedRoomCapacity = capacity;
+            this.selectedRoom = { id, name, capacity };
             this.selectedSlot = null;
             this.slots = [];
+            this.validateCapacity();
             if (this.selectedDate) {
                 this.fetchSlots();
             }

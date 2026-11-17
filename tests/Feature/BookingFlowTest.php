@@ -101,4 +101,38 @@ class BookingFlowTest extends TestCase
         $response->assertSee($booking->booking_code);
         $response->assertSee('BUKTI PEMBAYARAN RESMI');
     }
+
+    public function test_booking_rejects_people_count_exceeding_room_capacity(): void
+    {
+        $room = Room::where('capacity', '<=', 6)->first();
+        $package = Package::where('max_people', '>=', 8)->first();
+
+        $response = $this->actingAs($this->user)->post(route('booking.store'), [
+            'package_id' => $package->id,
+            'room_id' => $room->id,
+            'booking_date' => now()->addDays(2)->format('Y-m-d'),
+            'start_time' => '10:00',
+            'people_count' => 8, // Exceeds room capacity of 6
+            'payment_option' => 'full',
+        ]);
+
+        $response->assertSessionHasErrors(['people_count']);
+    }
+
+    public function test_auth_preserves_booking_state_parameters(): void
+    {
+        // 1. Visit login with booking parameters
+        $response = $this->get(route('login', ['package_id' => 2, 'room_id' => 1]));
+        $response->assertStatus(200);
+        $response->assertSessionHas('booking_package_id', 2);
+        $response->assertSessionHas('booking_room_id', 1);
+
+        // 2. Perform login
+        $loginResponse = $this->post(route('login'), [
+            'email' => $this->user->email,
+            'password' => 'password',
+        ]);
+
+        $loginResponse->assertRedirect(route('booking.wizard', ['package_id' => 2, 'room_id' => 1]));
+    }
 }

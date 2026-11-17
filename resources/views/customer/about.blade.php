@@ -62,11 +62,11 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach([
                 ['user-shield', '#C8A27A', 'Privasi Terjamin', 'Setiap sesi berlangsung tanpa gangguan. Ruangan dikunci untuk Anda saja selama sesi berlangsung — tidak ada orang lain yang bisa masuk.'],
-                ['wand-magic-sparkles', '#2F4F4F', 'Kualitas Profesional', 'Kamera DSLR full-frame terkalibrasi + lighting Godox studio-grade + preset editing eksklusif. Hasilnya? Foto siap cetak & unggah.'],
+                ['wand-magic-sparkles', '#2F4F4F', 'Kualitas Profesional', 'Kamera Full-Frame (Sony Alpha / Canon EOS) terkalibrasi + lighting studio Godox profesional + preset editing eksklusif. Hasilnya? Foto siap cetak & unggah.'],
                 ['calendar-check', '#2E9E6B', 'Booking Bebas Ribet', 'Tidak perlu DM, menunggu konfirmasi, atau bayar DP manual. Semua otomatis — pilih slot, bayar, tiket QR langsung di tangan.'],
                 ['paint-roller', '#C8A27A', 'Tema yang Beragam', 'Dari Korean minimalist hingga vintage darkroom, dari aesthetic boho hingga clean white — ada 15+ tema yang bisa dipilih sesuai mood.'],
                 ['clock-rotate-left', '#2F4F4F', 'Hasil Cepat', 'Foto editing selesai dan masuk ke galeri online Anda dalam 24 jam setelah sesi. Tidak perlu menunggu berminggu-minggu.'],
-                ['headset', '#2E9E6B', 'CS Responsif', 'Tim customer service kami siap membantu via WhatsApp setiap hari 08.00–21.00 WIB — dari pertanyaan hingga bantuan teknis.'],
+                ['headset', '#2E9E6B', 'CS Responsif', 'Tim customer service kami siap membantu via WhatsApp setiap hari 09.00–21.00 WIB — dari pertanyaan hingga bantuan teknis.'],
             ] as [$icon, $color, $title, $desc])
                 <div class="bg-cream rounded-2xl p-7 border border-cream-dark card-lift reveal shadow-card">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: {{ $color }}15;">
@@ -109,8 +109,8 @@
 
                 <ul class="space-y-4">
                     @foreach([
-                        ['Kamera DSLR/Mirrorless Full-Frame', 'Sony A7R IV + Canon EOS R5 terkalibrasi & terawat'],
-                        ['Lighting Studio Godox Grade', 'Softbox, strip light, hair light — semua sudah ter-set optimal'],
+                        ['Kamera Full-Frame Sony Alpha & Canon EOS', 'Sensor beresolusi tinggi terkalibrasi & lensa tajam terawat'],
+                        ['Lighting Studio Godox Profesional', 'Softbox, strip light, hair light — semua sudah ter-set optimal'],
                         ['Remote Shutter Wireless', 'Bebas jepret tanpa perlu minta tolong siapa pun'],
                         ['Ruang Ganti Privat', 'Ganti outfit nyaman tanpa rasa tidak enak'],
                         ['AC + WiFi Kencang', 'Nyaman sepanjang sesi, bisa langsung unggah stories'],

@@ -15,8 +15,15 @@ class AuthController extends Controller
     /** Maximum failed attempts before OTP verification is required. */
     private const MAX_ATTEMPTS_BEFORE_OTP = 3;
 
-    public function showLogin()
+    public function showLogin(Request $request)
     {
+        if ($request->filled('package_id')) {
+            session(['booking_package_id' => $request->query('package_id')]);
+        }
+        if ($request->filled('room_id')) {
+            session(['booking_room_id' => $request->query('room_id')]);
+        }
+
         return view('auth.login');
     }
 
@@ -122,7 +129,14 @@ class AuthController extends Controller
             return redirect()->intended(route('staff.scan'));
         }
 
-        return redirect()->intended(route('home'));
+        $bookingParams = array_filter([
+            'package_id' => session()->pull('booking_package_id'),
+            'room_id' => session()->pull('booking_room_id'),
+        ]);
+
+        $defaultUrl = ! empty($bookingParams) ? route('booking.wizard', $bookingParams) : route('home');
+
+        return redirect()->intended($defaultUrl);
     }
 
     /** Show the OTP verification page. */
@@ -199,7 +213,14 @@ class AuthController extends Controller
             return redirect()->route('staff.scan');
         }
 
-        return redirect()->route('home')->with('success', 'Verifikasi OTP berhasil! Selamat datang kembali.');
+        $bookingParams = array_filter([
+            'package_id' => session()->pull('booking_package_id'),
+            'room_id' => session()->pull('booking_room_id'),
+        ]);
+
+        $defaultUrl = ! empty($bookingParams) ? route('booking.wizard', $bookingParams) : route('home');
+
+        return redirect()->intended($defaultUrl)->with('success', 'Verifikasi OTP berhasil! Selamat datang kembali.');
     }
 
     /** Resend OTP. */
@@ -232,8 +253,15 @@ class AuthController extends Controller
         return back()->with('otp_sent', true)->with('masked_phone', $this->maskPhone($user->phone));
     }
 
-    public function showRegister()
+    public function showRegister(Request $request)
     {
+        if ($request->filled('package_id')) {
+            session(['booking_package_id' => $request->query('package_id')]);
+        }
+        if ($request->filled('room_id')) {
+            session(['booking_room_id' => $request->query('room_id')]);
+        }
+
         return view('auth.register');
     }
 
@@ -272,7 +300,14 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home')->with('success', 'Selamat datang di SnapSpace! Akun Anda berhasil dibuat.');
+        $bookingParams = array_filter([
+            'package_id' => session()->pull('booking_package_id'),
+            'room_id' => session()->pull('booking_room_id'),
+        ]);
+
+        $defaultUrl = ! empty($bookingParams) ? route('booking.wizard', $bookingParams) : route('home');
+
+        return redirect()->intended($defaultUrl)->with('success', 'Selamat datang di SnapSpace! Akun Anda berhasil dibuat.');
     }
 
     public function logout(Request $request)

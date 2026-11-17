@@ -43,8 +43,8 @@
                         :disabled="loading"
                         class="btn-gold btn-bounce w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-white font-bold text-base shadow-warm disabled:opacity-70">
                     <i class="fa-solid fa-magnifying-glass" x-show="!loading"></i>
-                    <i class="fa-solid fa-spinner animate-spin" x-show="loading"></i>
-                    <span x-text="loading ? 'Mencari...' : 'Cek Status Booking'"></span>
+                    <i class="fa-solid fa-spinner animate-spin" x-show="loading" x-cloak style="display: none;"></i>
+                    <span x-text="loading ? 'Mencari...' : 'Cek Status Booking'">Cek Status Booking</span>
                 </button>
             </form>
 

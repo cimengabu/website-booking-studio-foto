@@ -9,6 +9,7 @@ use App\Models\Booking;
 use App\Models\BookingAddon;
 use App\Models\Package;
 use App\Models\Promo;
+use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
@@ -38,6 +39,13 @@ class BookingService
             $notes = $data['notes'] ?? null;
 
             $package = Package::findOrFail($packageId);
+            $room = Room::findOrFail($roomId);
+            $maxAllowed = min((int) $room->capacity, (int) $package->max_people);
+
+            if ($peopleCount > $maxAllowed) {
+                throw new \InvalidArgumentException("Jumlah orang ({$peopleCount}) melebihi batas maksimal kapasitas {$maxAllowed} orang untuk ruangan {$room->name} dan paket {$package->name}.");
+            }
+
             $duration = $package->duration_minutes;
             $buffer = (int) Setting::getByKey('buffer_minutes', 15);
 
