@@ -1,6 +1,6 @@
 # SnapSpace Studio — Self-Photo Studio Booking Platform
 
-Website booking online resmi untuk **SnapSpace Studio**, platform pemesanan studio foto mandiri bergaya estetik Korea & kamar gelap analog (*Warm Pastel Korean & Vintage Darkroom*) berbasis di Surabaya, Indonesia.
+Website booking online resmi untuk **SnapSpace Studio**, platform pemesanan studio foto mandiri bergaya estetik Korea & kamar gelap analog (*Warm Pastel Korean & Vintage Darkroom*) berbasis di Klaten, Jawa Tengah, Indonesia.
 
 Platform ini dibangun dengan arsitektur bersih (*Service-Repository pattern*), sistem anti-bentrok slot (*pessimistic locking*), integrasi multi-gateway pembayaran (Midtrans), verifikasi kehadiran QR Code, alur darurat fotografer, pengiriman hasil foto berenkripsi (*Signed URL*), hingga kepatuhan privasi data pribadi (UU PDP).
 

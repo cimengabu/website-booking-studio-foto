@@ -325,9 +325,20 @@
                             </button>
                         </div>
 
-                        {{-- ── TAB 1: QRIS SCREEN (REAL ASPI STANDARD) ── --}}
+                        {{-- ── TAB 1: QRIS SCREEN (REAL ASPI STANDARD & SANDBOX SIMULATOR) ── --}}
                         <div x-show="activeTab === 'qris'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
                             <div class="qris-box p-6 mb-6">
+                                <!-- Sandbox Notice -->
+                                <div class="mb-5 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-3">
+                                    <i class="fa-solid fa-flask text-amber-600 mt-0.5 text-base shrink-0"></i>
+                                    <div class="space-y-0.5">
+                                        <span class="font-bold text-xs block">Mode Sandbox Simulator (Demo Pengujian)</span>
+                                        <p class="text-[11px] text-amber-800 leading-relaxed">
+                                            Sistem pembayaran beroperasi dalam mode pengujian. Anda tidak perlu mentransfer saldo rekening sungguhan. Gunakan tombol <strong>"Simulasikan Pembayaran Sukses"</strong> di bawah untuk menyelesaikan pesanan seketika.
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <!-- QRIS Header Bar -->
                                 <div class="flex items-center justify-between pb-4 border-b border-stone-200 mb-5">
                                     <div class="flex items-center gap-2">
@@ -348,17 +359,19 @@
                                 <!-- Dynamic QR Code Display -->
                                 <div class="text-center py-2">
                                     <div class="inline-block p-4 bg-white rounded-2xl border-2 border-stone-300 shadow-inner relative group">
-                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode('00020101021226670016ID.CO.QRIS.WWW011893600998877102030005204581253033605408' . $payAmount . '5802ID5924SNAPSPACE STUDIO KLT6006KLATEN61055746362180714' . $booking->booking_code . '6304') }}"
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode(route('booking.pay', $booking->booking_code)) }}"
                                              alt="Kode Pembayaran QRIS SnapSpace"
                                              class="w-48 h-48 sm:w-56 sm:h-56 mx-auto object-contain">
                                         <div class="text-[10px] font-mono text-stone-500 mt-2 font-semibold">
-                                            REF: {{ $booking->booking_code }} · EXPIRES AUTOMATICALLY
+                                            REF: {{ $booking->booking_code }} · SCAN DENGAN KAMERA HP UNTUK BAYAR
                                         </div>
                                     </div>
 
                                     <!-- Exact Nominal to Pay -->
                                     <div class="mt-4 bg-cream/70 rounded-2xl p-4 border border-cream-dark max-w-sm mx-auto">
-                                        <p class="text-[11px] font-semibold text-ink-muted uppercase tracking-wider mb-1">Nominal Yang Harus Dibayar</p>
+                                        <p class="text-[11px] font-semibold text-ink-muted uppercase tracking-wider mb-1">
+                                            {{ $booking->payment_option === 'dp' && $booking->paid_amount == 0 ? 'Nominal Pembayaran DP 50%' : 'Nominal Yang Harus Dibayar' }}
+                                        </p>
                                         <div class="flex items-center justify-center gap-2">
                                             <span class="font-mono font-bold text-2xl text-ink">
                                                 Rp {{ number_format($payAmount, 0, ',', '.') }}
@@ -370,13 +383,29 @@
                                                 <i class="fa-regular fa-copy text-sm"></i>
                                             </button>
                                         </div>
+                                        @if($booking->payment_option === 'dp' && $booking->paid_amount == 0)
+                                            <p class="text-[11px] text-amber-700 font-medium mt-1">
+                                                Sisa Rp {{ number_format($booking->total_price - $payAmount, 0, ',', '.') }} dilunasi sebelum sesi foto.
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    <!-- Direct 1-Click Simulation Button for QRIS -->
+                                    <div class="max-w-sm mx-auto mt-4">
+                                        <button type="button"
+                                                @click="triggerGatewayProcess()"
+                                                :disabled="submitting || !online"
+                                                class="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer">
+                                            <i class="fa-solid fa-bolt"></i>
+                                            <span>⚡ Simulasikan Pembayaran {{ $booking->payment_option === 'dp' && $booking->paid_amount == 0 ? 'DP 50%' : 'Lunas' }} Sukses</span>
+                                        </button>
                                     </div>
                                 </div>
 
                                 <!-- Supported Apps Logos -->
                                 <div class="mt-6 pt-5 border-t border-stone-100">
                                     <p class="text-[10px] font-bold text-center text-ink-muted uppercase tracking-wider mb-3">
-                                        Bisa dipindai dari semua aplikasi m-Banking & E-Wallet:
+                                        Dapat dipindai dari kamera ponsel / aplikasi e-wallet & m-Banking:
                                     </p>
                                     <div class="flex flex-wrap items-center justify-center gap-2">
                                         @foreach(['BCA Mobile', 'Livin Mandiri', 'BRImo', 'BNI Mobile', 'GoPay', 'OVO', 'DANA', 'ShopeePay', 'LinkAja'] as $appName)
@@ -389,13 +418,11 @@
 
                                 <!-- Step by step instructions -->
                                 <div class="mt-6 bg-stone-50 rounded-2xl p-4 border border-stone-200 text-xs text-ink-muted space-y-1.5">
-                                    <p class="font-bold text-ink mb-1">Petunjuk Pembayaran QRIS:</p>
+                                    <p class="font-bold text-ink mb-1">Petunjuk Pembayaran:</p>
                                     <ol class="list-decimal list-inside space-y-1 leading-relaxed">
-                                        <li>Buka aplikasi m-Banking atau E-Wallet yang Anda miliki.</li>
-                                        <li>Pilih menu <strong>Scan QR / Bayar dengan QRIS</strong>.</li>
-                                        <li>Arahkan kamera HP ke kode QR di atas.</li>
-                                        <li>Pastikan nama merchant tertera <strong>SNAPSPACE STUDIO KLATEN</strong> dengan nominal yang sesuai.</li>
-                                        <li>Konfirmasi pembayaran di aplikasi Anda, lalu tekan tombol konfirmasi di bawah.</li>
+                                        <li>Buka kamera ponsel Anda dan arahkan ke kode QR di atas untuk membuka halaman pembayaran di HP.</li>
+                                        <li>Atau langsung klik tombol <strong>"⚡ Simulasikan Pembayaran Sukses"</strong> untuk pengujian instan.</li>
+                                        <li>Setelah transaksi diverifikasi, E-Tiket sesi foto ber-QR Code resmi akan langsung diterbitkan otomatis.</li>
                                     </ol>
                                 </div>
                             </div>
@@ -816,7 +843,7 @@ function paymentPage() {
             }
         },
 
-        triggerGatewayProcess(event) {
+        triggerGatewayProcess() {
             if (this.submitting || !this.online) return;
             this.submitting = true;
             this.showProcessingModal = true;
@@ -827,7 +854,10 @@ function paymentPage() {
                 setTimeout(() => {
                     this.processingStep = 3;
                     setTimeout(() => {
-                        event.target.submit();
+                        const form = document.getElementById('paymentForm');
+                        if (form) {
+                            form.submit();
+                        }
                     }, 600);
                 }, 900);
             }, 800);

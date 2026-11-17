@@ -135,4 +135,47 @@ class BookingFlowTest extends TestCase
 
         $loginResponse->assertRedirect(route('booking.wizard', ['package_id' => 2, 'room_id' => 1]));
     }
+
+    public function test_public_ticket_page_accessible_without_auth_and_shows_details(): void
+    {
+        $booking = Booking::first();
+
+        // Accessible by guest without login
+        $response = $this->get(route('ticket.show', $booking->booking_code));
+
+        $response->assertStatus(200);
+        $response->assertSee($booking->booking_code);
+        $response->assertSee('SnapSpace Studio');
+        $response->assertSee($booking->room->name);
+    }
+
+    public function test_staff_checkin_supports_full_url_token_and_dp_status(): void
+    {
+        $staff = User::where('role', 'staff')->first() ?? User::factory()->create(['role' => 'staff']);
+        $booking = Booking::first();
+        $booking->update(['status' => 'confirmed', 'checked_in_at' => null]);
+
+        // 1. Scan using full URL format (as read by camera scanner)
+        $scannedUrl = "https://snapspace.web.id/ticket/{$booking->booking_code}";
+
+        $response = $this->actingAs($staff)->post(route('staff.checkin'), [
+            'token' => $scannedUrl,
+        ]);
+
+        $response->assertRedirect(route('staff.today'));
+        $this->assertEquals('in_progress', $booking->fresh()->status);
+        $this->assertNotNull($booking->fresh()->checked_in_at);
+    }
+
+    public function test_ticket_arrival_confirmation_endpoint(): void
+    {
+        $booking = Booking::where('status', 'confirmed')->first() ?? Booking::first();
+        $booking->update(['status' => 'confirmed', 'checked_in_at' => null]);
+
+        $response = $this->post(route('ticket.confirm', $booking->booking_code));
+
+        $response->assertSessionHas('success');
+        $this->assertEquals('in_progress', $booking->fresh()->status);
+        $this->assertNotNull($booking->fresh()->checked_in_at);
+    }
 }

@@ -383,7 +383,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 reveal">
             <div>
-                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-2">100% Foto Asli Pelanggan</p>
+                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-2">Inspirasi & Galeri Studio</p>
                 <h2 class="font-serif font-bold text-4xl text-ink">Portfolio Terbaru</h2>
             </div>
             <a href="{{ route('portfolio.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-gold hover:text-gold-dark transition-colors whitespace-nowrap">

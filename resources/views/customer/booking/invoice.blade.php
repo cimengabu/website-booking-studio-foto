@@ -316,7 +316,7 @@
                     <!-- Left: Notes & Verification QR -->
                     <div class="sm:w-1/2 flex items-start gap-4">
                         <div class="w-24 h-24 p-1.5 border border-stone-200 rounded-xl bg-white shadow-xs flex-shrink-0">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode(route('my-bookings.show', $booking->booking_code)) }}"
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode(route('ticket.show', $booking->booking_code)) }}"
                                  alt="QR Validasi Nota" class="w-full h-full object-contain">
                         </div>
                         <div class="text-[11px] text-ink-muted space-y-1">

@@ -57,6 +57,10 @@ Route::get('/cek-booking', function () {
 })->name('booking.check');
 Route::post('/api/check-booking', [BookingWizardController::class, 'checkBookingApi'])->name('api.check-booking');
 
+// Public E-Ticket & Verification (Bisa di-scan via HP Pelanggan / Resepsionis)
+Route::get('/ticket/{code}', [CheckinController::class, 'showPublicTicket'])->name('ticket.show');
+Route::post('/ticket/{code}/confirm', [CheckinController::class, 'confirmArrivalTicket'])->name('ticket.confirm');
+
 // Public API endpoints for Booking Wizard
 Route::get('/api/slots', [BookingWizardController::class, 'getSlotsApi'])->name('api.slots');
 Route::post('/api/calculate-price', [BookingWizardController::class, 'calculatePriceApi'])->name('api.calculate-price')->middleware('throttle:promo');

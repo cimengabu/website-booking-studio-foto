@@ -469,21 +469,29 @@
                         <p class="text-xs font-bold text-gold uppercase tracking-widest mb-1">E-Tiket Sesi</p>
                         <h3 class="font-serif font-bold text-2xl text-ink mb-4">{{ $booking->booking_code }}</h3>
 
-                        {{-- QR Code --}}
+                        {{-- QR Code (Guaranteed High-Res Image pointing to Public E-Ticket Verification) --}}
                         <div class="bg-cream rounded-2xl p-5 border border-cream-dark inline-block mb-4">
-                            <div class="w-40 h-40 mx-auto" id="qr-code"></div>
+                            <div class="w-40 h-40 mx-auto flex items-center justify-center">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data={{ urlencode(route('ticket.show', $booking->booking_code)) }}"
+                                     alt="QR Code Tiket {{ $booking->booking_code }}"
+                                     class="w-full h-full object-contain rounded-lg shadow-xs">
+                            </div>
                         </div>
 
-                        <p class="text-xs text-ink-muted mb-4">Tunjukkan QR code ini ke receptionist studio saat kedatangan untuk check-in.</p>
+                        <p class="text-xs text-ink-muted mb-4">Arahkan scanner staf studio atau kamera HP ke QR code ini saat kedatangan untuk konfirmasi check-in seketika.</p>
 
                         <div class="flex flex-col gap-2">
-                            <a href="#" onclick="window.print(); return false;"
-                               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-cream-dark text-ink text-sm font-semibold hover:border-gold hover:text-gold transition-colors">
-                                <i class="fa-solid fa-print text-xs"></i> Cetak Tiket
+                            <a href="{{ route('ticket.show', $booking->booking_code) }}" target="_blank"
+                               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gold text-white text-xs font-bold shadow-warm hover:bg-gold-dark transition-colors">
+                                <i class="fa-solid fa-up-right-from-square"></i> Buka Layar Penuh E-Tiket
                             </a>
-                            <a href="https://wa.me/?text={{ urlencode('🎬 E-Tiket SnapSpace Studio: '.$booking->booking_code."\n📅 Tanggal: ".$booking->booking_date->translatedFormat('d M Y').' '.$booking->start_time."\n📍 Ruangan: ".$booking->room->name) }}"
+                            <a href="#" onclick="window.print(); return false;"
+                               class="flex items-center justify-center gap-2 w-full py-2 rounded-xl border border-cream-dark text-ink text-xs font-semibold hover:border-gold hover:text-gold transition-colors">
+                                <i class="fa-solid fa-print text-xs"></i> Cetak Tiket Sesi
+                            </a>
+                            <a href="https://wa.me/?text={{ urlencode('🎬 E-Tiket SnapSpace Studio: '.$booking->booking_code."\n📅 Tanggal: ".$booking->booking_date->translatedFormat('d M Y').' '.$booking->start_time."\n📍 Ruangan: ".$booking->room->name."\n🎟️ Buka E-Tiket: ".route('ticket.show', $booking->booking_code)) }}"
                                target="_blank" rel="noopener"
-                               class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-success/10 text-success text-sm font-semibold border border-success/20 hover:bg-success/20 transition-colors">
+                               class="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-success/10 text-success text-xs font-semibold border border-success/20 hover:bg-success/20 transition-colors">
                                 <i class="fa-brands fa-whatsapp"></i> Bagikan Tiket via WA
                             </a>
                         </div>
@@ -824,23 +832,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const qrContainer = document.getElementById('qr-code');
-    if (qrContainer) {
-        QRCode.toCanvas(document.createElement('canvas'), '{{ $booking->booking_code }}', {
-            width: 160,
-            margin: 1,
-            color: { dark: '#1A1A1A', light: '#F8F6F3' },
-        }, function (err, canvas) {
-            if (!err) {
-                canvas.style.cssText = 'width:100%;height:auto;border-radius:8px;';
-                qrContainer.appendChild(canvas);
-            }
-        });
-    }
-});
-</script>
+{{-- QR Code rendered via native high-res image directly pointing to public E-Ticket verification --}}
 @endpush
 

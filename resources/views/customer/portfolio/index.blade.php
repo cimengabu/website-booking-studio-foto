@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Galeri Portfolio — SnapSpace Studio Foto Klaten')
-@section('meta_description', 'Galeri foto asli pelanggan SnapSpace Studio. Browse portfolio wisuda, prewedding, keluarga, self-photo, dan produk. Filter kategori, lightbox preview.')
+@section('title', 'Galeri Portfolio & Inspirasi Sesi — SnapSpace Studio Klaten')
+@section('meta_description', 'Galeri portfolio dan ragam inspirasi konsep foto SnapSpace Studio Klaten. Temukan inspirasi wisuda, prewedding, keluarga, self-photo, dan produk.')
 
 @section('content')
 
@@ -15,9 +15,9 @@
         </nav>
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <div>
-                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-3">100% Foto Asli Pelanggan</p>
+                <p class="text-xs font-bold text-gold uppercase tracking-widest mb-3">Inspirasi & Portofolio Studio</p>
                 <h1 class="font-serif font-bold text-4xl sm:text-5xl text-ink mb-4">Galeri Portfolio Studio</h1>
-                <p class="text-ink-muted text-lg max-w-xl">Semua foto diambil di studio SnapSpace oleh pelanggan nyata — bukan stock photo, bukan rekayasa. Ini adalah hasil karya mereka.</p>
+                <p class="text-ink-muted text-lg max-w-xl">Eksplorasi ragam inspirasi konsep foto, tema gaya, dan contoh hasil karya sesi estetik di SnapSpace Studio Klaten.</p>
             </div>
             <div class="text-right">
                 <p class="font-serif font-bold text-4xl text-gold">{{ $portfolios->total() }}+</p>
