@@ -115,6 +115,12 @@ class BookingService
                 if ($user && $user->loyalty_points > 0) {
                     $actualRedeemPoints = min($redeemPoints, $user->loyalty_points);
                     $user->decrement('loyalty_points', $actualRedeemPoints);
+
+                    ActivityLog::record(
+                        $userId,
+                        'loyalty_points_redeemed',
+                        "Menukarkan {$actualRedeemPoints} SnapPoints untuk potongan diskon booking {$bookingCode} (Sisa poin: {$user->fresh()->loyalty_points} pts)"
+                    );
                 }
             }
 
