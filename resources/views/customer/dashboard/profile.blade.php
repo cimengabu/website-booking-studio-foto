@@ -13,26 +13,36 @@
 
         <div class="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
             {{-- Avatar section --}}
-            <div class="relative group">
+            <div class="flex flex-col items-center gap-2">
+                <div class="relative group">
+                    @if(Auth::user()->avatar ?? false)
+                        <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="Avatar"
+                             class="w-24 h-24 rounded-2xl object-cover ring-2 ring-[#E8451E]/30">
+                    @else
+                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#E8451E] to-[#d03a16] flex items-center justify-center">
+                            <span class="font-heading font-black text-4xl text-white">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                        </div>
+                    @endif
+                    {{-- Upload overlay --}}
+                    <label for="avatar-upload"
+                           class="absolute inset-0 rounded-2xl bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <i class="fa-solid fa-camera text-white text-lg mb-1"></i>
+                        <span class="text-[10px] text-white font-mono">Ganti</span>
+                    </label>
+                    <form id="avatar-form" method="POST" action="{{ route('dashboard.profile.avatar') }}" enctype="multipart/form-data">
+                        @csrf @method('PATCH')
+                        <input type="file" id="avatar-upload" name="avatar" class="hidden" accept="image/*"
+                               onchange="document.getElementById('avatar-form').submit()">
+                    </form>
+                </div>
                 @if(Auth::user()->avatar ?? false)
-                    <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="Avatar"
-                         class="w-24 h-24 rounded-2xl object-cover ring-2 ring-[#E8451E]/30">
-                @else
-                    <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#E8451E] to-[#d03a16] flex items-center justify-center">
-                        <span class="font-heading font-black text-4xl text-white">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
-                    </div>
+                    <form method="POST" action="{{ route('dashboard.profile.avatar.delete') }}" onsubmit="return confirm('Yakin ingin menghapus foto profil ini?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer">
+                            <i class="fa-solid fa-trash-can text-[10px]"></i> Hapus Foto
+                        </button>
+                    </form>
                 @endif
-                {{-- Upload overlay --}}
-                <label for="avatar-upload"
-                       class="absolute inset-0 rounded-2xl bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                    <i class="fa-solid fa-camera text-white text-lg mb-1"></i>
-                    <span class="text-[10px] text-white font-mono">Ganti</span>
-                </label>
-                <form id="avatar-form" method="POST" action="{{ route('dashboard.profile.avatar') }}" enctype="multipart/form-data">
-                    @csrf @method('PATCH')
-                    <input type="file" id="avatar-upload" name="avatar" class="hidden" accept="image/*"
-                           onchange="document.getElementById('avatar-form').submit()">
-                </form>
             </div>
 
             {{-- User info --}}

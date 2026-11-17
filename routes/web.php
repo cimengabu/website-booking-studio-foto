@@ -94,6 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/dashboard/profil', [ProfileController::class, 'update'])->name('dashboard.profile.update');
     Route::patch('/dashboard/profil/password', [ProfileController::class, 'updatePassword'])->name('dashboard.profile.password');
     Route::patch('/dashboard/profil/avatar', [ProfileController::class, 'updateAvatar'])->name('dashboard.profile.avatar');
+    Route::delete('/dashboard/profil/avatar', [ProfileController::class, 'deleteAvatar'])->name('dashboard.profile.avatar.delete');
     Route::get('/dashboard/profil/export-data', [ProfileController::class, 'exportPersonalData'])->name('dashboard.profile.export-data');
     Route::delete('/dashboard/profil', [ProfileController::class, 'deleteAccount'])->name('dashboard.profile.delete');
 

@@ -83,6 +83,22 @@ class ProfileController extends Controller
         return back()->with('success', 'Foto profil berhasil diperbarui!');
     }
 
+    public function deleteAvatar()
+    {
+        $user = Auth::user();
+
+        if ($user->avatar) {
+            if (Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $user->update(['avatar' => null]);
+
+            return back()->with('success', 'Foto profil berhasil dihapus.');
+        }
+
+        return back()->with('info', 'Anda belum memiliki foto profil.');
+    }
+
     /**
      * Hak Akses & Portabilitas Data (UU PDP No. 27 Tahun 2022)
      * Mengunduh seluruh arsip data pribadi pelanggan dalam format JSON
