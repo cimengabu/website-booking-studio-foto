@@ -122,4 +122,42 @@ class SecurityAndComplianceTest extends TestCase
         $this->assertTrue(File::exists($backupDir));
         $this->assertNotEmpty(File::files($backupDir));
     }
+
+    public function test_customer_cannot_access_other_customers_booking_or_payment_page(): void
+    {
+        $otherCustomer = User::factory()->create([
+            'role' => 'customer',
+            'email' => 'other-customer@example.com',
+        ]);
+
+        $otherBooking = Booking::create([
+            'booking_code' => 'BK-IDOR-TEST',
+            'user_id' => $otherCustomer->id,
+            'package_id' => 1,
+            'room_id' => 1,
+            'booking_date' => now()->addDays(3)->format('Y-m-d'),
+            'start_time' => '10:00',
+            'end_time' => '10:30',
+            'customer_name' => 'Other Customer',
+            'customer_phone' => '081299998888',
+            'customer_email' => 'other-customer@example.com',
+            'subtotal' => 100000,
+            'addons_total' => 0,
+            'markup_amount' => 0,
+            'discount' => 0,
+            'total_price' => 100000,
+            'paid_amount' => 0,
+            'payment_type' => 'full',
+            'status' => 'pending',
+            'expires_at' => now()->addMinutes(30),
+        ]);
+
+        // Customer attempts to view other customer's booking detail -> 404 Not Found (scoped strictly to Auth::id())
+        $response1 = $this->actingAs($this->customer)->get(route('my-bookings.show', $otherBooking->booking_code));
+        $response1->assertStatus(404);
+
+        // Customer attempts to view other customer's payment page -> 403 Forbidden
+        $response2 = $this->actingAs($this->customer)->get(route('booking.pay', $otherBooking->booking_code));
+        $response2->assertStatus(403);
+    }
 }
