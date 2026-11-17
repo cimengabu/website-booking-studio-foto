@@ -239,26 +239,6 @@
     </div>
 </section>
 
-{{-- ── SOSIAL MEDIA ── --}}
-<section class="py-12 bg-cream border-t border-cream-dark">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
-        <p class="text-xs font-bold text-ink-muted uppercase tracking-widest mb-4">Ikuti Kami</p>
-        <div class="flex gap-4 justify-center">
-            @foreach([
-                ['instagram', 'bg-gradient-to-br from-purple-500 to-pink-500', '@snapspace.id', 'https://instagram.com'],
-                ['tiktok', 'bg-ink', '@snapspacestudio', 'https://tiktok.com'],
-                ['youtube', 'bg-red-600', 'SnapSpace Studio', 'https://youtube.com'],
-            ] as [$icon, $bg, $handle, $url])
-                <a href="{{ $url }}" target="_blank" rel="noopener"
-                   class="flex items-center gap-3 px-5 py-3 rounded-2xl {{ $bg }} text-white text-sm font-semibold hover:opacity-90 transition-all shadow-card btn-bounce">
-                    <i class="fa-brands fa-{{ ltrim($icon, 'fa-') }}"></i>
-                    <span class="hidden sm:inline">{{ $handle }}</span>
-                </a>
-            @endforeach
-        </div>
-    </div>
-</section>
-
 @endsection
 
 @push('scripts')

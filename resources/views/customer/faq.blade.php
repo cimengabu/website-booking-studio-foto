@@ -37,7 +37,7 @@
                     ['Metode pembayaran apa saja yang diterima?', 'Kami menerima: QRIS, GoPay, OVO, DANA, ShopeePay, Transfer Bank (BCA, BNI, BRI, Mandiri via Virtual Account), dan Kartu Kredit/Debit Visa/Mastercard. Semua pembayaran diproses melalui Midtrans — payment gateway yang aman dan berlisensi Bank Indonesia.'],
                     ['Apakah bisa bayar DP (uang muka) dulu?', 'Ya! Kami menyediakan opsi DP 50% dari total harga. Sisa pembayaran bisa dilunasi minimal H-1 sebelum sesi atau saat datang di studio (cash/transfer).'],
                     ['Berapa lama batas waktu pembayaran setelah booking?', 'Setelah membuat booking, Anda punya waktu 60 menit untuk menyelesaikan pembayaran. Jika melewati batas waktu, slot akan otomatis dilepas dan tersedia untuk pelanggan lain.'],
-                    ['Apakah ada promo atau diskon khusus?', 'Ya! Kami sering mengadakan promo midweek (Selasa-Rabu), promo weekend pagi, dan promo seasonal (liburan, hari Valentine, dll.). Ikuti Instagram @snapspace.id untuk info promo terbaru. Anda juga bisa memasukkan kode promo saat checkout.'],
+                    ['Apakah ada promo atau diskon khusus?', 'Ya! Kami sering mengadakan promo midweek (Selasa-Rabu), promo weekend pagi, dan promo seasonal (liburan, hari Valentine, dll.). Pantau website SnapSpace untuk info promo terbaru. Anda juga bisa memasukkan kode promo saat checkout.'],
                 ],
                 'Saat & Setelah Sesi' => [
                     ['Apa yang perlu dibawa saat datang ke studio?', 'Cukup bawa: (1) Tiket QR dari email/akun SnapSpace, (2) KTP/identitas untuk konfirmasi, (3) Outfit yang ingin dipakai foto, (4) Properti tambahan jika ada yang tidak tersedia di studio.'],

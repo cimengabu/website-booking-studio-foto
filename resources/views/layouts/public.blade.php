@@ -518,12 +518,6 @@
                         Studio foto mandiri premium dengan berbagai tema estetik. Abadikan momen terbaik Anda bersama orang-orang tersayang.
                     </p>
                     <div class="flex gap-2">
-                        <a href="https://instagram.com" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-white/8 hover:bg-gold transition-colors duration-200 flex items-center justify-center" aria-label="Instagram">
-                            <i class="fa-brands fa-instagram text-sm"></i>
-                        </a>
-                        <a href="https://tiktok.com" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-white/8 hover:bg-gold transition-colors duration-200 flex items-center justify-center" aria-label="TikTok">
-                            <i class="fa-brands fa-tiktok text-sm"></i>
-                        </a>
                         <a href="https://wa.me/6287825688608" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-white/8 hover:bg-success transition-colors duration-200 flex items-center justify-center" aria-label="WhatsApp">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                         </a>

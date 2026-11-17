@@ -89,10 +89,17 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 mb-6 no-print">
         <div class="bg-white rounded-2xl shadow-sm border border-cream-dark p-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-                <a href="{{ route('my-bookings.show', $booking->booking_code) }}"
-                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-ink-soft hover:bg-cream hover:text-ink transition-colors">
-                    <i class="fa-solid fa-arrow-left text-xs"></i> Kembali ke Pesanan
-                </a>
+                @if(Auth::check() && (Auth::user()->isAdmin() || Auth::user()->isStaff()))
+                    <a href="{{ route('admin.bookings.show', $booking->id) }}"
+                       class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-ink-soft hover:bg-cream hover:text-ink transition-colors">
+                        <i class="fa-solid fa-arrow-left text-xs"></i> Kembali ke Pesanan (Admin)
+                    </a>
+                @else
+                    <a href="{{ route('my-bookings.show', $booking->booking_code) }}"
+                       class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold text-ink-soft hover:bg-cream hover:text-ink transition-colors">
+                        <i class="fa-solid fa-arrow-left text-xs"></i> Kembali ke Pesanan
+                    </a>
+                @endif
                 <span class="text-stone-300">|</span>
                 <span class="text-xs font-mono text-ink-muted">INV/{{ $booking->booking_date->format('Ymd') }}/SNAP/{{ substr($booking->booking_code, -6) }}</span>
             </div>

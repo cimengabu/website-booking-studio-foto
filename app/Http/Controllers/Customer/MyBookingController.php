@@ -31,10 +31,14 @@ class MyBookingController extends Controller
 
     public function show(string $code)
     {
-        $booking = Booking::with(['room.images', 'package', 'bookingAddons.addon', 'payments', 'photoResults', 'photoDelivery', 'review'])
-            ->where('booking_code', $code)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $query = Booking::with(['room.images', 'package', 'bookingAddons.addon', 'payments', 'photoResults', 'photoDelivery', 'review'])
+            ->where('booking_code', $code);
+
+        if (! Auth::user()?->isAdmin() && ! Auth::user()?->isStaff()) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $booking = $query->firstOrFail();
 
         return view('customer.my-bookings.show', compact('booking'));
     }
