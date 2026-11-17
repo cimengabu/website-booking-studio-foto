@@ -72,7 +72,7 @@
                             {{-- Specs --}}
                             <div class="grid grid-cols-2 gap-2 mb-4 pt-4 border-t border-cream-dark">
                                 @foreach([
-                                    ['users', 'text-gold', $room->capacity.' orang'],
+                                    ['users', 'text-gold', 'Maks. '.$room->capacity.' orang'],
                                     ['expand', 'text-teal', $room->area_m2.' m²'],
                                     ['camera-retro', 'text-success', 'Remote Shutter'],
                                     ['bolt', 'text-gold', 'Lighting Studio'],

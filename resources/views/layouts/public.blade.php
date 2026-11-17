@@ -606,7 +606,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-xs text-white/40">&copy; {{ date('Y') }} SnapSpace Studio. Seluruh hak dilindungi undang-undang.</p>
                 <div class="flex items-center gap-4 text-xs text-white/40">
-                    <span>Dibuat dengan <i class="fa-solid fa-heart text-gold mx-1"></i> di Klaten</span>
+                    <span>Dibuat dengan sepenuh hati di Klaten</span>
                 </div>
             </div>
         </div>

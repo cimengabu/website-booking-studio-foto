@@ -64,7 +64,7 @@
                 ['user-shield', '#C8A27A', 'Privasi Terjamin', 'Setiap sesi berlangsung tanpa gangguan. Ruangan dikunci untuk Anda saja selama sesi berlangsung — tidak ada orang lain yang bisa masuk.'],
                 ['wand-magic-sparkles', '#2F4F4F', 'Kualitas Profesional', 'Kamera Full-Frame (Sony Alpha / Canon EOS) terkalibrasi + lighting studio Godox profesional + preset editing eksklusif. Hasilnya? Foto siap cetak & unggah.'],
                 ['calendar-check', '#2E9E6B', 'Booking Bebas Ribet', 'Tidak perlu DM, menunggu konfirmasi, atau bayar DP manual. Semua otomatis — pilih slot, bayar, tiket QR langsung di tangan.'],
-                ['paint-roller', '#C8A27A', 'Tema yang Beragam', 'Dari Korean minimalist hingga vintage darkroom, dari aesthetic boho hingga clean white — ada 15+ tema yang bisa dipilih sesuai mood.'],
+                ['paint-roller', '#C8A27A', 'Tema yang Beragam', '3 studio tematik utama: Korean Minimalist, Vintage Darkroom, dan Minimalist White Box — lengkap dengan properti foto estetik & backdrop modular.'],
                 ['clock-rotate-left', '#2F4F4F', 'Hasil Cepat', 'Foto editing selesai dan masuk ke galeri online Anda dalam 24 jam setelah sesi. Tidak perlu menunggu berminggu-minggu.'],
                 ['headset', '#2E9E6B', 'CS Responsif', 'Tim customer service kami siap membantu via WhatsApp setiap hari 09.00–21.00 WIB — dari pertanyaan hingga bantuan teknis.'],
             ] as [$icon, $color, $title, $desc])

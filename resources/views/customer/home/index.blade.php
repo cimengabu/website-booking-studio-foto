@@ -360,7 +360,7 @@
                 @foreach([
                     ['500+', 'Sesi Foto Selesai', 'camera'],
                     ['4.9★', 'Rating Pelanggan', 'star'],
-                    ['15+', 'Tema Ruangan Unik', 'palette'],
+                    ['3 Studio', 'Konsep Tematik Estetik', 'palette'],
                     ['24/7', 'Booking Online', 'calendar'],
                 ] as [$val, $label, $icon])
                     <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
@@ -456,7 +456,7 @@
             <div class="max-w-2xl">
                 <p class="text-xs font-bold text-gold uppercase tracking-widest mb-3">Testimoni & Ulasan</p>
                 <h2 class="font-serif font-bold text-4xl text-ink mb-4">Kata Mereka tentang SnapSpace</h2>
-                <p class="text-ink-muted">Ribuan momen indah telah diabadikan. Inilah cerita nyata dari para pelanggan setia kami.</p>
+                <p class="text-ink-muted">Lebih dari 500+ sesi foto telah dipercaya untuk mengabadikan momen berharga. Inilah cerita nyata dari para pelanggan setia kami.</p>
             </div>
             <div>
                 <button type="button"
