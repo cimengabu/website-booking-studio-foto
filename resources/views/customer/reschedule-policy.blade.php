@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Kebijakan Reschedule, Pembatalan & Aturan Bisnis — SnapSpace Studio')
-@section('meta_description', 'Kebijakan resmi reschedule maksimal 1x minimal H-2, refund pembatalan berjenjang, penalti no-show, dan tata cara pelunasan di SnapSpace Studio Surabaya.')
+@section('meta_description', 'Kebijakan resmi reschedule maksimal 1x minimal H-2, refund pembatalan berjenjang, penalti no-show, dan tata cara pelunasan di SnapSpace Studio Klaten.')
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-16 space-y-10">

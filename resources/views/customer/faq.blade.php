@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'FAQ — Pertanyaan yang Sering Diajukan | SnapSpace Studio')
-@section('meta_description', 'Temukan jawaban atas pertanyaan umum seputar booking studio foto, paket, pembayaran, reschedule, dan layanan SnapSpace Studio Surabaya.')
+@section('meta_description', 'Temukan jawaban atas pertanyaan umum seputar booking studio foto, paket, pembayaran, reschedule, dan layanan SnapSpace Studio Klaten.')
 
 @section('content')
 
@@ -30,7 +30,7 @@
                 'Sebelum Booking' => [
                     ['Apakah saya perlu membawa fotografer sendiri?', 'Tidak perlu sama sekali! Studio kami dilengkapi dengan kamera DSLR/Mirrorless full-frame yang terpasang di tripod, plus remote shutter wireless yang bisa Anda genggam. Anda cukup atur angle, pose, dan tekan tombol — hasilnya langsung terlihat di kamera.'],
                     ['Apakah harus mendaftar/buat akun untuk booking?', 'Untuk proses booking Anda perlu login atau mendaftar terlebih dahulu, namun proses registrasinya sangat cepat (kurang dari 1 menit). Akun dibutuhkan agar Anda bisa melihat status booking, mengunduh hasil foto, dan mengakses riwayat sesi.'],
-                    ['Berapa orang yang bisa ikut dalam satu sesi?', 'Tergantung paket yang dipilih: Basic (1–2 orang), Standard (1–4 orang), Premium (hingga 6 orang). Untuk grup lebih besar atau acara korporat, silakan hubungi kami terlebih dahulu.'],
+                    ['Berapa orang yang bisa ikut dalam satu sesi?', 'Tergantung paket yang dipilih: Basic (1–2 orang), Standard (1–4 orang), Premium (hingga 8 orang). Untuk grup lebih besar atau acara korporat, silakan hubungi kami terlebih dahulu.'],
                     ['Apakah ada batas minimum usia?', 'Tidak ada batas minimum usia. Namun, untuk peserta di bawah 12 tahun wajib didampingi orang tua/wali yang bertanggung jawab sepanjang sesi berlangsung.'],
                 ],
                 'Booking & Pembayaran' => [

@@ -126,7 +126,7 @@
                     </div>
                     <div class="text-xs text-ink-muted space-y-0.5 leading-relaxed mt-2">
                         <p class="font-medium text-ink">PT SnapSpace Kreatif Indonesia</p>
-                        <p>Jl. Tunjungan No. 88, Genteng, Kota Surabaya, Jawa Timur 60275</p>
+                        <p>Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten, Jawa Tengah</p>
                         <p>WhatsApp: +62 878-2568-8608 · Email: billing@snapspace.id</p>
                         <p class="font-mono text-[11px] text-stone-500">NMID: ID1020240988771 · NPWP: 98.765.432.1-604.000</p>
                     </div>
@@ -150,7 +150,7 @@
                         @if($booking->paid_amount >= $booking->total_price)
                             <div class="stamp-box stamp-paid">
                                 <div class="text-center">
-                                    <div class="text-[10px] tracking-wider font-semibold">SNAPSPACE SURABAYA</div>
+                                    <div class="text-[10px] tracking-wider font-semibold">SNAPSPACE KLATEN</div>
                                     <div class="text-base font-black">★ LUNAS ★</div>
                                     <div class="text-[9px] tracking-widest">{{ $booking->payments->last()?->paid_at?->format('d/m/Y H:i') ?? date('d/m/Y') }} WIB</div>
                                 </div>
@@ -158,7 +158,7 @@
                         @elseif($booking->paid_amount > 0)
                             <div class="stamp-box stamp-dp">
                                 <div class="text-center">
-                                    <div class="text-[10px] tracking-wider font-semibold">SNAPSPACE SURABAYA</div>
+                                    <div class="text-[10px] tracking-wider font-semibold">SNAPSPACE KLATEN</div>
                                     <div class="text-sm font-black">★ DP 50% TERIMA ★</div>
                                     <div class="text-[9px] tracking-widest">SISA Rp {{ number_format($booking->remaining_balance, 0, ',', '.') }}</div>
                                 </div>
@@ -422,7 +422,7 @@
                 </div>
 
                 <div class="text-center sm:text-right flex flex-col items-center sm:items-end">
-                    <p class="text-[11px] text-ink-muted mb-1">Surabaya, {{ now()->translatedFormat('d F Y') }}</p>
+                    <p class="text-[11px] text-ink-muted mb-1">Klaten, {{ now()->translatedFormat('d F Y') }}</p>
                     <div class="relative w-40 h-20 flex items-center justify-center my-1">
                         <!-- Digital Seal Graphic -->
                         <div class="absolute inset-0 border-2 border-dashed border-gold/40 rounded-xl bg-gold/5 flex items-center justify-center">

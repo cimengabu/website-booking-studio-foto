@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Paket & Harga — SnapSpace Studio Foto Surabaya')
+@section('title', 'Paket & Harga — SnapSpace Studio Foto Klaten')
 @section('meta_description', 'Daftar paket foto self-studio SnapSpace: Basic, Standard, Premium. Harga transparan mulai Rp 99.000. Sudah termasuk editing, remote shutter, dan galeri digital.')
 
 @section('content')

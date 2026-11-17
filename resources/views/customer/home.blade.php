@@ -16,7 +16,7 @@
             <div class="lg:col-span-7 space-y-6 text-center lg:text-left" data-aos="fade-right">
                 <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#1E1D1A] border border-[#2D2B26] text-xs font-mono font-semibold text-[#F2C94C]">
                     <span class="w-2 h-2 rounded-full bg-[#E8451E] animate-ping"></span>
-                    <span>SELF-PHOTO STUDIO NO. 1 DI SURABAYA</span>
+                    <span>SELF-PHOTO STUDIO NO. 1 DI KLATEN</span>
                 </div>
 
                 <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight">

@@ -84,7 +84,7 @@ class NotificationService
         }
 
         $message .= "\n📍 *Lokasi Studio:*\n"
-            ."SnapSpace Studio, Jl. Tunjungan No. 88, Surabaya\n\n"
+            ."SnapSpace Studio, Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten\n\n"
             ."Tunjukkan kode booking atau QR check-in saat tiba di studio:\n"
             ."🔗 {$checkUrl}\n\n"
             .'Sampai jumpa di studio!';
@@ -162,7 +162,7 @@ class NotificationService
             ."1. Hadir 10–15 menit sebelum sesi untuk persiapan kostum & briefing.\n"
             ."2. Siapkan konsep pose atau properti favorit kamu.\n"
             ."3. Tunjukkan tiket booking digital: {$checkUrl}\n\n"
-            ."📍 Lokasi: Jl. Tunjungan No. 88, Surabaya\n"
+            ."📍 Lokasi: Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten\n"
             .'Hubungi kami jika ada kendala perjalanan: wa.me/6287825688608';
 
         $waUrl = $this->buildWhatsAppUrl($phone, $message);
@@ -194,7 +194,7 @@ class NotificationService
             ."Halo *{$user->name}*,\n"
             ."Sesi foto Anda di ruangan *{$booking->room->name}* akan dimulai pukul *{$booking->start_time} WIB* (kurang lebih 2 jam lagi).\n\n"
             ."• *Kode Booking:* {$booking->booking_code}\n"
-            ."• *Lokasi:* Jl. Tunjungan No. 88, Surabaya\n"
+            ."• *Lokasi:* Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten\n"
             ."• *QR Check-in:* {$checkUrl}\n\n"
             .'Harap pastikan Anda sudah dalam perjalanan agar tidak mengurangi durasi sesi foto. Tim kami siap menyambut Anda!';
 

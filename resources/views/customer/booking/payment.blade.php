@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Pembayaran Booking ' . $booking->booking_code . ' — SnapSpace Studio')
-@section('meta_description', 'Selesaikan pembayaran booking studio foto SnapSpace Surabaya secara instan dan aman via QRIS, Virtual Account, E-Wallet, atau Kartu.')
+@section('meta_description', 'Selesaikan pembayaran booking studio foto SnapSpace Klaten secara instan dan aman via QRIS, Virtual Account, E-Wallet, atau Kartu.')
 
 @push('styles')
 <style>
@@ -52,7 +52,7 @@
             <h1 class="font-serif font-bold text-2xl sm:text-4xl text-ink mb-2">Selesaikan Pembayaran Anda</h1>
             <p class="text-xs sm:text-sm text-ink-muted">
                 Kode Booking: <span class="font-mono font-bold text-gold bg-gold/10 px-2 py-0.5 rounded-md">{{ $booking->booking_code }}</span>
-                · SnapSpace Studio Surabaya
+                · SnapSpace Studio Klaten
             </p>
         </div>
 
@@ -341,14 +341,14 @@
                                     </div>
                                     <div class="text-right">
                                         <span class="text-[10px] text-stone-500 font-mono block">NMID: ID1020240988771</span>
-                                        <span class="text-xs font-bold text-ink block">SNAPSPACE SURABAYA</span>
+                                        <span class="text-xs font-bold text-ink block">SNAPSPACE KLATEN</span>
                                     </div>
                                 </div>
 
                                 <!-- Dynamic QR Code Display -->
                                 <div class="text-center py-2">
                                     <div class="inline-block p-4 bg-white rounded-2xl border-2 border-stone-300 shadow-inner relative group">
-                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode('00020101021226670016ID.CO.QRIS.WWW011893600998877102030005204581253033605408' . $payAmount . '5802ID5924SNAPSPACE STUDIO SBY6008SURABAYA61056027562180714' . $booking->booking_code . '6304') }}"
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode('00020101021226670016ID.CO.QRIS.WWW011893600998877102030005204581253033605408' . $payAmount . '5802ID5924SNAPSPACE STUDIO KLT6006KLATEN61055746362180714' . $booking->booking_code . '6304') }}"
                                              alt="Kode Pembayaran QRIS SnapSpace"
                                              class="w-48 h-48 sm:w-56 sm:h-56 mx-auto object-contain">
                                         <div class="text-[10px] font-mono text-stone-500 mt-2 font-semibold">
@@ -394,7 +394,7 @@
                                         <li>Buka aplikasi m-Banking atau E-Wallet yang Anda miliki.</li>
                                         <li>Pilih menu <strong>Scan QR / Bayar dengan QRIS</strong>.</li>
                                         <li>Arahkan kamera HP ke kode QR di atas.</li>
-                                        <li>Pastikan nama merchant tertera <strong>SNAPSPACE STUDIO SURABAYA</strong> dengan nominal yang sesuai.</li>
+                                        <li>Pastikan nama merchant tertera <strong>SNAPSPACE STUDIO KLATEN</strong> dengan nominal yang sesuai.</li>
                                         <li>Konfirmasi pembayaran di aplikasi Anda, lalu tekan tombol konfirmasi di bawah.</li>
                                     </ol>
                                 </div>

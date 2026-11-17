@@ -84,7 +84,7 @@
                 </div>
                 <div>
                     <span class="block font-serif font-bold text-2xl text-white tracking-tight">SnapSpace</span>
-                    <span class="block text-[10px] font-medium text-gold-light uppercase tracking-widest">Self-Photo & Studio Surabaya</span>
+                    <span class="block text-[10px] font-medium text-gold-light uppercase tracking-widest">Self-Photo & Studio Klaten</span>
                 </div>
             </a>
         </div>

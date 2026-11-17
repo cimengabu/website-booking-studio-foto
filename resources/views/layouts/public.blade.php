@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="@yield('meta_description', 'SnapSpace — Studio foto mandiri premium di Surabaya. Booking slot real-time, lighting profesional, berbagai tema estetik. Abadikan momen terbaik Anda.')">
+    <meta name="description" content="@yield('meta_description', 'SnapSpace — Studio foto mandiri premium di Klaten. Booking slot real-time, lighting profesional, berbagai tema estetik. Abadikan momen terbaik Anda.')">
     <title>@yield('title', 'SnapSpace Studio — Foto Profesional, Booking Real-Time')</title>
 
     <!-- Canonical -->
@@ -576,7 +576,7 @@
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-white/80 uppercase tracking-wide">Lokasi</p>
-                                <p class="text-sm text-white/60 mt-0.5">Jl. Tunjungan No. 88<br>Surabaya, Jawa Timur</p>
+                                <p class="text-sm text-white/60 mt-0.5">Waru, RT 17 / RW 07, Pandanan<br>Wonosari, Klaten, Jawa Tengah</p>
                             </div>
                         </li>
                         <li class="flex items-start gap-3">
@@ -606,7 +606,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-xs text-white/40">&copy; {{ date('Y') }} SnapSpace Studio. Seluruh hak dilindungi undang-undang.</p>
                 <div class="flex items-center gap-4 text-xs text-white/40">
-                    <span>Dibuat dengan <i class="fa-solid fa-heart text-gold mx-1"></i> di Surabaya</span>
+                    <span>Dibuat dengan <i class="fa-solid fa-heart text-gold mx-1"></i> di Klaten</span>
                 </div>
             </div>
         </div>

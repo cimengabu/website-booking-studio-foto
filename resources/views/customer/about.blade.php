@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Tentang Kami — SnapSpace Studio Foto Premium Surabaya')
-@section('meta_description', 'Kenali SnapSpace lebih dekat. Studio foto mandiri premium di Surabaya dengan berbagai tema estetik, fotografer berpengalaman, dan fasilitas modern.')
+@section('title', 'Tentang Kami — SnapSpace Studio Foto Premium Klaten')
+@section('meta_description', 'Kenali SnapSpace lebih dekat. Studio foto mandiri premium di Klaten dengan berbagai tema estetik, fotografer berpengalaman, dan fasilitas modern.')
 
 @section('content')
 

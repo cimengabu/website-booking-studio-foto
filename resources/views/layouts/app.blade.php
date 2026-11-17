@@ -251,7 +251,7 @@
             <div>
                 <h4 class="font-heading font-bold text-white text-sm uppercase tracking-wider mb-4">Lokasi & Jam Kerja</h4>
                 <p class="text-xs text-gray-400 leading-relaxed mb-2">
-                    <i class="fa-solid fa-location-dot text-[#E8451E] mr-1.5"></i> Jl. Tunjungan No. 88, Surabaya, Jawa Timur
+                    <i class="fa-solid fa-location-dot text-[#E8451E] mr-1.5"></i> Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten
                 </p>
                 <p class="text-xs text-gray-400 mb-1">
                     <i class="fa-solid fa-clock text-[#F2C94C] mr-1.5"></i> Buka Setiap Hari: 09:00 - 21:00 WIB

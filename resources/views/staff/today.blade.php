@@ -199,7 +199,7 @@
 
     <!-- Footer -->
     <footer class="py-4 text-center text-[11px] text-white/40 border-t border-white/5">
-        SnapSpace Studio Staff Portal &copy; {{ date('Y') }} — Surabaya
+        SnapSpace Studio Staff Portal &copy; {{ date('Y') }} — Klaten
     </footer>
 
     <!-- Alpine.js -->

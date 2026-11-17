@@ -217,7 +217,7 @@
                 <div>
                     <label class="block text-xs font-mono uppercase tracking-wider text-gray-300 mb-2" for="studio_address">Alamat Studio</label>
                     <input type="text" id="studio_address" name="studio_address" required
-                           value="{{ $settings['studio_address'] ?? 'Jl. Tunjungan No. 88, Surabaya' }}"
+                           value="{{ $settings['studio_address'] ?? 'Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten' }}"
                            class="w-full bg-[#141311] border border-[#2D2B26] rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#E8451E]">
                 </div>
 

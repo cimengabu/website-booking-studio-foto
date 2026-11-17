@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Galeri Portfolio — SnapSpace Studio Foto Surabaya')
+@section('title', 'Galeri Portfolio — SnapSpace Studio Foto Klaten')
 @section('meta_description', 'Galeri foto asli pelanggan SnapSpace Studio. Browse portfolio wisuda, prewedding, keluarga, self-photo, dan produk. Filter kategori, lightbox preview.')
 
 @section('content')
@@ -106,7 +106,7 @@
 
             {{-- Pagination --}}
             <div class="mt-12 flex justify-center reveal">
-                {{ $portfolios->appends(request()->query())->links('vendor.pagination.portfolio') }}
+                {{ view()->exists('vendor.pagination.portfolio') ? $portfolios->appends(request()->query())->links('vendor.pagination.portfolio') : $portfolios->appends(request()->query())->links() }}
             </div>
 
         @else

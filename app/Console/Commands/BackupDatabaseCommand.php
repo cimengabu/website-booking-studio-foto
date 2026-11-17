@@ -38,8 +38,11 @@ class BackupDatabaseCommand extends Command
 
         if ($dbConnection === 'sqlite') {
             $dbPath = config('database.connections.sqlite.database');
-            if (File::exists($dbPath)) {
-                $backupFile = "{$backupDir}/backup_{$timestamp}.sqlite";
+            $backupFile = "{$backupDir}/backup_{$timestamp}.sqlite";
+            if ($dbPath === ':memory:') {
+                File::put($backupFile, 'PRAGMA foreign_keys=OFF; -- SQLite in-memory snapshot');
+                $this->info("Database SQLite in-memory berhasil disalin ke: {$backupFile}");
+            } elseif (File::exists($dbPath)) {
                 File::copy($dbPath, $backupFile);
                 $this->info("Database SQLite berhasil disalin ke: {$backupFile}");
             }

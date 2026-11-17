@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Ruangan Favorit Saya — SnapSpace Studio')
-@section('meta_description', 'Lihat koleksi studio foto favorit Anda di SnapSpace Surabaya.')
+@section('meta_description', 'Lihat koleksi studio foto favorit Anda di SnapSpace Klaten.')
 
 @section('content')
 

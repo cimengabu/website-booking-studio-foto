@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
         Setting::setKey('buffer_minutes', 15);
         Setting::setKey('dp_percent', 50);
         Setting::setKey('extra_person_fee', 25000);
-        Setting::setKey('studio_address', 'Jl. Tunjungan No. 88, Surabaya');
+        Setting::setKey('studio_address', 'Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten');
         Setting::setKey('studio_phone', '+62 878-2568-8608');
 
         // 3. Rooms
@@ -239,7 +239,7 @@ class DatabaseSeeder extends Seeder
             'booking_id' => $booking->id,
             'user_id' => $customer->id,
             'rating' => 5,
-            'comment' => 'Studio paling estetik di Surabaya! Hasil fotonya jernih banget, staf ramah, dan proses booking gampang banget tanpa ribet.',
+            'comment' => 'Studio paling estetik di Klaten! Hasil fotonya jernih banget, staf ramah, dan proses booking gampang banget tanpa ribet.',
             'is_visible' => true,
         ]);
     }

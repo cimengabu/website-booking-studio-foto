@@ -1,7 +1,25 @@
 @extends('layouts.public')
 
-@section('title', 'Kontak & Lokasi — SnapSpace Studio Surabaya')
-@section('meta_description', 'Hubungi SnapSpace Studio Surabaya. Lokasi di Jl. Tunjungan No. 88. Buka setiap hari 09.00-21.00. Chat via WhatsApp atau isi form pesan di sini.')
+@section('title', 'Kontak & Lokasi — SnapSpace Studio Klaten')
+@section('meta_description', 'Hubungi SnapSpace Studio Klaten. Lokasi di Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten. Buka setiap hari 09.00-21.00. Chat via WhatsApp atau isi form pesan di sini.')
+
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-Zcn6bjR/8RBhbEZq8nHvUcE/VCITgkWFQdaGY/vv9ZGQgrCA/PenPRUMNKzIEaeFoNbMGr221PghhTr7+wtkitg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    .leaflet-popup-content-wrapper {
+        border-radius: 14px;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+        padding: 4px;
+    }
+    .leaflet-popup-content {
+        margin: 10px 12px;
+        line-height: 1.4;
+    }
+    .leaflet-container {
+        font-family: inherit;
+    }
+</style>
+@endpush
 
 @section('content')
 
@@ -40,9 +58,9 @@
                             <div>
                                 <p class="font-semibold text-sm text-ink mb-1">Lokasi Studio</p>
                                 <p class="text-sm text-ink-muted leading-relaxed">
-                                    Jl. Tunjungan No. 88<br>
-                                    Genteng, Surabaya, Jawa Timur 60275<br>
-                                    <a href="https://maps.google.com" target="_blank" rel="noopener" class="text-gold hover:underline text-xs mt-1 inline-block">
+                                    Waru, RT 17 / RW 07<br>
+                                    Pandanan, Wonosari, Klaten, Jawa Tengah<br>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=Waru+RT+17+RW+07+Pandanan+Wonosari+Klaten" target="_blank" rel="noopener" class="text-gold hover:underline text-xs mt-1 inline-block">
                                         <i class="fa-solid fa-map mr-1"></i> Buka di Google Maps
                                     </a>
                                 </p>
@@ -98,36 +116,41 @@
                     </div>
                 </div>
 
-                {{-- Google Maps Embed & Interactive Map Card --}}
+                {{-- Map Embed & Interactive Card --}}
                 <div class="rounded-3xl overflow-hidden border border-cream-dark shadow-card reveal bg-cream" data-delay="100">
-                    <div class="relative w-full h-[280px] bg-cream-dark">
-                        <iframe
-                            src="https://maps.google.com/maps?q=Jl.+Tunjungan+No.88,+Genteng,+Surabaya,+Jawa+Timur+60275&t=&z=16&ie=UTF8&iwloc=&output=embed"
-                            width="100%"
-                            height="100%"
-                            style="border:0;"
-                            allowfullscreen=""
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            title="Peta Lokasi SnapSpace Studio Surabaya">
-                        </iframe>
+                    <div class="relative w-full h-[300px] bg-cream-dark">
+                        {{-- Interactive Leaflet Map Container --}}
+                        <div id="studio-map" class="w-full h-full z-0">
+                            {{-- Fallback OpenStreetMap iframe while JS initializes or if JS disabled --}}
+                            <iframe
+                                id="osm-fallback-iframe"
+                                src="https://www.openstreetmap.org/export/embed.html?bbox=110.7328%2C-7.6250%2C110.7528%2C-7.6100&amp;layer=mapnik&amp;marker=-7.61747%2C110.74286"
+                                width="100%"
+                                height="100%"
+                                style="border:0;"
+                                loading="lazy"
+                                title="Peta Lokasi SnapSpace Studio Pandanan Wonosari Klaten">
+                            </iframe>
+                        </div>
                     </div>
-                    <div class="p-4 bg-white border-t border-cream-dark flex items-center justify-between gap-3">
+                    <div class="p-4 bg-white border-t border-cream-dark flex flex-wrap items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 rounded-xl bg-gold/15 flex items-center justify-center text-gold shrink-0">
-                                <i class="fa-solid fa-diamond-turn-right text-sm"></i>
+                                <i class="fa-solid fa-location-dot text-base text-gold"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-bold text-ink">SnapSpace Studio Tunjungan</p>
-                                <p class="text-[11px] text-ink-muted">Jl. Tunjungan No. 88, Surabaya</p>
+                                <p class="text-xs font-bold text-ink">SnapSpace Studio Klaten</p>
+                                <p class="text-[11px] text-ink-muted">Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten</p>
                             </div>
                         </div>
-                        <a href="https://www.google.com/maps/search/?api=1&query=Jl.+Tunjungan+No.88+Surabaya"
-                           target="_blank" rel="noopener"
-                           class="px-3.5 py-1.5 rounded-xl bg-gold hover:bg-gold-dark text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 shrink-0">
-                            <i class="fa-solid fa-map-location-dot"></i>
-                            <span>Buka Maps</span>
-                        </a>
+                        <div class="flex items-center gap-2">
+                            <a href="https://www.google.com/maps/search/?api=1&query=Waru+RT+17+RW+07+Pandanan+Wonosari+Klaten"
+                               target="_blank" rel="noopener"
+                               class="px-3.5 py-1.5 rounded-xl bg-gold hover:bg-gold-dark text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 shrink-0">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                <span>Buka Google Maps</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -238,3 +261,61 @@
 </section>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6AvXEtZP40N42h68hZQD631IEWHUENW/P20afmpz4FTBoH8n61P7vaJS51MfTx5wna3c/Zg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fallback = document.getElementById('osm-fallback-iframe');
+        const mapContainer = document.getElementById('studio-map');
+
+        if (typeof L !== 'undefined' && mapContainer) {
+            try {
+                if (fallback) {
+                    fallback.remove();
+                }
+
+                const lat = -7.6174726;
+                const lon = 110.7428622;
+
+                const map = L.map('studio-map', {
+                    center: [lat, lon],
+                    zoom: 16,
+                    scrollWheelZoom: false
+                });
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+                }).addTo(map);
+
+                const customPin = L.divIcon({
+                    className: 'custom-studio-pin',
+                    html: '<div style="background-color:#C8A27A;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(200,162,122,0.6);border:3px solid #ffffff;"><i class="fa-solid fa-camera" style="color:white;font-size:15px;"></i></div>',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18],
+                    popupAnchor: [0, -22]
+                });
+
+                const marker = L.marker([lat, lon], { icon: customPin }).addTo(map);
+
+                marker.bindPopup(`
+                    <div style="font-family:'Plus Jakarta Sans',sans-serif;padding:2px;min-width:180px;">
+                        <p style="font-weight:700;font-size:13px;margin:0 0 3px;color:#1A1A1A;">SnapSpace Studio</p>
+                        <p style="font-size:11px;color:#6B6560;margin:0 0 8px;line-height:1.4;">Waru, RT 17 / RW 07, Pandanan, Wonosari, Klaten</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Waru+RT+17+RW+07+Pandanan+Wonosari+Klaten" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;background:#C8A27A;color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;text-decoration:none;">
+                            <span>Buka di Google Maps &rarr;</span>
+                        </a>
+                    </div>
+                `).openPopup();
+
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 200);
+            } catch (e) {
+                console.warn('Leaflet initialization failed, fallback remains:', e);
+            }
+        }
+    });
+</script>
+@endpush

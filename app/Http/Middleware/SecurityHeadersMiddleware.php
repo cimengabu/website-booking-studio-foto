@@ -30,14 +30,14 @@ class SecurityHeadersMiddleware
         // Restrict unnecessary browser features
         $response->headers->set('Permissions-Policy', 'camera=(self), microphone=(), geolocation=()');
 
-        // Content Security Policy (compatible with Alpine.js, Tailwind CDN, Google Fonts, and Midtrans Snap)
+        // Content Security Policy (compatible with Alpine.js, Tailwind CDN, Google Fonts, Midtrans Snap, and Maps)
         $csp = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; "
             ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com https://app.midtrans.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com https://unpkg.com; "
-            ."style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+            ."style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; "
             ."font-src 'self' https://fonts.gstatic.com data:; "
             ."img-src 'self' data: https: blob:; "
             ."connect-src 'self' https://app.sandbox.midtrans.com https://app.midtrans.com https:; "
-            ."frame-src 'self' https://app.sandbox.midtrans.com https://app.midtrans.com;";
+            ."frame-src 'self' https://app.sandbox.midtrans.com https://app.midtrans.com https://www.google.com https://maps.google.com https://*.google.com https://www.openstreetmap.org https://*.openstreetmap.org;";
         $response->headers->set('Content-Security-Policy', $csp);
 
         // HTTP Strict Transport Security (HSTS) when running under HTTPS or production

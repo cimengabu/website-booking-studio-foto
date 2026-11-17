@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'SnapSpace Studio — Studio Foto Premium, Booking Real-Time Surabaya')
-@section('meta_description', 'Studio foto mandiri premium Surabaya. Berbagai tema estetik, slot real-time, bayar via QRIS/GoPay/OVO. Abadikan momen terbaik bersama orang tersayang.')
+@section('title', 'SnapSpace Studio — Studio Foto Premium, Booking Real-Time Klaten')
+@section('meta_description', 'Studio foto mandiri premium di Klaten. Berbagai tema estetik, slot real-time, bayar via QRIS/GoPay/OVO. Abadikan momen terbaik bersama orang tersayang.')
 
 @section('content')
 
@@ -667,7 +667,7 @@
                 ['Apa saja metode pembayaran yang tersedia?', 'Kami menerima QRIS, GoPay, OVO, DANA, ShopeePay, Virtual Account BCA/BNI/BRI/Mandiri, dan kartu kredit melalui gateway pembayaran Midtrans yang aman.'],
                 ['Berapa lama foto siap diterima setelah sesi?', 'Foto yang sudah melalui proses editing akan dikirimkan ke galeri online akun Anda dalam waktu maksimal 24 jam setelah sesi selesai.'],
                 ['Apakah bisa reschedule jika ada halangan?', 'Reschedule bisa dilakukan maksimal H-24 jam sebelum jadwal sesi tanpa biaya tambahan. Pembatalan H-24 dikenakan biaya 50% dari nilai paket.'],
-                ['Berapa maksimal orang dalam satu sesi foto?', 'Tergantung paket dan ruangan yang dipilih. Umumnya paket Basic untuk 1-2 orang, Standard 1-4 orang, dan Premium hingga 6 orang.'],
+                ['Berapa maksimal orang dalam satu sesi foto?', 'Tergantung paket dan ruangan yang dipilih. Umumnya paket Basic untuk 1-2 orang, Standard 1-4 orang, dan Premium hingga 8 orang.'],
             ] as $idx => [$q, $a])
                 <div x-data="{ open: {{ $idx === 0 ? 'true' : 'false' }} }"
                      class="bg-cream rounded-2xl border border-cream-dark overflow-hidden">

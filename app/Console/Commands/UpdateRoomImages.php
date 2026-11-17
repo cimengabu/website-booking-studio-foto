@@ -85,7 +85,7 @@ class UpdateRoomImages extends Command
                 'user_id' => $customer?->id,
                 'room_id' => $r1?->id,
                 'rating' => 5,
-                'comment' => 'Studio paling estetik di Surabaya! Hasil fotonya jernih banget, staf ramah, dan proses booking gampang banget tanpa ribet.',
+                'comment' => 'Studio paling estetik di Klaten! Hasil fotonya jernih banget, staf ramah, dan proses booking gampang banget tanpa ribet.',
             ],
             [
                 'guest_name' => 'Dimas Pratama',
@@ -113,14 +113,14 @@ class UpdateRoomImages extends Command
                 'user_id' => null,
                 'room_id' => $r3?->id,
                 'rating' => 5,
-                'comment' => 'Self photo studio terbaik di Tunjungan! Remote shutter responsif, monitor preview gede, jadi bisa eksplor gaya sendiri tanpa canggung dilihatin fotografer.',
+                'comment' => 'Self photo studio terbaik di Klaten! Remote shutter responsif, monitor preview gede, jadi bisa eksplor gaya sendiri tanpa canggung dilihatin fotografer.',
             ],
             [
                 'guest_name' => 'Nadia Rahmawati',
                 'user_id' => null,
                 'room_id' => $r2?->id,
                 'rating' => 5,
-                'comment' => 'Sangat puas! Lokasinya strategis di Jl. Tunjungan, tempatnya dingin, wangi, dan peralatan kameranya profesional (full-frame Sony). Pasti bakal balik lagi bareng bestie.',
+                'comment' => 'Sangat puas! Lokasinya strategis di Pandanan Wonosari Klaten, tempatnya dingin, wangi, dan peralatan kameranya profesional (full-frame Sony). Pasti bakal balik lagi bareng bestie.',
             ],
         ];
 
