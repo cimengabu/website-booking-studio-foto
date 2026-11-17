@@ -109,7 +109,7 @@
                             </div>
                             <div>
                                 <p class="font-semibold text-sm text-ink mb-0.5">Email</p>
-                                <a href="mailto:hello@snapspace.id" class="text-sm text-gold hover:underline">hello@snapspace.id</a>
+                                <a href="mailto:ind4hwijaya06@gmail.com" class="text-sm text-gold hover:underline">ind4hwijaya06@gmail.com</a>
                             </div>
                         </div>
                     </div>
