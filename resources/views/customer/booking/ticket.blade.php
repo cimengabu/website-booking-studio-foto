@@ -161,6 +161,15 @@
                             <span class="font-mono">Rp {{ number_format($booking->remaining_balance, 0, ',', '.') }}</span>
                         </div>
                     @endif
+
+                    @if(!empty($booking->notes))
+                        <div class="pt-3 border-t border-cream-dark text-xs">
+                            <span class="text-ink-muted block mb-1">Catatan Khusus Pemesan:</span>
+                            <p class="text-ink italic bg-cream p-2.5 rounded-xl border border-cream-dark leading-relaxed">
+                                "{{ $booking->notes }}"
+                            </p>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Action Buttons --}}

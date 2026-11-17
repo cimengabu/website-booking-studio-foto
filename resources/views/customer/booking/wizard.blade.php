@@ -461,7 +461,7 @@
                                 ['door-open', 'Ruangan', 'selectedRoomName'],
                                 ['calendar', 'Tanggal', 'selectedDate'],
                                 ['clock', 'Jam Sesi', 'selectedSlot?.start'],
-                                ['users', 'Jumlah Orang', 'form.people_count + \" orang\"'],
+                                ['users', 'Jumlah Orang', "form.people_count + ' orang'"],
                                 ['user', 'Pemesan', 'form.name'],
                             ] as [$icon, $label, $val])
                                 <div class="flex items-center gap-3 py-3 border-b border-cream-dark last:border-0">
@@ -474,6 +474,17 @@
                                     </div>
                                 </div>
                             @endforeach
+
+                            {{-- Catatan Khusus dari Pemesan --}}
+                            <div class="flex items-start gap-3 py-3 border-b border-cream-dark" x-show="form.notes && form.notes.trim().length > 0">
+                                <div class="w-9 h-9 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-note-sticky text-gold text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs text-ink-muted">Catatan Khusus</p>
+                                    <p class="font-medium text-xs sm:text-sm text-ink whitespace-pre-line italic bg-cream/70 p-2.5 rounded-xl border border-cream-dark mt-1" x-text="form.notes"></p>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Policy summary box --}}

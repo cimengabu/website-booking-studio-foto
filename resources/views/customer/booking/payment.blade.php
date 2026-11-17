@@ -174,6 +174,16 @@
                                 </span>
                                 <span class="font-semibold text-ink">{{ $booking->people_count }} orang</span>
                             </div>
+                            @if(!empty($booking->notes))
+                                <div class="py-2 border-b border-stone-100">
+                                    <span class="flex items-center gap-2 text-ink-muted mb-1 text-xs">
+                                        <i class="fa-solid fa-note-sticky text-gold w-4 text-center"></i> Catatan Khusus
+                                    </span>
+                                    <p class="text-xs text-ink italic bg-stone-50 p-2.5 rounded-xl border border-stone-200 whitespace-pre-line leading-relaxed">
+                                        "{{ $booking->notes }}"
+                                    </p>
+                                </div>
+                            @endif
                         </div>
 
                         {{-- Add-ons Breakdown if any --}}
