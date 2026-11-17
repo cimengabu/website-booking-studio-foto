@@ -60,6 +60,177 @@ webbooking/
 
 ---
 
+## 🗄️ Skema Database & Relasi Tabel (Entity Relationship)
+
+Sistem menggunakan database relasional ternormalisasi dengan foreign key constraints, cascading delete, dan indexing untuk performa query pencarian slot:
+
+```mermaid
+erDiagram
+    USERS ||--o{ BOOKINGS : "places"
+    USERS ||--o{ REVIEWS : "writes"
+    USERS ||--o{ ACTIVITY_LOGS : "logs"
+    ROOMS ||--o{ ROOM_IMAGES : "has"
+    ROOMS ||--o{ BOOKINGS : "booked_in"
+    ROOMS ||--o{ BLOCKED_SLOTS : "blocked_by"
+    PACKAGES ||--o{ BOOKINGS : "selected_in"
+    BOOKINGS ||--o{ BOOKING_ADDONS : "contains"
+    ADDONS ||--o{ BOOKING_ADDONS : "added_to"
+    BOOKINGS ||--o{ PAYMENTS : "paid_via"
+    BOOKINGS ||--o{ PHOTO_RESULTS : "produces"
+    BOOKINGS ||--o| PHOTO_DELIVERIES : "delivered_with"
+    BOOKINGS ||--o| REVIEWS : "reviewed_by"
+    USERS ||--o{ BOOKINGS : "assigned_as_photographer"
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string phone
+        enum role "customer,admin,staff,photographer"
+        integer loyalty_points
+        string avatar
+        timestamp pdp_consent_at
+    }
+
+    ROOMS {
+        bigint id PK
+        string name
+        string slug UK
+        string theme
+        integer capacity
+        integer area_m2
+        boolean is_active
+    }
+
+    PACKAGES {
+        bigint id PK
+        string name
+        string slug UK
+        integer duration_minutes
+        integer max_people
+        integer edited_photos
+        decimal price
+        boolean is_active
+    }
+
+    BOOKINGS {
+        bigint id PK
+        string booking_code UK
+        bigint user_id FK
+        bigint room_id FK
+        bigint package_id FK
+        bigint photographer_id FK
+        date booking_date
+        time start_time
+        time end_time
+        integer people_count
+        decimal subtotal
+        decimal addons_total
+        decimal discount
+        decimal total_price
+        decimal paid_amount
+        enum payment_option "dp,full"
+        enum status "pending,confirmed,dp_paid,paid,checked_in,completed,delivered,closed,rescheduled,cancelled,expired,no_show"
+        string qr_token UK
+        timestamp expires_at
+    }
+
+    PAYMENTS {
+        bigint id PK
+        bigint booking_id FK
+        string order_id UK
+        enum payment_kind "dp,full,remaining"
+        string payment_type
+        decimal gross_amount
+        string transaction_status
+        string snap_token
+        timestamp paid_at
+    }
+
+    BOOKING_ADDONS {
+        bigint id PK
+        bigint booking_id FK
+        bigint addon_id FK
+        integer qty
+        decimal unit_price
+        decimal subtotal
+    }
+
+    PHOTO_RESULTS {
+        bigint id PK
+        bigint booking_id FK
+        string path
+        string original_name
+        bigint size
+    }
+
+    PHOTO_DELIVERIES {
+        bigint id PK
+        bigint booking_id FK
+        timestamp delivered_at
+        timestamp expires_at
+        integer download_count
+        string watermark_text
+    }
+
+    REVIEWS {
+        bigint id PK
+        bigint booking_id FK
+        bigint user_id FK
+        bigint room_id FK
+        integer rating
+        text comment
+        string photo
+        text admin_reply
+        boolean is_visible
+    }
+
+    PROMOS {
+        bigint id PK
+        string code UK
+        enum type "percent,fixed"
+        decimal value
+        decimal min_order
+        decimal max_discount
+        integer quota
+        integer used_count
+    }
+
+    BLOCKED_SLOTS {
+        bigint id PK
+        bigint room_id FK
+        date date
+        time start_time
+        time end_time
+        string reason
+    }
+```
+
+### 📋 Kamus Data Tabel Utama (Data Dictionary)
+
+| Nama Tabel | Fungsi & Deskripsi | Relasi Kunci |
+|:---|:---|:---|
+| **`users`** | Menyimpan identitas user, RBAC role (`customer`, `admin`, `staff`, `photographer`), OTP login, poin loyalitas (`loyalty_points`), dan persetujuan UU PDP. | Primary key `id` |
+| **`rooms`** | Master data ruangan foto, tema studio (Korean / Darkroom), kapasitas orang, ukuran ruangan, dan status aktif. | 1-ke-N ke `room_images`, `bookings`, `blocked_slots` |
+| **`room_images`** | Galeri foto interior tiap studio dengan tanda foto sampul utama (`is_primary`). | Foreign key `room_id` |
+| **`packages`** | Master paket foto (durasi menit, jumlah orang gratis, jatah foto diedit, harga rupiah). | 1-ke-N ke `bookings` |
+| **`addons`** | Master layanan tambahan (tambahan orang, cetak polaroid/frame, kostum, file mentah/RAW). | N-ke-N ke `bookings` via `booking_addons` |
+| **`pricing_rules`** | Aturan markup tarif otomatis (misal: weekend surcharge / peak hours markup). | Dibaca oleh `PricingService` |
+| **`promos`** | Kode voucher diskon (persen / nominal flat), kuota maksimal penggunaan, dan masa berlaku. | Dicatat kode promo pada `bookings.promo_code` |
+| **`blocked_slots`** | Jadwal blokir slot studio untuk pemeliharaan, servis alat, atau hari libur mendadak studio. | Foreign key `room_id` (nullable untuk full-studio) |
+| **`bookings`** | Entitas reservasi inti: kode booking unik, status lifecycle (13 state), snapshot harga, QR token check-in, dan penugasan fotografer. | FK `user_id`, `room_id`, `package_id`, `photographer_id` |
+| **`booking_addons`** | Tabel pivot rincian add-on yang dipilih pada reservasi beserta harga snapshot. | FK `booking_id`, `addon_id` |
+| **`payments`** | Riwayat transaksi gateway pembayaran (Midtrans `order_id`, jenis tagihan DP/Pelunasan, status, dan raw response). | Foreign key `booking_id` |
+| **`photo_results`** | File foto hasil sesi studio resolusi tinggi yang diunggah oleh fotografer. | Foreign key `booking_id` |
+| **`photo_deliveries`** | Pengaturan pengiriman galeri ke pelanggan (masa aktif tautan, teks watermark, counter unduh). | Foreign key `booking_id` |
+| **`portfolios`** | Showcase portofolio hasil foto publik berdasarkan kategori untuk ditampilkan di landing page. | Foreign key `room_id` (opsional) |
+| **`reviews`** | Ulasan kepuasan, rating bintang 1-5, foto testimoni, dan balasan tanggapan resmi dari admin. | FK `booking_id`, `user_id`, `room_id` |
+| **`favorites`** | Daftar tema ruangan favorit yang disimpan oleh pelanggan. | FK `user_id`, `room_id` |
+| **`activity_logs`** | Audit trail pencatatan aktivitas sensitif pengguna (login, booking, refund, ubah jadwal, penukaran poin). | Foreign key `user_id` |
+| **`settings`** | Konfigurasi dinamis operasional (nama studio, nomor WhatsApp CS, alamat, jam operasional). | Kunci unik `key` |
+
+---
+
 ## ⚡ Fitur Utama
 
 ### 1. Portal Pelanggan (Customer Experience)
