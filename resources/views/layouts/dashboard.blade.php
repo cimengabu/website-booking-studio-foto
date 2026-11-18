@@ -216,6 +216,12 @@
 
     {{-- Bottom actions --}}
     <div class="px-3 py-4 border-t border-[#2D2B26] flex-shrink-0 space-y-1">
+        <a href="https://wa.me/6287825688608?text=Halo%20SnapSpace%20Studio%2C%20saya%20butuh%20bantuan%20terkait%20akun%2Fbooking%20saya."
+           target="_blank" rel="noopener"
+           class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+            <i class="fa-brands fa-whatsapp w-4 text-center text-base text-emerald-400"></i>
+            <span>Bantuan WhatsApp</span>
+        </a>
         <a href="{{ route('home') }}"
            class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400">
             <i class="fa-solid fa-arrow-left w-4 text-center text-sm"></i>

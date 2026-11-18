@@ -640,6 +640,15 @@
 
     <x-logout-confirm-modal />
 
+    <!-- Floating WhatsApp Direct Chat -->
+    <a href="https://wa.me/6287825688608?text=Halo%20SnapSpace%20Studio%2C%20saya%20ingin%20bertanya%20tentang%20booking%20foto."
+       target="_blank" rel="noopener"
+       class="fixed bottom-20 sm:bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20bd5a] text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all duration-300 hover:scale-105 group border-2 border-white/40"
+       title="Chat Admin via WhatsApp (+62 878-2568-8608)">
+        <i class="fa-brands fa-whatsapp text-2xl"></i>
+        <span class="hidden sm:inline text-xs font-bold font-sans tracking-wide">Chat WhatsApp</span>
+    </a>
+
     @stack('scripts')
 </body>
 </html>
