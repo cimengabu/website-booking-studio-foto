@@ -387,6 +387,29 @@ Aplikasi memiliki jadwal rutin otomatis yang terdaftar di `routes/console.php`:
 
 ---
 
+# SnapSpace
+
+## Website Preview
+
+![Homepage](screenshots/homepage.png)
+
+![Paket Harga](screenshots/paket-harga.png)
+
+![Ruangan Studio](screenshots/ruangan-studio.png)
+
+![Galeri Foto](screenshots/galeri-foto.png)
+
+![Tentang Kami](screenshots/tentang-kami.png)
+
+![Kontak](screenshots/kontak.png)
+
+![Login](screenshots/login.png)
+
+![Register](screenshots/register.png)
+
+![Admin Dashboard](screenshots/dashboard-admin.png)
+
+
 ## 📄 Lisensi
 
 Project ini dilisensikan di bawah lisensi [MIT License](LICENSE).  
