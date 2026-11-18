@@ -29,57 +29,73 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid (contoh: nama@domain.com).',
+            'password.required' => 'Kata sandi (password) wajib diisi.',
         ]);
 
         $email = strtolower(trim($request->input('email')));
         $user = User::where('email', $email)->first();
 
-        // --- Wrong password / user not found ---
-        if (! $user || ! Hash::check($request->input('password'), $user->password)) {
-            if ($user) {
-                $newCount = ($user->failed_login_count ?? 0) + 1;
-                $user->failed_login_count = $newCount;
+        // 1. Akun belum terdaftar
+        if (! $user) {
+            ActivityLog::record(
+                null,
+                'auth_login_unregistered',
+                "Percobaan login dengan email yang belum terdaftar: {$email}."
+            );
+
+            return back()->withErrors([
+                'email' => 'Akun dengan email ini belum terdaftar di SnapSpace. Silakan daftar terlebih dahulu.',
+            ])->onlyInput('email');
+        }
+
+        // 2. Kata sandi salah
+        if (! Hash::check($request->input('password'), $user->password)) {
+            $newCount = ($user->failed_login_count ?? 0) + 1;
+            $user->failed_login_count = $newCount;
+            $user->save();
+
+            // After MAX_ATTEMPTS_BEFORE_OTP failures → generate OTP
+            if ($newCount >= self::MAX_ATTEMPTS_BEFORE_OTP) {
+                $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $user->login_otp = $otp;
+                $user->login_otp_expires_at = now()->addMinutes(10);
+                $user->otp_verified_at = null;
                 $user->save();
 
-                // After MAX_ATTEMPTS_BEFORE_OTP failures → generate OTP
-                if ($newCount >= self::MAX_ATTEMPTS_BEFORE_OTP) {
-                    $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-                    $user->login_otp = $otp;
-                    $user->login_otp_expires_at = now()->addMinutes(10);
-                    $user->otp_verified_at = null;
-                    $user->save();
+                // Store pending email in session so OTP page knows which user
+                $request->session()->put('otp_pending_email', $email);
 
-                    // Store pending email in session so OTP page knows which user
-                    $request->session()->put('otp_pending_email', $email);
+                ActivityLog::record(
+                    $user->id,
+                    'auth_otp_sent',
+                    "Kode OTP dikirim ke nomor HP {$user->phone} setelah {$newCount}x gagal login."
+                );
 
-                    ActivityLog::record(
-                        $user->id,
-                        'auth_otp_sent',
-                        "Kode OTP dikirim ke nomor HP {$user->phone} setelah {$newCount}x gagal login."
-                    );
-
-                    // In a real app: send OTP via SMS gateway here
-                    // SmsGateway::send($user->phone, "Kode OTP SnapSpace: {$otp}");
-
-                    return redirect()->route('login.otp')
-                        ->with('otp_sent', true)
-                        ->with('masked_phone', $this->maskPhone($user->phone));
-                }
+                return redirect()->route('login.otp')
+                    ->with('otp_sent', true)
+                    ->with('masked_phone', $this->maskPhone($user->phone));
             }
 
             ActivityLog::record(
-                null,
+                $user->id,
                 'auth_login_failed',
-                "Percobaan login gagal untuk email: {$email}."
+                "Percobaan login gagal (kata sandi salah) untuk email: {$email}."
             );
 
-            $remaining = self::MAX_ATTEMPTS_BEFORE_OTP - ($user?->failed_login_count ?? 0);
+            $remaining = self::MAX_ATTEMPTS_BEFORE_OTP - $newCount;
+            $warningMsg = 'Kata sandi (password) yang Anda masukkan salah. Periksa kembali huruf besar dan kecilnya.';
+            if ($remaining > 0) {
+                $warningMsg .= " (Tersisa {$remaining}x percobaan lagi sebelum verifikasi OTP).";
+            }
 
             return back()->withErrors([
-                'email' => "Email atau password yang Anda masukkan salah. Tersisa {$remaining}x percobaan sebelum verifikasi HP diperlukan.",
+                'password' => $warningMsg,
             ])->onlyInput('email');
         }
 
@@ -275,11 +291,15 @@ class AuthController extends Controller
             'consent_pdp' => ['nullable'],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
+            'name.string' => 'Nama lengkap harus berupa teks.',
+            'name.max' => 'Nama lengkap maksimal 255 karakter.',
             'email.required' => 'Alamat email wajib diisi.',
-            'email.unique' => 'Email sudah terdaftar.',
+            'email.email' => 'Format alamat email tidak valid (contoh: nama@domain.com).',
+            'email.unique' => 'Alamat email ini sudah terdaftar. Silakan login atau gunakan email lain.',
             'phone.required' => 'Nomor WhatsApp / HP wajib diisi.',
-            'password.required' => 'Password wajib diisi.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.required' => 'Kata sandi (password) wajib diisi.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok. Pastikan kedua kolom kata sandi sama persis.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
         ]);
 
         $user = User::create([

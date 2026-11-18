@@ -431,8 +431,14 @@
                             </div>
                         </div>
 
-                        <button @click="goToSummary()" :disabled="!form.name || !form.phone"
-                                class="btn-gold btn-bounce w-full py-4 rounded-2xl text-white font-bold text-base mt-6 shadow-warm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <!-- Warning Alert when required fields are missing -->
+                        <div x-show="step3Error" x-cloak class="p-3.5 mt-4 rounded-2xl bg-danger/10 border border-danger/25 text-danger text-xs font-semibold flex items-center gap-2.5 shadow-xs">
+                            <i class="fa-solid fa-circle-exclamation text-base shrink-0"></i>
+                            <span x-text="step3Error"></span>
+                        </div>
+
+                        <button @click="goToSummary()"
+                                class="btn-gold btn-bounce w-full py-4 rounded-2xl text-white font-bold text-base mt-4 shadow-warm flex items-center justify-center gap-2 cursor-pointer">
                             Lanjut: Lihat Ringkasan <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
@@ -939,8 +945,19 @@ function bookingWizard(initRoomId, initPackageId) {
             }
         },
 
+        step3Error: '',
         goToSummary() {
-            if (!this.form.name || !this.form.phone) return;
+            this.step3Error = '';
+            if (!this.form.name || !this.form.name.trim()) {
+                this.step3Error = 'Nama Lengkap pemesan wajib diisi sebelum melanjutkan!';
+                document.getElementById('w_name')?.focus();
+                return;
+            }
+            if (!this.form.phone || !this.form.phone.trim()) {
+                this.step3Error = 'Nomor WhatsApp pemesan wajib diisi untuk pengiriman e-tiket!';
+                document.getElementById('w_phone')?.focus();
+                return;
+            }
             this.recalculate();
             this.step = 4;
         },

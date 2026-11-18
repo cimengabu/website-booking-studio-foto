@@ -140,11 +140,21 @@
 
             <!-- Flash Error Message -->
             @if($errors->any())
-                <div class="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs font-medium flex items-start gap-3">
+                <div class="p-4 rounded-2xl bg-danger/10 border border-danger/25 text-danger text-xs font-medium flex items-start gap-3 shadow-xs">
                     <i class="fa-solid fa-circle-exclamation text-base mt-0.5 shrink-0"></i>
-                    <div>
-                        <p class="font-bold">Gagal Masuk</p>
-                        <p class="mt-0.5">{{ $errors->first() }}</p>
+                    <div class="flex-1">
+                        <p class="font-bold text-sm">Peringatan Masuk Akun</p>
+                        <p class="mt-1 leading-relaxed text-xs">{{ $errors->first() }}</p>
+
+                        @if(str_contains($errors->first(), 'belum terdaftar'))
+                            <div class="mt-3 pt-2.5 border-t border-danger/20 flex items-center justify-between">
+                                <span class="text-xs text-danger font-medium">Belum punya akun?</span>
+                                <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-danger text-white font-bold text-xs hover:bg-rose-700 transition-colors shadow-xs">
+                                    <span>Daftar Akun Baru</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             @endif
@@ -163,24 +173,34 @@
 
                 <!-- Email -->
                 <div>
-                    <label for="email" class="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">Alamat Email</label>
+                    <label for="email" class="block text-xs font-bold text-ink-muted uppercase tracking-wider mb-2">
+                        Alamat Email <span class="text-danger">*</span>
+                    </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-light">
                             <i class="fa-regular fa-envelope text-sm"></i>
                         </div>
                         <input type="email" id="email" name="email" x-model="email"
-                               value="{{ $errors->any() ? old('email') : '' }}"
+                               value="{{ old('email') }}"
                                required autofocus
                                autocomplete="off"
-                               class="w-full pl-10 pr-4 py-3 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
+                               class="w-full pl-10 pr-4 py-3 rounded-xl border @error('email') border-danger/70 bg-danger/5 ring-2 ring-danger/20 @else border-cream-dark bg-white @enderror text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                placeholder="email@kamu.com">
                     </div>
+                    @error('email')
+                        <p class="text-xs text-danger mt-1.5 flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-circle-exclamation text-[11px] shrink-0"></i>
+                            <span>{{ $message }}</span>
+                        </p>
+                    @enderror
                 </div>
 
                 <!-- Password -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <label for="password" class="block text-xs font-bold text-ink-muted uppercase tracking-wider">Password</label>
+                        <label for="password" class="block text-xs font-bold text-ink-muted uppercase tracking-wider">
+                            Kata Sandi (Password) <span class="text-danger">*</span>
+                        </label>
                     </div>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-light">
@@ -188,13 +208,19 @@
                         </div>
                         <input :type="showPassword ? 'text' : 'password'" id="password" name="password" x-model="password" required
                                autocomplete="new-password"
-                               class="w-full pl-10 pr-10 py-3 rounded-xl border border-cream-dark bg-white text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
+                               class="w-full pl-10 pr-10 py-3 rounded-xl border @error('password') border-danger/70 bg-danger/5 ring-2 ring-danger/20 @else border-cream-dark bg-white @enderror text-sm text-ink placeholder-ink-light focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/15 transition-all shadow-xs"
                                placeholder="••••••••">
                         <button type="button" @click="showPassword = !showPassword"
                                 class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-ink-light hover:text-ink transition-colors">
                             <i class="fa-regular" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                         </button>
                     </div>
+                    @error('password')
+                        <p class="text-xs text-danger mt-1.5 flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-circle-exclamation text-[11px] shrink-0"></i>
+                            <span>{{ $message }}</span>
+                        </p>
+                    @enderror
                 </div>
 
                 <!-- Remember Me & Forgot Password -->
