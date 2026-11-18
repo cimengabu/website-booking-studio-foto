@@ -6,76 +6,89 @@
 @section('content')
 
 {{-- ── IMAGE GALLERY HERO ── --}}
-<section class="bg-cream-dark"
-         x-data="{ activeImg: 0, images: {{ json_encode($room->images->pluck('path')->toArray() ?: ['https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=1200']) }} }">
-
-    {{-- Main image --}}
-    <div class="relative aspect-[21/9] overflow-hidden bg-cream-dark max-h-[520px]">
-        <template x-for="(src, idx) in images" :key="idx">
-            <img :src="src" :alt="'{{ $room->name }} foto ' + (idx+1)"
-                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-                 :class="activeImg === idx ? 'opacity-100' : 'opacity-0'"
-                 loading="lazy">
-        </template>
-
-        {{-- Gradient for text readability --}}
-        <div class="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent pointer-events-none"></div>
-
-        {{-- Nav arrows (show if multiple images) --}}
-        @if($room->images->count() > 1)
-            <button @click="activeImg = (activeImg - 1 + images.length) % images.length"
-                    class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors flex items-center justify-center shadow-card">
-                <i class="fa-solid fa-chevron-left text-ink text-xs"></i>
-            </button>
-            <button @click="activeImg = (activeImg + 1) % images.length"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors flex items-center justify-center shadow-card">
-                <i class="fa-solid fa-chevron-right text-ink text-xs"></i>
-            </button>
-        @endif
-
-        {{-- Dots --}}
-        @if($room->images->count() > 1)
-            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                @foreach($room->images as $i => $img)
-                    <button @click="activeImg = {{ $i }}"
-                            class="w-2 h-2 rounded-full transition-all duration-200"
-                            :class="activeImg === {{ $i }} ? 'bg-white w-5' : 'bg-white/50'"></button>
-                @endforeach
-            </div>
-        @endif
-    </div>
-
-    {{-- Thumbnail strip --}}
-    @if($room->images->count() > 1)
-        <div class="bg-white border-b border-cream-dark py-3 overflow-x-auto">
-            <div class="flex gap-2 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-max sm:w-auto">
-                @foreach($room->images as $i => $img)
-                    <button @click="activeImg = {{ $i }}"
-                            class="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all duration-200"
-                            :class="activeImg === {{ $i }} ? 'border-gold' : 'border-transparent opacity-60 hover:opacity-100'">
-                        <img src="{{ $img->path }}" alt="" class="w-full h-full object-cover">
-                    </button>
-                @endforeach
-            </div>
-        </div>
-    @endif
-</section>
-
-{{-- ── BREADCRUMB ── --}}
-<div class="bg-white border-b border-cream-dark py-3">
+<section class="bg-cream pt-6 pb-2">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav class="flex items-center gap-2 text-xs text-ink-muted">
+        {{-- Breadcrumb --}}
+        <nav class="flex items-center gap-2 text-xs text-ink-muted mb-4" aria-label="Breadcrumb">
             <a href="{{ route('home') }}" class="hover:text-gold transition-colors">Beranda</a>
             <i class="fa-solid fa-chevron-right text-[9px]"></i>
             <a href="{{ route('rooms.index') }}" class="hover:text-gold transition-colors">Ruangan</a>
             <i class="fa-solid fa-chevron-right text-[9px]"></i>
             <span class="text-ink font-medium">{{ $room->name }}</span>
         </nav>
+
+        {{-- Main image card --}}
+        <div class="bg-white rounded-3xl border border-cream-dark shadow-card overflow-hidden"
+             x-data="{ activeImg: 0, images: {{ json_encode($room->images->pluck('path')->toArray() ?: ['https://images.unsplash.com/photo-1527061011665-3652c757a4d4?q=80&w=1200']) }} }">
+
+            <div class="relative w-full aspect-[16/9] sm:aspect-[2/1] lg:aspect-[2.2/1] overflow-hidden bg-stone-900 max-h-[500px]">
+                <template x-for="(src, idx) in images" :key="idx">
+                    <img :src="src" :alt="'{{ $room->name }} foto ' + (idx+1)"
+                         class="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500"
+                         :class="activeImg === idx ? 'opacity-100' : 'opacity-0'"
+                         loading="lazy">
+                </template>
+
+                {{-- Gradient for contrast --}}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
+
+                {{-- Badges --}}
+                <div class="absolute top-4 left-4 flex gap-2">
+                    <span class="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-bold border border-white/20">
+                        {{ $room->theme }}
+                    </span>
+                    @if($room->is_active)
+                        <span class="px-3.5 py-1.5 rounded-full bg-emerald-950/80 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-500/30 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Tersedia
+                        </span>
+                    @endif
+                </div>
+
+                {{-- Nav arrows --}}
+                @if($room->images->count() > 1)
+                    <button @click="activeImg = (activeImg - 1 + images.length) % images.length"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white text-ink transition-all flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <button @click="activeImg = (activeImg + 1) % images.length"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white text-ink transition-all flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                @endif
+
+                {{-- Dots --}}
+                @if($room->images->count() > 1)
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                        @foreach($room->images as $i => $img)
+                            <button @click="activeImg = {{ $i }}"
+                                    class="h-2 rounded-full transition-all duration-200"
+                                    :class="activeImg === {{ $i }} ? 'bg-gold w-6' : 'bg-white/60 w-2 hover:bg-white'"></button>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            {{-- Thumbnail strip --}}
+            @if($room->images->count() > 1)
+                <div class="p-3 bg-white border-t border-cream-dark overflow-x-auto">
+                    <div class="flex gap-2.5">
+                        @foreach($room->images as $i => $img)
+                            <button @click="activeImg = {{ $i }}"
+                                    class="w-20 h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all duration-200"
+                                    :class="activeImg === {{ $i }} ? 'border-gold shadow-sm scale-95' : 'border-transparent opacity-60 hover:opacity-100'">
+                                <img src="{{ $img->path }}" alt="" class="w-full h-full object-cover">
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
-</div>
+</section>
 
 {{-- ── MAIN CONTENT + STICKY SIDEBAR ── --}}
-<section class="py-12 bg-cream">
+<section class="py-10 bg-cream">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
