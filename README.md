@@ -391,22 +391,31 @@ Aplikasi memiliki jadwal rutin otomatis yang terdaftar di `routes/console.php`:
 
 ## Website Preview
 
+HOMEPAGE
 ![Homepage](screenshots/homepage.png)
 
+PAKET HARGA
 ![Paket Harga](screenshots/paket-harga.png)
 
+RUANGAN STUDIO
 ![Ruangan Studio](screenshots/ruangan-studio.png)
 
+GALERI FOTO
 ![Galeri Foto](screenshots/galeri-foto.png)
 
+TENTANG KAMI
 ![Tentang Kami](screenshots/tentang-kami.png)
 
+KONTAK
 ![Kontak](screenshots/kontak.png)
 
+LOGIN
 ![Login](screenshots/login.png)
 
+REGISTER
 ![Register](screenshots/register.png)
 
+DASHBOARD ADMIN
 ![Admin Dashboard](screenshots/dashboard-admin.png)
 
 
